@@ -45,6 +45,21 @@ svg.i{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-widt
 @keyframes sway1{from{transform:rotate(-26deg)}to{transform:rotate(8deg)}}
 @keyframes sway2{from{transform:rotate(26deg)}to{transform:rotate(-8deg)}}
 body[data-screen="setup"] .beam{opacity:.25}
+/* light show canvases: back = stage lights behind the app, front = flashes/sparkles over it */
+#lsBack{position:absolute;inset:0;width:100%;height:100%}
+#lsFront{position:fixed;inset:0;width:100%;height:100%;z-index:57;pointer-events:none}
+body.ls-spots .beam{display:none}
+.lights-pop{position:fixed;top:64px;right:max(16px,env(safe-area-inset-right,0px));width:min(400px,calc(100vw - 32px));max-height:calc(100vh - 80px);overflow:auto}
+.ls-presets{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.ls-presets .btn[aria-pressed="true"]{border-color:var(--gold);background:rgba(255,200,61,.18);color:var(--gold-2)}
+.ls-list{display:grid;gap:2px}
+.ls-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(130,155,255,.14)}
+.ls-row:last-child{border-bottom:0}
+.ls-row input{width:20px;height:20px;accent-color:var(--gold);cursor:pointer}
+.ls-row label{display:grid;cursor:pointer;line-height:1.25}
+.ls-row b{font-size:15px}
+.ls-row small{color:var(--muted);font-size:12.5px}
+.ls-row .btn{min-height:36px;padding:4px 12px}
 
 /* ---------- shell ---------- */
 .app{position:relative;z-index:1;height:100%;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}
@@ -466,7 +481,8 @@ body[data-screen="setup"] .toast{bottom:calc(84px + env(safe-area-inset-bottom,0
 }
 </style>
 
-<div class="spots" aria-hidden="true"><div class="beam b1"></div><div class="beam b2"></div></div>
+<div class="spots" aria-hidden="true"><div class="beam b1"></div><div class="beam b2"></div><canvas id="lsBack"></canvas></div>
+<canvas id="lsFront" aria-hidden="true"></canvas>
 
 <div class="app" id="app">
   <header class="topbar">
@@ -478,6 +494,7 @@ body[data-screen="setup"] .toast{bottom:calc(84px + env(safe-area-inset-bottom,0
       </div>
       <button type="button" class="icon-btn" id="btnHelp" data-act="help" data-i18n-aria="help"></button>
       <button type="button" class="icon-btn" id="btnSound" data-act="soundPanel" data-i18n-aria="spTitle" aria-expanded="false"></button>
+      <button type="button" class="icon-btn" id="btnLights" data-act="lightsPanel" data-i18n-aria="lsTitle" aria-expanded="false"><span data-ico="bulb"></span></button>
       <button type="button" class="icon-btn" id="btnFs" data-act="fullscreen" data-i18n-aria="fullscreen"></button>
       <button type="button" class="icon-btn" id="btnRestart" data-act="restart" data-i18n-aria="rsTitle" hidden></button>
       <button type="button" class="btn btn-sm" id="btnSetup" data-act="toSetup" hidden></button>
@@ -617,6 +634,13 @@ body[data-screen="setup"] .toast{bottom:calc(84px + env(safe-area-inset-bottom,0
   <button type="button" class="btn btn-sm" data-act="testSound"><span data-ico="vol"></span><span data-i18n="test"></span></button>
   <p class="note" id="spNote"></p>
 </div>
+<div class="pop lights-pop" id="lightsPop" hidden role="dialog" aria-labelledby="lsTitle">
+  <div class="pop-head"><h3 id="lsTitle" data-i18n="lsTitle"></h3><button type="button" class="icon-btn sm" data-act="closeLights" data-i18n-aria="close"><span data-ico="x"></span></button></div>
+  <div class="ls-presets" id="lsPresets"></div>
+  <div class="ls-list" id="lsList"></div>
+  <label class="check-row" id="lsForceRow" hidden><input type="checkbox" id="lsForce"><span data-i18n="lsForce"></span></label>
+  <p class="note" id="lsNote"></p>
+</div>
 
 <div class="splash" id="splash" hidden><div class="sp-round" id="spRound"></div><div class="sp-x2" id="spX2" hidden></div></div>
 <div class="strike-fx" id="strikeFx" hidden></div>
@@ -638,13 +662,14 @@ const uid = () => Math.random().toString(36).slice(2, 10);
 const clampInt = (v, lo, hi, d) => { const n = parseInt(v, 10); return Number.isFinite(n) ? Math.min(hi, Math.max(lo, n)) : d; };
 const reduceMotion = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
 const MAX_ROUNDS = 30, MAX_ANSWERS = 20, MAX_HISTORY = 80;
-const KEY = { config:'feud.v1.config', game:'feud.v1.game', sets:'feud.v1.sets', audio:'feud.v1.audio', screen:'feud.v1.screen', library:'feud.v1.library', classes:'feud.v1.classes', sheet:'feud.v1.sheet', sheetCache:'feud.v1.sheetcache' };
+const KEY = { config:'feud.v1.config', game:'feud.v1.game', sets:'feud.v1.sets', audio:'feud.v1.audio', screen:'feud.v1.screen', library:'feud.v1.library', classes:'feud.v1.classes', sheet:'feud.v1.sheet', sheetCache:'feud.v1.sheetcache', lights:'feud.v1.lights' };
 const LEVELS = ['starters', 'movers', 'flyers', 'ket'];
 const guards = {};
 function guard(k, ms){ const n = performance.now(); if (guards[k] && n - guards[k] < ms) return false; guards[k] = n; return true; }
 
 const ICON = {
   help:'<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><path d="M9.3 9.2a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.4-2.7 4"/><path d="M12 17.4h.01"/></svg>',
+  bulb:'<svg class="i" viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1 2V16h5.2v-.2c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/><path d="M4 4l1.5 1.5M20 4l-1.5 1.5M2 11h2M20 11h2"/></svg>',
   vol:'<svg class="i" viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4.5 4.5 0 0 1 0 6"/><path d="M18.2 6.3a8.3 8.3 0 0 1 0 11.4"/></svg>',
   mute:'<svg class="i" viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></svg>',
   fs:'<svg class="i" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>',
@@ -740,6 +765,16 @@ en:{
   soundNote:'Browsers only allow sound after a click, so sound starts with your first click.', noAudio:'This browser can’t play generated sound. The game works without it.',
   muted:'Sound muted.', unmuted:'Sound on.', fsFail:'Fullscreen isn’t available in this view. Open the game in its own browser tab and try again.',
   stealToast:'{team} steals {n} points!', clearedToast:'Board cleared!', topAnswer:'TOP ANSWER!', dflt:'(default)', bonusCol:'Bonus',
+  lsTitle:'Light show', lsOff:'Off', lsSoft:'Gentle', lsMax:'Full blast', lsTry:'Try', lsForce:'Run lights even with “reduce motion” on',
+  lsNote:'Press Try to preview an effect. Lights run during the game; the results screen gets the full party.', lsRm:'This computer asks for less motion, so lights and confetti are off. Tick the box above to run them anyway.',
+  lsN_spot:'Stage spotlights', lsD_spot:'Sweeping beams; team colour on the answering team, gold in bonus rounds',
+  lsN_wash:'Team glow', lsD_wash:'The answering team’s side glows and pulses when they score',
+  lsN_flash:'Camera flash', lsD_flash:'A white flash on the top answer, a steal and the winner',
+  lsN_rays:'Golden rays', lsD_rays:'Spinning rays behind the top answer and the winner',
+  lsN_alarm:'Red alarm', lsD_alarm:'Red edges on a strike; a spinning beacon at three strikes',
+  lsN_dust:'Gold dust', lsD_dust:'Floating sparkles in bonus rounds and on the results screen',
+  lsN_disco:'Disco party', lsD_disco:'Colourful moving lights when the board is cleared, a steal works and at the end',
+  lsN_pulse:'Timer heartbeat', lsD_pulse:'The screen edges pulse red in the last three seconds',
   lv_starters:'Starters', lv_movers:'Movers', lv_flyers:'Flyers', lv_ket:'KET (A2 Key)',
   clsTitle:'Class & question library', fClass:'Class', noClass:'— No class —', manageClasses:'Classes', importExcel:'Import Excel', openLibrary:'Question library', libCount:'{n} sets in the library',
   clsPick:'Choose a class to see the question sets for its level.', clsNone:'No classes yet. Press Classes to add one, for example 1A · Starters.',
@@ -838,6 +873,16 @@ vi:{
   soundNote:'Trình duyệt chỉ cho phát âm thanh sau khi bạn bấm chuột, nên âm thanh bắt đầu từ lần bấm đầu tiên.', noAudio:'Trình duyệt này không phát được âm thanh. Trò chơi vẫn chạy bình thường.',
   muted:'Đã tắt âm thanh.', unmuted:'Đã bật âm thanh.', fsFail:'Không bật được toàn màn hình ở đây. Hãy mở trò chơi trong một tab riêng rồi thử lại.',
   stealToast:'{team} cướp được {n} điểm!', clearedToast:'Đã mở hết bảng!', topAnswer:'TOP ANSWER!', dflt:'(mặc định)', bonusCol:'Nhân điểm',
+  lsTitle:'Hiệu ứng ánh sáng', lsOff:'Tắt', lsSoft:'Nhẹ nhàng', lsMax:'Đã đời', lsTry:'Thử', lsForce:'Vẫn chạy ánh sáng khi máy bật “giảm chuyển động”',
+  lsNote:'Bấm Thử để xem trước từng hiệu ứng. Ánh sáng chạy trong lúc chơi; màn kết quả được “quẩy” hết cỡ.', lsRm:'Máy này đang bật giảm chuyển động nên ánh sáng và pháo giấy bị tắt. Đánh dấu ô phía trên để vẫn chạy.',
+  lsN_spot:'Đèn pha sân khấu', lsD_spot:'Đèn quét qua lại; đổi màu theo đội đang trả lời, vàng ở vòng nhân điểm',
+  lsN_wash:'Hào quang đội', lsD_wash:'Phía đội đang trả lời sáng lên, bừng sáng khi ghi điểm',
+  lsN_flash:'Chớp đèn máy ảnh', lsD_flash:'Chớp trắng khi mở ô điểm cao nhất, cướp điểm, đội thắng',
+  lsN_rays:'Tia hào quang vàng', lsD_rays:'Tia sáng xoay quanh ô điểm cao nhất và tên đội thắng',
+  lsN_alarm:'Đèn báo đỏ', lsD_alarm:'Viền màn hình đỏ khi sai; đèn xoay cảnh báo khi đủ 3 lần sai',
+  lsN_dust:'Bụi vàng lấp lánh', lsD_dust:'Hạt sáng bay lơ lửng ở vòng nhân điểm và màn kết quả',
+  lsN_disco:'Đèn disco', lsD_disco:'Đèn màu chạy khắp màn khi mở hết bảng, cướp điểm thành công và lúc kết thúc',
+  lsN_pulse:'Nhịp tim đồng hồ', lsD_pulse:'Viền màn hình đập đỏ trong 3 giây cuối',
   lv_starters:'Starters', lv_movers:'Movers', lv_flyers:'Flyers', lv_ket:'KET (A2 Key)',
   clsTitle:'Lớp học & thư viện câu hỏi', fClass:'Lớp', noClass:'— Chưa chọn lớp —', manageClasses:'Quản lý lớp', importExcel:'Nhập Excel', openLibrary:'Thư viện câu hỏi', libCount:'Thư viện có {n} bộ',
   clsPick:'Chọn một lớp để xem các bộ câu hỏi của cấp độ lớp đó.', clsNone:'Chưa có lớp nào. Bấm Quản lý lớp để thêm, ví dụ 1A · Starters.',
@@ -1108,7 +1153,7 @@ function setTurn(tm){
   if (!game) return;
   if (game.turn === tm) { pulsePodium(tm); return; }
   push({k:'turn'}); game.turn = tm; commit();
-  Sound.fx('blip'); pulsePodium(tm); toast(t('turnTo', {team:teamName(tm)}));
+  Sound.fx('blip'); Lights.fire('turn', {team:tm}); pulsePodium(tm); toast(t('turnTo', {team:teamName(tm)}));
 }
 function revealTile(i){
   if (!game || screen !== 'game') return;
@@ -1126,9 +1171,10 @@ function revealTile(i){
   const top = isTopAnswer(r, i);
   if (r.double) { Sound.fx('revealDouble'); flashX2(i); } else Sound.fx('reveal');
   if (top) { Sound.fx('topAnswer'); flashTop(i); }
+  Lights.fire('reveal', {team:tm, double:r.double}); if (top) Lights.fire('top', {i});
   gainChip(tm, pts); tileGain(i, pts, r.double);
   tileBurst(i, top ? 70 : r.double ? 40 : 18, 420);
-  if (r.revealed.every(Boolean)) setTimeout(() => { Sound.fx('cleared'); toast(t('clearedToast')); Confetti.rain(1600); }, top ? 1500 : 750);
+  if (r.revealed.every(Boolean)) setTimeout(() => { Sound.fx('cleared'); toast(t('clearedToast')); Confetti.rain(1600); Lights.fire('cleared'); }, top ? 1500 : 750);
 }
 function isTopAnswer(r, i){ let mx = 0; r.answers.forEach(a => { if (a.points > mx) mx = a.points; }); return mx > 0 && r.answers[i].points === mx; }
 function revealNext(){
@@ -1152,7 +1198,7 @@ function strike(){
   r.strikes++;
   if (r.strikes === 3) r.steal = other(game.turn);
   commit();
-  showStrikeFx(r.strikes); Sound.fx('strike'); shakeBoard();
+  showStrikeFx(r.strikes); Sound.fx('strike'); shakeBoard(); Lights.fire('strike', {n:r.strikes});
   if (r.strikes === 3) setTimeout(() => Sound.fx('stealAlert'), 800);
 }
 function stealSuccess(){
@@ -1165,7 +1211,7 @@ function stealSuccess(){
   hidden.forEach(i => { r.revealed[i] = true; r.by[i] = tm; });
   r.earned[tm] += pts; r.stealResult = 'success'; r.stealPts = pts;
   commit();
-  Sound.fx('steal'); gainChip(tm, pts); toast(t('stealToast', {team:teamName(tm), n:pts}));
+  Sound.fx('steal'); Lights.fire('steal', {team:tm}); gainChip(tm, pts); toast(t('stealToast', {team:teamName(tm), n:pts}));
   const pod = $(tm === 'A' ? '#podA' : '#podB').getBoundingClientRect();
   Confetti.burst(pod.left + pod.width / 2, pod.top + pod.height / 2, 90);
   if (r.double) hidden.forEach((i, k) => setTimeout(() => flashX2(i), k * 140));
@@ -1174,7 +1220,7 @@ function stealFail(){
   const r = cur();
   if (!stealPending(r)) return;
   push({k:'steal'}); r.stealResult = 'fail'; r.stealPts = 0; commit();
-  Sound.fx('buzzer'); shakeBoard();
+  Sound.fx('buzzer'); shakeBoard(); Lights.fire('stealFail');
 }
 function swapSteal(){
   const r = cur();
@@ -1343,7 +1389,7 @@ function renderGame(){
   $('#cbUndo').disabled = !game.history.length;
   const last = game.index >= game.rounds.length - 1;
   $('#nextLabel').textContent = last ? t('finish') : t('nextRound');
-  updateManualPanel();
+  updateManualPanel(); Lights.kick();
   updateBrand();
 }
 function pulsePodium(tm){ const p = $(tm === 'A' ? '#podA' : '#podB'); p.animate && p.animate([{transform:'translateY(-4px) scale(1)'},{transform:'translateY(-4px) scale(1.05)'},{transform:'translateY(-4px) scale(1)'}], {duration:350}); }
@@ -1389,7 +1435,7 @@ function showSplash(r){
   sp.hidden = true; void sp.offsetWidth; sp.hidden = false;
   clearTimeout(showSplash.t); showSplash.t = setTimeout(() => { sp.hidden = true; }, 1950);
 }
-function introRound(){ if (!game || screen !== 'game') return; const r = cur(); showSplash(r); Sound.fx(r.double ? 'doubleIntro' : 'roundIntro'); }
+function introRound(){ if (!game || screen !== 'game') return; const r = cur(); showSplash(r); Sound.fx(r.double ? 'doubleIntro' : 'roundIntro'); Lights.fire('round', {double:r.double}); }
 
 let cdState = null;
 function countdown(then){
@@ -1418,12 +1464,12 @@ function stopTimer(){ Timer.running = false; cancelAnimationFrame(Timer.raf); cl
 function tickTimer(){
   if (!Timer.running) return;
   const left = Math.max(0, Timer.end - performance.now()), sec = Math.ceil(left / 1000);
-  if (sec !== Timer.last) { Timer.last = sec; if (sec > 0) Sound.fx(sec <= 3 ? 'tickHi' : 'tick'); }
+  if (sec !== Timer.last) { Timer.last = sec; if (sec > 0) Sound.fx(sec <= 3 ? 'tickHi' : 'tick'); if (sec > 0 && sec <= 3) Lights.fire('tick'); }
   const el = $('#timer'); el.classList.toggle('low', sec <= 3);
   $('#timerNum').textContent = sec;
   $('#timerArc').setAttribute('stroke-dashoffset', (119.38 * (1 - left / (Timer.total * 1000))).toFixed(2));
   if (left <= 0) {
-    Timer.running = false; el.classList.add('done'); Sound.fx('timeUp');
+    Timer.running = false; el.classList.add('done'); Sound.fx('timeUp'); Lights.fire('timeUp');
     const tu = $('#timeUp'); tu.textContent = t('timeUp'); tu.hidden = false; setTimeout(() => { tu.hidden = true; }, 1600);
     Timer.hideT = setTimeout(() => { el.hidden = true; el.classList.remove('done', 'low'); }, 2600);
     return;
@@ -1461,7 +1507,7 @@ function renderResults(){
   $('#resTable').innerHTML = `<table class="tbl"><thead><tr><th>${esc(t('roundCol'))}</th><th>${esc(t('questionCol'))}</th><th class="num">${esc(teamName('A'))}</th><th class="num">${esc(teamName('B'))}</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><td></td><td>${esc(t('totalRow'))}</td><td class="num">${sa}</td><td class="num">${sb}</td></tr></tfoot></table>`;
   updateBrand();
 }
-function celebrate(){ Sound.fx('fanfare'); setTimeout(() => Confetti.rain(5200), 250); }
+function celebrate(){ Sound.fx('fanfare'); setTimeout(() => Lights.fire('win'), 3300); setTimeout(() => Confetti.rain(5200), 250); }
 function resultsText(){
   const sa = score('A'), sb = score('B'), w = sa > sb ? 'A' : sb > sa ? 'B' : null;
   const d = new Date(game.startedAt).toLocaleString(LANG === 'vi' ? 'vi-VN' : 'en-GB');
@@ -1704,6 +1750,7 @@ function setScreen(name){
   if (name === 'setup') { renderSetup(); keepAwake(false); }
   if (name === 'game') { boardSig = ''; renderGame(); keepAwake(true); }
   if (name === 'results') { renderResults(); keepAwake(true); }
+  Lights.kick();
   updateBrand();
 }
 
@@ -1748,12 +1795,12 @@ function confirmBox(o){
 }
 let toastT = 0;
 function toast(msg, kind){ const el = $('#toast'); el.textContent = msg; el.className = 'toast show' + (kind ? ' ' + kind : ''); clearTimeout(toastT); toastT = setTimeout(() => { el.className = 'toast'; }, 2800); }
-function closePops(){ const s = $('#soundPop'); if (s && !s.hidden) closeSoundPanel(); const p = $('#pointsPop'); if (p && !p.hidden) togglePoints(false); }
+function closePops(){ const s = $('#soundPop'); if (s && !s.hidden) closeSoundPanel(); const l = $('#lightsPop'); if (l && !l.hidden) closeLightsPanel(); const p = $('#pointsPop'); if (p && !p.hidden) togglePoints(false); }
 function releaseFocus(pop, trigger){
   const a = document.activeElement;
   if (a && pop.contains(a)) { if (trigger && trigger.offsetParent !== null) trigger.focus({preventScroll:true}); else a.blur(); }
 }
-function anyPopOpen(){ return !$('#soundPop').hidden || !$('#pointsPop').hidden; }
+function anyPopOpen(){ return !$('#soundPop').hidden || !$('#lightsPop').hidden || !$('#pointsPop').hidden; }
 
 /* error list */
 function showErrorList(errors){
@@ -2686,7 +2733,7 @@ function updateSoundUI(){
   $('#spMusicVal').textContent = Math.round(s.music * 100) + '%'; $('#spSfxVal').textContent = Math.round(s.sfx * 100) + '%';
   $('#spNote').textContent = Sound.supported ? t('soundNote') : t('noAudio');
 }
-function toggleSoundPanel(){ const p = $('#soundPop'); if (!p.hidden) { closeSoundPanel(); return; } togglePoints(false); p.hidden = false; $('#btnSound').setAttribute('aria-expanded', 'true'); updateSoundUI(); }
+function toggleSoundPanel(){ const p = $('#soundPop'); if (!p.hidden) { closeSoundPanel(); return; } togglePoints(false); if (!$('#lightsPop').hidden) closeLightsPanel(); p.hidden = false; $('#btnSound').setAttribute('aria-expanded', 'true'); updateSoundUI(); }
 function closeSoundPanel(){ const p = $('#soundPop'); releaseFocus(p, $('#btnSound')); p.hidden = true; $('#btnSound').setAttribute('aria-expanded', 'false'); }
 function toggleMute(){ Sound.setMuted(!Sound.st.muted); updateSoundUI(); toast(Sound.st.muted ? t('muted') : t('unmuted')); }
 
@@ -2713,11 +2760,204 @@ const Confetti = (() => {
     raf = requestAnimationFrame(tick);
   }
   return {
-    burst(x, y, n){ if (reduceMotion) return; size(); for (let i = 0; i < (n || 80); i++) spawn(x, y, (Math.random() - 0.5) * 16, -Math.random() * 13 - 4); loop(); },
-    rain(ms){ if (reduceMotion) return; size(); rainUntil = performance.now() + ms; const n0 = Math.round(Math.min(120, W / 9)); for (let i = 0; i < n0; i++) spawn(Math.random() * W, H * 0.35, (Math.random() - 0.5) * 18, -Math.random() * 14 - 4); loop(); },
+    burst(x, y, n){ if (!Lights.allowed()) return; size(); for (let i = 0; i < (n || 80); i++) spawn(x, y, (Math.random() - 0.5) * 16, -Math.random() * 13 - 4); loop(); },
+    rain(ms){ if (!Lights.allowed()) return; size(); rainUntil = performance.now() + ms; const n0 = Math.round(Math.min(120, W / 9)); for (let i = 0; i < n0; i++) spawn(Math.random() * W, H * 0.35, (Math.random() - 0.5) * 18, -Math.random() * 14 - 4); loop(); },
     clear(){ parts = []; rainUntil = 0; if (raf) { cancelAnimationFrame(raf); raf = 0; } cx.setTransform(1, 0, 0, 1, 0, 0); cx.clearRect(0, 0, cv.width, cv.height); }
   };
 })();
+
+/* ================= light show (canvas; JS-driven so each effect can be switched on its own) ================= */
+const Lights = (() => {
+  const LIST = ['spot', 'wash', 'flash', 'rays', 'alarm', 'dust', 'disco', 'pulse'];
+  const PRESETS = { off:[], soft:['spot', 'wash', 'rays', 'dust'], max:LIST };
+  const saved = store.get(KEY.lights) || {};
+  const st = { on:{}, force:!!saved.force };
+  LIST.forEach(k => { st.on[k] = saved.on && typeof saved.on[k] === 'boolean' ? saved.on[k] : true; });
+  const save = () => store.set(KEY.lights, st);
+  const allowed = () => !reduceMotion || st.force;
+  const act = k => st.on[k] && allowed();
+  const C = { a:[60,211,255], b:[255,99,212], gold:[255,200,61], violet:[170,120,255], red:[255,46,72], white:[255,255,255] };
+  const DISCO = [[255,70,120],[60,211,255],[255,200,61],[120,255,140],[190,110,255],[255,140,40]];
+  const back = $('#lsBack'), front = $('#lsFront'), bx = back.getContext('2d'), fx = front.getContext('2d');
+  let W = 0, H = 0, raf = 0, last = 0, ev = [], dust = [];
+  const SCALE = 0.5;
+  function size(){
+    const w = window.innerWidth, h = window.innerHeight;
+    if (w === W && h === H) return; W = w; H = h;
+    [back, front].forEach(c => { c.width = Math.round(W * SCALE); c.height = Math.round(H * SCALE); });
+  }
+  const rgba = (c, a) => `rgba(${c[0]},${c[1]},${c[2]},${Math.max(0, Math.min(1, a)).toFixed(3)})`;
+  const mix = (c1, c2, k) => c1.map((v, i) => Math.round(v + (c2[i] - v) * k));
+  const gameOn = () => screen === 'game' && !!game;
+  const curDouble = () => gameOn() && !!cur().double;
+  const demoing = k => ev.some(e => e.fx === k && e.kind === 'demo');
+  function want(k){
+    if (!act(k) && !demoing(k)) return false;
+    if (demoing(k)) return true;
+    if (k === 'spot' || k === 'wash') return gameOn();
+    if (k === 'dust') return curDouble() || screen === 'results';
+    if (k === 'rays' || k === 'disco') return screen === 'results';
+    return false;
+  }
+  function add(e){ e.t0 = performance.now(); ev.push(e); kick(); }
+  function kick(){
+    document.body.classList.toggle('ls-spots', want('spot'));
+    if (!raf && !document.hidden) raf = requestAnimationFrame(frame);
+  }
+  function frame(now){
+    raf = 0;
+    if (now - last < 30) { raf = requestAnimationFrame(frame); return; }
+    last = now; size();
+    ev = ev.filter(e => now - e.t0 < e.dur);
+    const t = now / 1000;
+    bx.setTransform(SCALE, 0, 0, SCALE, 0, 0); fx.setTransform(SCALE, 0, 0, SCALE, 0, 0);
+    bx.clearRect(0, 0, W, H); fx.clearRect(0, 0, W, H);
+    bx.globalCompositeOperation = fx.globalCompositeOperation = 'lighter';
+    const live = LIST.some(want) || ev.some(e => act(e.fx) || e.kind === 'demo');
+    if (want('spot')) drawSpots(t, now);
+    if (want('wash')) drawWash(t, now);
+    if (want('dust')) drawDust(t);
+    if (want('disco')) drawDisco(t, 0.9);
+    if (want('rays') && screen === 'results') { const w = $('#resWinner'); if (w) { const r = w.getBoundingClientRect(); drawRays(r.left + r.width / 2, r.top + r.height / 2, Math.max(W, H) * 0.55, t, 0.8); } }
+    ev.forEach(e => {
+      if (!act(e.fx) && e.kind !== 'demo') return;
+      const p = (now - e.t0) / e.dur, env = Math.min(1, p * 6, (1 - p) * 3);
+      if (e.fx === 'rays' && e.kind !== 'demo') drawRays(e.x, e.y, e.r, t, env);
+      else if (e.fx === 'rays') drawRays(W / 2, H / 2, Math.max(W, H) * 0.5, t, env);
+      else if (e.fx === 'flash') { fx.globalCompositeOperation = 'source-over'; fx.fillStyle = rgba(C.white, 0.6 * Math.pow(1 - p, 2)); fx.fillRect(0, 0, W, H); fx.globalCompositeOperation = 'lighter'; }
+      else if (e.fx === 'alarm') { const ph = (p * (e.beats || 1)) % 1; vignette(C.red, 0.55 * Math.sin(Math.PI * ph)); if (e.beacon) beacon(t, env); }
+      else if (e.fx === 'pulse') vignette(C.red, 0.42 * Math.sin(Math.PI * p));
+      else if (e.fx === 'disco' && e.kind !== 'demo') drawDisco(t, env);
+    });
+    if (live || ev.length) raf = requestAnimationFrame(frame);
+    else { document.body.classList.remove('ls-spots'); }
+  }
+  function tint(){
+    let c = null, k = 0; const now = performance.now();
+    ev.forEach(e => { if (e.fx === 'spot' && e.color) { const p = (now - e.t0) / e.dur, s = 1 - p; if (s > k) { k = s; c = e.color; } } });
+    return { c, k };
+  }
+  function drawSpots(t, now){
+    let base = [C.a, C.violet, C.violet, C.b];
+    if (gameOn()) {
+      if (curDouble()) base = [C.gold, C.violet, C.gold, C.violet];
+      else { const tc = game.turn === 'B' ? C.b : C.a; base = [tc, C.violet, tc, C.violet]; }
+    }
+    const tn = tint(), fast = ev.some(e => e.fx === 'spot' && e.fast);
+    const spd = fast ? 2.6 : 0.45, xs = [0.08, 0.34, 0.66, 0.92];
+    xs.forEach((fxp, i) => {
+      const col = tn.c ? mix(base[i], tn.c, Math.min(1, tn.k * 1.4)) : base[i];
+      const ang = Math.sin(t * spd * (1 + i * 0.17) + i * 1.7) * 0.5 + (fxp - 0.5) * -0.6;
+      const ox = W * fxp, oy = -H * 0.04, len = H * 1.35, half = 0.13;
+      const a1 = Math.PI / 2 + ang - half, a2 = Math.PI / 2 + ang + half;
+      const g = bx.createLinearGradient(ox, oy, ox + Math.cos(Math.PI / 2 + ang) * len, oy + Math.sin(Math.PI / 2 + ang) * len);
+      const alpha = 0.22 + tn.k * 0.25;
+      g.addColorStop(0, rgba(col, alpha)); g.addColorStop(0.55, rgba(col, alpha * 0.35)); g.addColorStop(1, rgba(col, 0));
+      bx.fillStyle = g; bx.beginPath(); bx.moveTo(ox, oy);
+      bx.lineTo(ox + Math.cos(a1) * len, oy + Math.sin(a1) * len); bx.lineTo(ox + Math.cos(a2) * len, oy + Math.sin(a2) * len); bx.closePath(); bx.fill();
+      const h = bx.createRadialGradient(ox, oy + 6, 0, ox, oy + 6, 60); h.addColorStop(0, rgba(col, 0.55)); h.addColorStop(1, rgba(col, 0));
+      bx.fillStyle = h; bx.fillRect(ox - 60, oy - 54, 120, 120);
+    });
+  }
+  function drawWash(t, now){
+    const tm = gameOn() ? game.turn : (Math.floor(t / 1.5) % 2 ? 'B' : 'A');
+    const col = tm === 'B' ? C.b : C.a, x = tm === 'B' ? W : 0;
+    let boost = 0; ev.forEach(e => { if (e.fx === 'wash' && e.kind === 'pulse' && e.team === tm) boost = Math.max(boost, 1 - (now - e.t0) / e.dur); });
+    const a = 0.16 + Math.sin(t * 1.6) * 0.03 + boost * 0.35, r = Math.max(W, H) * (0.55 + boost * 0.2);
+    const g = bx.createRadialGradient(x, H * 0.55, 0, x, H * 0.55, r); g.addColorStop(0, rgba(col, a)); g.addColorStop(1, rgba(col, 0));
+    bx.fillStyle = g; bx.fillRect(0, 0, W, H);
+  }
+  function drawDust(t){
+    const n = Math.round(Math.min(70, W / 18)), cols = screen === 'results' ? DISCO.concat([C.gold, C.gold]) : [C.gold, [255,236,170], C.white];
+    while (dust.length < n) dust.push({ x:Math.random() * W, y:H + Math.random() * H * 0.3, v:12 + Math.random() * 30, s:1 + Math.random() * 2.4, ph:Math.random() * 6, c:cols[Math.random() * cols.length | 0] });
+    dust.forEach(d => {
+      d.y -= d.v / 30; d.x += Math.sin(t + d.ph) * 0.3;
+      if (d.y < -10) { d.y = H + 10; d.x = Math.random() * W; }
+      const tw = 0.35 + 0.65 * Math.abs(Math.sin(t * 2.2 + d.ph)), r = d.s * 4;
+      const g = fx.createRadialGradient(d.x, d.y, 0, d.x, d.y, r); g.addColorStop(0, rgba(d.c, 0.9 * tw)); g.addColorStop(1, rgba(d.c, 0));
+      fx.fillStyle = g; fx.fillRect(d.x - r, d.y - r, r * 2, r * 2);
+      fx.fillStyle = rgba(C.white, 0.8 * tw); fx.fillRect(d.x - d.s * 1.6, d.y - 0.5, d.s * 3.2, 1); fx.fillRect(d.x - 0.5, d.y - d.s * 1.6, 1, d.s * 3.2);
+    });
+  }
+  function drawDisco(t, env){
+    DISCO.concat(DISCO).forEach((c, i) => {
+      const x = W * (0.5 + 0.45 * Math.sin(t * (0.7 + i * 0.09) + i * 2.1)), y = H * (0.5 + 0.42 * Math.cos(t * (0.55 + i * 0.07) + i * 1.3)), r = Math.min(W, H) * 0.16;
+      const g = fx.createRadialGradient(x, y, 0, x, y, r); g.addColorStop(0, rgba(c, 0.22 * env)); g.addColorStop(1, rgba(c, 0));
+      fx.fillStyle = g; fx.fillRect(x - r, y - r, r * 2, r * 2);
+    });
+  }
+  function drawRays(x, y, R, t, env){
+    const n = 18;
+    for (let i = 0; i < n; i++) {
+      const a = i * Math.PI * 2 / n + t * 0.6, w = 0.07;
+      const g = fx.createRadialGradient(x, y, 0, x, y, R); g.addColorStop(0, rgba(C.gold, 0.32 * env)); g.addColorStop(0.5, rgba([255,236,170], 0.12 * env)); g.addColorStop(1, rgba(C.gold, 0));
+      fx.fillStyle = g; fx.beginPath(); fx.moveTo(x, y); fx.lineTo(x + Math.cos(a - w) * R, y + Math.sin(a - w) * R); fx.lineTo(x + Math.cos(a + w) * R, y + Math.sin(a + w) * R); fx.closePath(); fx.fill();
+    }
+  }
+  function vignette(col, a){
+    if (a <= 0) return;
+    const g = fx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.32, W / 2, H / 2, Math.hypot(W, H) * 0.55);
+    g.addColorStop(0, rgba(col, 0)); g.addColorStop(1, rgba(col, a));
+    fx.fillStyle = g; fx.fillRect(0, 0, W, H);
+  }
+  function beacon(t, env){
+    const x = W / 2, y = 0, R = Math.hypot(W, H), a = t * 7;
+    [a, a + Math.PI].forEach(b => {
+      const g = fx.createRadialGradient(x, y, 0, x, y, R); g.addColorStop(0, rgba(C.red, 0.4 * env)); g.addColorStop(1, rgba(C.red, 0));
+      fx.fillStyle = g; fx.beginPath(); fx.moveTo(x, y); fx.lineTo(x + Math.cos(b - 0.22) * R, y + Math.sin(b - 0.22) * R); fx.lineTo(x + Math.cos(b + 0.22) * R, y + Math.sin(b + 0.22) * R); fx.closePath(); fx.fill();
+    });
+  }
+  function rectOf(i){ const tl = $(`#board .tile[data-i="${i}"]`); if (!tl) return null; const r = tl.getBoundingClientRect(); return { x:r.left + r.width / 2, y:r.top + r.height / 2, r:Math.max(r.width, r.height) * 1.6 }; }
+  /* game events -> effects (each tagged with the effect it belongs to; drawn only while that effect is on) */
+  function fire(name, o){
+    o = o || {};
+    if (!allowed() && name !== 'demo') return;
+    switch (name) {
+      case 'reveal': add({ fx:'wash', kind:'pulse', team:o.team, dur:1100 }); add({ fx:'spot', color:o.double ? C.gold : C.white, dur:700 }); break;
+      case 'top': { const r = rectOf(o.i); if (r) add({ fx:'rays', x:r.x, y:r.y, r:r.r, dur:2800 }); add({ fx:'flash', dur:320 }); add({ fx:'spot', color:C.gold, dur:1800, fast:true }); break; }
+      case 'strike': if (o.n === 3) add({ fx:'alarm', dur:1800, beats:3, beacon:true }); else add({ fx:'alarm', dur:650 }); add({ fx:'spot', color:C.red, dur:800 }); break;
+      case 'stealFail': add({ fx:'alarm', dur:900 }); add({ fx:'spot', color:C.red, dur:900 }); break;
+      case 'steal': add({ fx:'flash', dur:320 }); add({ fx:'disco', dur:3200 }); add({ fx:'wash', kind:'pulse', team:o.team, dur:1600 }); add({ fx:'spot', color:o.team === 'B' ? C.b : C.a, dur:1800, fast:true }); break;
+      case 'cleared': add({ fx:'disco', dur:2600 }); add({ fx:'spot', color:C.gold, dur:1500, fast:true }); break;
+      case 'turn': add({ fx:'wash', kind:'pulse', team:o.team, dur:700 }); break;
+      case 'tick': add({ fx:'pulse', dur:420 }); break;
+      case 'timeUp': add({ fx:'alarm', dur:1000 }); break;
+      case 'round': add({ fx:'spot', color:o.double ? C.gold : C.white, dur:1600, fast:true }); break;
+      case 'win': add({ fx:'flash', dur:380 }); break;
+    }
+  }
+  function demo(k){
+    size(); const big = Math.max(W, H);
+    if (k === 'spot') { add({ fx:'spot', kind:'demo', dur:4200 }); add({ fx:'spot', color:C.gold, dur:2000, fast:true, kind:'demo' }); }
+    else if (k === 'wash') { add({ fx:'wash', kind:'demo', dur:3600 }); }
+    else if (k === 'flash') add({ fx:'flash', kind:'demo', dur:340 });
+    else if (k === 'rays') add({ fx:'rays', kind:'demo', dur:3000, x:W / 2, y:H / 2, r:big * 0.5 });
+    else if (k === 'alarm') add({ fx:'alarm', kind:'demo', dur:1800, beats:3, beacon:true });
+    else if (k === 'dust') add({ fx:'dust', kind:'demo', dur:4500 });
+    else if (k === 'disco') add({ fx:'disco', kind:'demo', dur:3500 });
+    else if (k === 'pulse') [0, 1000, 2000].forEach(d => setTimeout(() => add({ fx:'pulse', kind:'demo', dur:420 }), d));
+  }
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) kick(); });
+  window.addEventListener('resize', () => { W = 0; size(); });
+  return {
+    LIST, PRESETS, st, fire, demo, kick, allowed,
+    set(k, v){ st.on[k] = !!v; save(); kick(); },
+    preset(name){ const p = PRESETS[name] || []; LIST.forEach(k => { st.on[k] = p.includes(k); }); save(); kick(); },
+    presetName(){ return Object.keys(PRESETS).find(n => LIST.every(k => st.on[k] === PRESETS[n].includes(k))) || ''; },
+    setForce(v){ st.force = !!v; save(); kick(); }
+  };
+})();
+function renderLightsPanel(){
+  const pn = Lights.presetName();
+  $('#lsPresets').innerHTML = ['off', 'soft', 'max'].map(n => `<button type="button" class="btn btn-sm" data-act="lsPreset" data-p="${n}" aria-pressed="${pn === n}">${esc(t({off:'lsOff', soft:'lsSoft', max:'lsMax'}[n]))}</button>`).join('');
+  $('#lsList').innerHTML = Lights.LIST.map(k => `<div class="ls-row"><input type="checkbox" id="ls_${k}" data-ls="${k}" ${Lights.st.on[k] ? 'checked' : ''}><label for="ls_${k}"><b>${esc(t('lsN_' + k))}</b><small>${esc(t('lsD_' + k))}</small></label><button type="button" class="btn btn-sm" data-act="lsTry" data-k="${k}">${esc(t('lsTry'))}</button></div>`).join('');
+  $('#lsForceRow').hidden = !reduceMotion; $('#lsForce').checked = Lights.st.force;
+  $('#lsNote').textContent = reduceMotion && !Lights.st.force ? t('lsRm') : t('lsNote');
+}
+function toggleLightsPanel(){ const p = $('#lightsPop'); if (!p.hidden) { closeLightsPanel(); return; } if (!$('#soundPop').hidden) closeSoundPanel(); togglePoints(false); p.hidden = false; $('#btnLights').setAttribute('aria-expanded', 'true'); renderLightsPanel(); }
+function closeLightsPanel(){ const p = $('#lightsPop'); releaseFocus(p, $('#btnLights')); p.hidden = true; $('#btnLights').setAttribute('aria-expanded', 'false'); }
+$('#lsList').addEventListener('change', e => { const k = e.target.dataset && e.target.dataset.ls; if (!k) return; Lights.set(k, e.target.checked); renderLightsPanel(); if (e.target.checked) Lights.demo(k); });
+$('#lsForce').addEventListener('change', e => { Lights.setForce(e.target.checked); renderLightsPanel(); });
 
 /* ================= events ================= */
 document.addEventListener('pointerdown', () => Sound.unlock(), { capture:true });
@@ -2726,6 +2966,8 @@ document.addEventListener('keydown', () => Sound.unlock(), { capture:true });
 document.addEventListener('click', e => {
   const sp = $('#soundPop');
   if (!sp.hidden && !e.target.closest('#soundPop') && !e.target.closest('#btnSound')) closeSoundPanel();
+  const lp = $('#lightsPop');
+  if (!lp.hidden && !e.target.closest('#lightsPop') && !e.target.closest('#btnLights')) closeLightsPanel();
   const pp = $('#pointsPop');
   if (!pp.hidden && !e.target.closest('#pointsPop') && !e.target.closest('#cbPoints')) togglePoints(false);
   const tile = e.target.closest('#board .tile[data-i]');
@@ -2738,6 +2980,9 @@ document.addEventListener('click', e => {
     case 'help': openHelp(); break;
     case 'soundPanel': toggleSoundPanel(); break;
     case 'closeSound': toggleSoundPanel(); break;
+    case 'lightsPanel': case 'closeLights': toggleLightsPanel(); break;
+    case 'lsPreset': Lights.preset(b.dataset.p); renderLightsPanel(); if (b.dataset.p !== 'off') Lights.demo('spot'); break;
+    case 'lsTry': Lights.demo(b.dataset.k); break;
     case 'soundOn': Sound.setMuted(false); updateSoundUI(); Sound.fx('blip'); break;
     case 'muteAll': Sound.setMuted(true); updateSoundUI(); break;
     case 'testSound': if (Sound.st.muted) { Sound.setMuted(false); updateSoundUI(); } Sound.fx('reveal'); break;
