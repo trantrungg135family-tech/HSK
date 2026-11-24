@@ -6,7 +6,7 @@ _Cập nhật: 2026-11-24 — bàn giao trước khi người dùng đổi tài 
 1. Đọc file này, chạy `git pull` (Git ở `C:\Program Files\Git\cmd\git.exe` nếu `git` không có trong PATH).
 2. Hỏi người dùng đã thử game chưa (âm thanh, ánh sáng, tải Google Sheet khi mở bằng bấm đúp) và có muốn đổi gì không.
 3. Ba cải thiện UI/UX màn chơi đã xong (xem "Đã xong gần đây"); nhờ người dùng thử trên máy chiếu thật.
-   Các đề xuất khác (làm sau nếu người dùng muốn): chia màn thiết lập thành bước/thẻ (Chọn bộ / Cài đặt / Sửa câu hỏi); đưa thẻ Google Sheet lên trên thẻ Excel; màn kết quả thêm bục xếp hạng hoặc biểu đồ điểm theo vòng.
+   Các đề xuất khác (làm sau nếu người dùng muốn): chia màn thiết lập thành bước/thẻ (Chọn bộ / Cài đặt / Sửa câu hỏi); đưa thẻ Google Sheet lên trên thẻ Excel; màn kết quả thêm biểu đồ điểm theo vòng (bục xếp hạng đã có).
 4. Chờ người dùng duyệt câu hỏi trong Google Sheet (cột Approved = Y) rồi thử thật: Game setup → Question bank (Google Sheet) → chọn cấp → chọn bộ → Start.
 5. Khi người dùng đưa chủ đề hoặc xin thêm bộ: dùng skill `feud-questions`, ghi tiếp vào tab đúng cấp với số bộ tiếp theo (Starters 6, Movers 6…). Nếu cần sửa sheet bằng connector: kiểm tra tài khoản mới mở được sheet `17W9UR-HAxUWoh-Lb8RQV37EIOTfJ30ZDTOHhBDUfOv8`; game thì đọc sheet công khai, không cần connector.
 
@@ -20,6 +20,7 @@ _Cập nhật: 2026-11-24 — bàn giao trước khi người dùng đổi tài 
 - Người dùng duyệt 100 câu trong Google Sheet.
 
 ## Đã xong gần đây
+- Hiệu ứng vui (9 mục đã duyệt trong `classroom-feud/PROPOSAL-FX.md`): trống dồn khi giữ phím số/giữ chuột trên ô (bấm nhanh vẫn mở ngay); tiếng khán giả reo/vỗ tay (Gregor Quendel, **CC BY 4.0** — ghi công trong `SOUNDS.md` và mục Cách chơi) + tiếng "ôi…" tổng hợp khi sai; giọng đọc tiếng Anh giọng nữ Kenney (CC0): 3-2-1-go, Round n / Final round, Correct, Wrong, Hurry up, Congratulations / It's a tie, Ready-Go khi bấm chuông; khung Âm thanh có mức Lớp yên tĩnh / Bình thường / Sân khấu + công tắc khán giả / giọng / trống; Light show thêm "Pháo hoa sao" (màu đội) và "Băng rôn và vương miện" (vương miện đội dẫn, LEAD CHANGE!, 🔥 3 IN A ROW / ON FIRE, bục nảy); bấm chuông face-off (Q / P, nút Bấm chuông hoặc phím O, tùy chọn tự chạy đầu mỗi vòng trong Thông tin trò chơi); màn kết quả có bục xếp hạng + 5 giải MVP. File game 388 → ~538 KB. Thử ở 1280×720 và 1920×1080 (face-off, trống dồn phím + chuột, chuỗi 3/5, cướp điểm, đổi ngôi, vòng ×2, kết quả, VI, hoàn tác), 36 âm giải mã được, không lỗi console. Chưa xem được lúc pháo hoa nổ (khung trình duyệt bị ẩn) và chưa nghe trên loa thật.
 - Thanh điều khiển (`#consoleWrap`, `const CtlBar`) tự thu thành dải 12 px ở mép dưới sau 3 giây chuột không ở gần; hiện lại khi đưa chuột xuống mép, Tab vào, hoặc chạm dải. Không thu khi đang mở Points/Sound/Lights, hộp thoại, hay đang chờ cướp điểm; phím tắt và phím H vẫn chạy.
 - Câu hỏi (`#question`) to ~1,5 lần (`clamp(26px,min(5vw,8.1vh),90px)`); câu dài (tới 200 ký tự) tự thu nhỏ bằng `fitQuestion()` để không chèn bảng (đã thử 1280×720, 1920×1080, 600×900).
 - 3 ô X (`#strikes`) to hơn và nằm giữa ngay dưới câu hỏi, trên bảng; thông báo vòng (`#roundNote`) thành nhãn vàng to đặt cạnh ô X; đồng hồ đặt bên phải hàng đó.
