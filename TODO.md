@@ -5,10 +5,7 @@ _Cập nhật: 2026-11-24 — bàn giao trước khi người dùng đổi tài 
 ## Đang làm tiếp theo
 1. Đọc file này, chạy `git pull` (Git ở `C:\Program Files\Git\cmd\git.exe` nếu `git` không có trong PATH).
 2. Hỏi người dùng đã thử game chưa (âm thanh, ánh sáng, tải Google Sheet khi mở bằng bấm đúp) và có muốn đổi gì không.
-3. Người dùng đã chọn **để sau** 3 cải thiện UI/UX (2026-11-24) — đừng hỏi lại, chỉ làm khi người dùng nhắc. Ba việc đó, trong `classroom-feud/Classroom-Feud.html`:
-   - Thanh điều khiển giáo viên (`.controls`, phím H đã có) tự thu thành dải mỏng khi không di chuột, để màn chiếu gọn.
-   - Câu hỏi (`#question`) to hơn khoảng 1,5 lần.
-   - Thông báo trong vòng (`#roundNote`, ví dụ "Team B stole 44 points!") và 3 ô X (`#strikes`) to hơn, đặt giữa.
+3. Ba cải thiện UI/UX màn chơi đã xong (xem "Đã xong gần đây"); nhờ người dùng thử trên máy chiếu thật.
    Các đề xuất khác (làm sau nếu người dùng muốn): chia màn thiết lập thành bước/thẻ (Chọn bộ / Cài đặt / Sửa câu hỏi); đưa thẻ Google Sheet lên trên thẻ Excel; màn kết quả thêm bục xếp hạng hoặc biểu đồ điểm theo vòng.
 4. Chờ người dùng duyệt câu hỏi trong Google Sheet (cột Approved = Y) rồi thử thật: Game setup → Question bank (Google Sheet) → chọn cấp → chọn bộ → Start.
 5. Khi người dùng đưa chủ đề hoặc xin thêm bộ: dùng skill `feud-questions`, ghi tiếp vào tab đúng cấp với số bộ tiếp theo (Starters 6, Movers 6…). Nếu cần sửa sheet bằng connector: kiểm tra tài khoản mới mở được sheet `17W9UR-HAxUWoh-Lb8RQV37EIOTfJ30ZDTOHhBDUfOv8`; game thì đọc sheet công khai, không cần connector.
@@ -19,11 +16,13 @@ _Cập nhật: 2026-11-24 — bàn giao trước khi người dùng đổi tài 
 | (không có) | | | | |
 
 ## Chờ (phụ thuộc / chờ người dùng)
-- (UI/UX: người dùng hoãn, chờ người dùng nhắc lại.)
 - Người dùng nghe/xem thử âm thanh và ánh sáng trên loa/máy chiếu thật, góp ý tiếng hoặc hiệu ứng muốn đổi.
 - Người dùng duyệt 100 câu trong Google Sheet.
 
 ## Đã xong gần đây
+- Thanh điều khiển (`#consoleWrap`, `const CtlBar`) tự thu thành dải 12 px ở mép dưới sau 3 giây chuột không ở gần; hiện lại khi đưa chuột xuống mép, Tab vào, hoặc chạm dải. Không thu khi đang mở Points/Sound/Lights, hộp thoại, hay đang chờ cướp điểm; phím tắt và phím H vẫn chạy.
+- Câu hỏi (`#question`) to ~1,5 lần (`clamp(26px,min(5vw,8.1vh),90px)`); câu dài (tới 200 ký tự) tự thu nhỏ bằng `fitQuestion()` để không chèn bảng (đã thử 1280×720, 1920×1080, 600×900).
+- 3 ô X (`#strikes`) to hơn và nằm giữa ngay dưới câu hỏi, trên bảng; thông báo vòng (`#roundNote`) thành nhãn vàng to đặt cạnh ô X; đồng hồ đặt bên phải hàng đó.
 - Light show (e88242d): nút bóng đèn trên thanh trên → khung 8 hiệu ứng ánh sáng vẽ bằng canvas (`const Lights`, canvas `#lsBack` sau app và `#lsFront` trước app): đèn pha, hào quang đội, chớp máy ảnh, tia vàng, đèn báo đỏ, bụi vàng, disco, nhịp tim đồng hồ. Mỗi cái bật/tắt + nút Thử; preset Tắt/Nhẹ nhàng/Đã đời (mặc định Đã đời); lưu ở `localStorage` key `feud.v1.lights`. Máy bật "giảm chuyển động" thì tắt ánh sáng + pháo giấy, trừ khi tích ô "Vẫn chạy…". Đã thử trong trình duyệt 1280×720: top answer, 3 lần sai, cướp điểm, màn kết quả, không lỗi console. Mô tả trong `classroom-feud/SOUNDS.md`.
 - Phân tích UI/UX đã gửi người dùng trong chat (tóm tắt ở mục "Đang làm tiếp theo" 3).
 - Sửa tải Google Sheet khi giáo viên mở game bằng bấm đúp (file://): Google không trả CORS cho origin `null` → game chuyển sang JSONP (`gsFetchTabJsonp` + `gsTableToCsv`); đã so khớp từng ký tự với CSV ở cả 4 tab.

@@ -189,14 +189,14 @@ input[type=range]{width:100%;accent-color:var(--gold)}
 .gain{position:absolute;left:50%;top:40%;transform:translateX(-50%);font-family:var(--f-display);font-size:clamp(20px,2.4vw,34px);color:var(--gold-2);text-shadow:0 0 14px rgba(255,200,61,.9);pointer-events:none;animation:gainUp 1.3s ease-out forwards;white-space:nowrap}
 .gain.neg{color:#ffb3bf;text-shadow:0 0 14px rgba(255,61,85,.9)}
 @keyframes gainUp{0%{opacity:0;transform:translate(-50%,10px) scale(.8)}15%{opacity:1;transform:translate(-50%,0) scale(1.1)}100%{opacity:0;transform:translate(-50%,-70px) scale(1)}}
-.center{display:grid;grid-template-rows:auto 1fr auto;gap:clamp(6px,1.2vh,14px);min-width:0}
+.center{display:grid;grid-template-rows:auto auto 1fr;gap:clamp(6px,1.2vh,14px);min-width:0}
 .q-banner{display:grid;justify-items:center;gap:clamp(4px,.8vh,10px);text-align:center}
 .round-line{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:10px}
 .round-chip{font-family:var(--f-display);font-size:clamp(12px,1.15vw,16px);letter-spacing:.06em;color:var(--neon-2);padding:4px 12px;border-radius:999px;border:1px solid rgba(60,211,255,.5);background:rgba(4,8,30,.55)}
 .x2badge{font-family:var(--f-display);font-size:clamp(13px,1.35vw,19px);color:#2a1600;padding:5px 14px;border-radius:999px;background:linear-gradient(100deg,#ffd25c 0%,#fff3c4 40%,#ffc83d 60%,#e8a017 100%);background-size:220% 100%;box-shadow:0 0 22px rgba(255,200,61,.7);animation:x2pulse 1.4s ease-in-out infinite,shine 2.4s linear infinite}
 @keyframes x2pulse{0%,100%{transform:scale(1);box-shadow:0 0 14px rgba(255,200,61,.5)}50%{transform:scale(1.08);box-shadow:0 0 36px rgba(255,200,61,.95)}}
 @keyframes shine{from{background-position:120% 0}to{background-position:-120% 0}}
-.question{margin:0;font-family:var(--f-board);font-weight:700;font-size:clamp(22px,min(3.3vw,5.4vh),60px);line-height:1.08;max-width:34ch;text-wrap:balance;overflow-wrap:anywhere;text-shadow:0 2px 0 rgba(0,0,0,.45),0 0 26px rgba(60,211,255,.35)}
+.question{margin:0;font-family:var(--f-board);font-weight:700;font-size:clamp(26px,min(5vw,8.1vh),90px);line-height:1.1;max-width:100%;text-wrap:balance;overflow-wrap:anywhere;text-shadow:0 2px 0 rgba(0,0,0,.45),0 0 26px rgba(60,211,255,.35)}
 
 /* marquee board */
 .marquee{position:relative;min-height:max(190px,calc(var(--mrows,3) * 40px + 36px));display:grid;grid-template-rows:minmax(0,1fr);padding:clamp(14px,1.8vw,24px);border-radius:24px;background:linear-gradient(180deg,#1b2266,#0a0e38);border:3px solid #c88a1c;box-shadow:inset 0 0 0 2px rgba(255,214,110,.55),inset 0 0 40px rgba(0,0,0,.6),0 0 40px rgba(255,200,61,.18),0 0 90px rgba(60,211,255,.12)}
@@ -246,12 +246,13 @@ input[type=range]{width:100%;accent-color:var(--gold)}
 @keyframes shake{10%,90%{transform:translateX(-3px)}20%,80%{transform:translateX(6px)}30%,50%,70%{transform:translateX(-10px)}40%,60%{transform:translateX(10px)}}
 
 /* status row */
-.status-row{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:12px;min-height:46px}
-.round-note{margin:0;justify-self:start;font-weight:600;font-size:clamp(14px,1.4vw,20px);color:var(--gold-2);text-shadow:0 0 12px rgba(255,200,61,.35)}
-.strikes{display:flex;gap:10px;justify-self:center}
-.strike-slot{display:grid;place-items:center;width:clamp(36px,4.4vmin,56px);aspect-ratio:1;border-radius:10px;border:2px solid rgba(255,61,85,.35);background:rgba(50,0,14,.4);font-family:var(--f-display);font-size:clamp(18px,2.6vmin,32px);color:rgba(255,61,85,.25);transition:all .25s}
+.status-row{position:relative;display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:clamp(6px,1vh,12px) clamp(12px,1.6vw,26px);min-height:clamp(44px,7vmin,84px);padding-inline:clamp(56px,7vmin,84px)}
+.round-note{margin:0;order:2;max-width:100%;text-align:center;font-family:var(--f-board);font-weight:800;font-size:clamp(18px,min(2.5vw,4.4vh),44px);line-height:1.15;color:var(--gold-2);padding:.14em .75em;border-radius:999px;border:2px solid rgba(255,200,61,.55);background:rgba(4,8,30,.72);text-shadow:0 0 14px rgba(255,200,61,.5);box-shadow:0 0 22px rgba(255,200,61,.25);text-wrap:balance}
+.round-note:empty{display:none}
+.strikes{display:flex;gap:clamp(8px,1.4vmin,16px);order:1}
+.strike-slot{display:grid;place-items:center;width:clamp(44px,7vmin,84px);aspect-ratio:1;border-radius:clamp(10px,1.4vmin,16px);border:3px solid rgba(255,61,85,.35);background:rgba(50,0,14,.4);font-family:var(--f-display);font-size:clamp(26px,4.3vmin,52px);color:rgba(255,61,85,.25);transition:all .25s}
 .strike-slot.on{color:#fff;background:radial-gradient(circle,#ff6577,#b0001b);border-color:#ff9aa6;box-shadow:0 0 20px rgba(255,61,85,.75)}
-.timer{justify-self:end;position:relative;width:clamp(48px,6vmin,70px);aspect-ratio:1;display:grid;place-items:center}
+.timer{position:absolute;right:0;top:50%;transform:translateY(-50%);width:clamp(48px,6vmin,70px);aspect-ratio:1;display:grid;place-items:center}
 .timer svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
 .timer .trk{fill:rgba(4,8,30,.7);stroke:rgba(139,233,255,.2);stroke-width:4}
 .timer .arc{fill:none;stroke:var(--neon);stroke-width:4;stroke-linecap:round;transition:stroke .3s}
@@ -259,7 +260,7 @@ input[type=range]{width:100%;accent-color:var(--gold)}
 .timer span{position:relative;font-family:var(--f-display);font-size:clamp(16px,2.4vmin,26px);font-variant-numeric:tabular-nums}
 .timer.low span{color:#ffb3bf}
 .timer.done{animation:timerDone .5s ease 3}
-@keyframes timerDone{50%{transform:scale(1.2)}}
+@keyframes timerDone{50%{transform:translateY(-50%) scale(1.2)}}
 
 /* steal */
 .steal{--tc:var(--team-b);--tc-rgb:var(--b-rgb);display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 22px;padding:12px 18px;border-radius:18px;border:2px solid var(--tc);background:linear-gradient(90deg,rgba(var(--tc-rgb),.22),rgba(10,14,52,.94) 28%,rgba(10,14,52,.94) 72%,rgba(var(--tc-rgb),.22));box-shadow:0 0 32px rgba(var(--tc-rgb),.45);animation:stealIn .45s cubic-bezier(.2,1.3,.4,1)}
@@ -279,8 +280,8 @@ input[type=range]{width:100%;accent-color:var(--gold)}
 .btn-ok:hover{background:rgba(14,120,80,.75);border-color:#8ff7c8}
 
 /* console */
-.console-wrap{position:relative}
-.console{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px 22px;padding:8px;border-radius:18px;background:rgba(6,10,34,.78);border:1px solid var(--line)}
+.console-wrap{position:relative;display:grid;grid-template-rows:1fr;transition:grid-template-rows .35s ease}
+.console{min-height:0;transition:opacity .25s ease,padding .35s ease,border-color .35s ease;display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px 22px;padding:8px;border-radius:18px;background:rgba(6,10,34,.78);border:1px solid var(--line)}
 .c-group{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
 .cbtn{display:inline-flex;align-items:center;gap:8px;min-height:50px;padding:6px 14px;border-radius:12px;border:1px solid var(--line);background:linear-gradient(180deg,rgba(36,50,146,.85),rgba(16,24,82,.92));color:var(--ink);font-weight:700;font-size:15px;line-height:1.1;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.08);transition:background-color .2s,border-color .2s,box-shadow .2s,transform .1s;touch-action:manipulation;user-select:none;-webkit-user-select:none}
 .cbtn:hover{border-color:rgba(139,233,255,.65)}
@@ -301,6 +302,12 @@ input[type=range]{width:100%;accent-color:var(--gold)}
 .show-controls{position:absolute;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));opacity:.55;z-index:5}
 .show-controls:hover,.show-controls:focus-visible{opacity:1}
 .game.clean .console-wrap{display:none}
+/* auto-collapsed console: a thin strip at the bottom edge, expands on hover / focus / tap */
+.ctl-handle{display:none}
+.console-wrap.collapsed{grid-template-rows:0fr;min-height:12px;cursor:pointer}
+.console-wrap.collapsed .console{overflow:hidden;padding-block:0;border-color:transparent;opacity:0}
+.console-wrap.collapsed .ctl-handle{display:block;position:absolute;left:50%;bottom:2px;transform:translateX(-50%);width:clamp(64px,9vw,120px);height:6px;border-radius:999px;background:rgba(139,233,255,.28);box-shadow:0 0 10px rgba(60,211,255,.25);transition:background-color .2s}
+.console-wrap.collapsed:hover .ctl-handle{background:rgba(139,233,255,.6)}
 
 /* popovers */
 .pop{z-index:65;width:min(360px,calc(100vw - 32px));padding:16px;border-radius:18px;background:linear-gradient(180deg,#18216a,#0c1246);border:1px solid rgba(139,233,255,.35);box-shadow:0 24px 60px rgba(0,0,0,.6);display:grid;gap:12px}
@@ -451,10 +458,9 @@ body[data-screen="setup"] .toast{bottom:calc(84px + env(safe-area-inset-bottom,0
   .cbtn{min-height:46px;padding:6px 10px;font-size:14px}
   .cbtn kbd,.cbtn small{display:none}
   .console{gap:6px 10px}
-  .status-row{grid-template-columns:auto 1fr auto}
-  .round-note{grid-column:1 / -1;grid-row:2;justify-self:center;text-align:center}
-  .strikes{grid-column:1;justify-self:start}
-  .timer{grid-column:3}
+  .status-row{padding-inline:0}
+  .timer{position:relative;top:auto;right:auto;transform:none;order:1}
+  @keyframes timerDone{50%{transform:scale(1.2)}}
   .brand-title{font-size:15px}
   .tb-actions .seg button{padding:0 9px}
 }
@@ -534,14 +540,14 @@ body[data-screen="setup"] .toast{bottom:calc(84px + env(safe-area-inset-bottom,0
             <div class="round-line"><span class="round-chip" id="roundChip"></span><span class="x2badge" id="x2badge" hidden></span></div>
             <h2 class="question" id="question"></h2>
           </div>
-          <div class="marquee" id="marquee">
-            <i class="bulbs top"></i><i class="bulbs bottom"></i><i class="bulbs left"></i><i class="bulbs right"></i>
-            <div class="board" id="board"></div>
-          </div>
           <div class="status-row">
             <p class="round-note" id="roundNote" aria-live="polite"></p>
             <div class="strikes" id="strikes"><span class="strike-slot">X</span><span class="strike-slot">X</span><span class="strike-slot">X</span></div>
             <div class="timer" id="timer" hidden><svg viewBox="0 0 44 44" aria-hidden="true"><circle class="trk" cx="22" cy="22" r="19"/><circle class="arc" id="timerArc" cx="22" cy="22" r="19" stroke-dasharray="119.38" stroke-dashoffset="0"/></svg><span id="timerNum"></span></div>
+          </div>
+          <div class="marquee" id="marquee">
+            <i class="bulbs top"></i><i class="bulbs bottom"></i><i class="bulbs left"></i><i class="bulbs right"></i>
+            <div class="board" id="board"></div>
           </div>
         </div>
         <div class="podium team-b" id="podB" data-act="turnB">
@@ -567,6 +573,7 @@ body[data-screen="setup"] .toast{bottom:calc(84px + env(safe-area-inset-bottom,0
       </div>
 
       <div class="console-wrap" id="consoleWrap">
+        <span class="ctl-handle" id="ctlHandle" aria-hidden="true"></span>
         <div class="pop points-pop" id="pointsPop" hidden role="dialog" aria-labelledby="mpTitle">
           <div class="pop-head"><h3 id="mpTitle" data-i18n="mpTitle"></h3><button type="button" class="icon-btn sm" data-act="closePoints" data-i18n-aria="close"><span data-ico="x"></span></button></div>
           <div class="field"><label for="mpBase" data-i18n="mpBase"></label><input type="text" id="mpBase" inputmode="numeric" maxlength="3" value="10"></div>
@@ -731,7 +738,7 @@ en:{
   fixFirst:'Fix these before starting', fixHint:'Click a problem to jump to it.',
   roundOf:'ROUND {n} / {total}', answering:'Answering',
   reveal:'Reveal', revealSub:'no points', strike:'Strike', timer:'Timer', points:'Points', undo:'Undo', resetRound:'Reset round', nextRound:'Next round', finish:'Finish game',
-  hideControls:'Hide controls', showControls:'Show controls',
+  hideControls:'Hide controls', showControls:'Show controls', ctlPeek:'Controls tucked away — point here or tap to show them',
   stealTitle:'STEAL CHANCE!', stealBy:'{team} can steal', switchTeam:'Switch team',
   stealHow:'One guess. If it matches a hidden answer, press Steal succeeded or click that answer’s tile.',
   stealWorth:'Worth {n} pts', stealWorthX:'{b} × {m}', stealOK:'Steal succeeded', stealFail:'Steal failed',
@@ -839,7 +846,7 @@ vi:{
   fixFirst:'Hãy sửa các lỗi sau trước khi bắt đầu', fixHint:'Bấm vào một lỗi để đến chỗ cần sửa.',
   roundOf:'VÒNG {n} / {total}', answering:'Đang trả lời',
   reveal:'Mở đáp án', revealSub:'không tính điểm', strike:'Sai', timer:'Đếm giờ', points:'Điểm', undo:'Hoàn tác', resetRound:'Chơi lại vòng', nextRound:'Vòng tiếp', finish:'Kết thúc',
-  hideControls:'Ẩn bảng điều khiển', showControls:'Hiện bảng điều khiển',
+  hideControls:'Ẩn bảng điều khiển', showControls:'Hiện bảng điều khiển', ctlPeek:'Bảng điều khiển đã thu gọn — đưa chuột tới đây hoặc chạm để hiện',
   stealTitle:'CƠ HỘI CƯỚP ĐIỂM!', stealBy:'{team} được cướp điểm', switchTeam:'Đổi đội',
   stealHow:'Chỉ một lần đoán. Nếu trùng một đáp án còn ẩn, bấm Cướp thành công hoặc bấm vào ô đáp án đó.',
   stealWorth:'Trị giá {n} điểm', stealWorthX:'{b} × {m}', stealOK:'Cướp thành công', stealFail:'Cướp thất bại',
@@ -1367,6 +1374,7 @@ function renderGame(){
   const badge = $('#x2badge'); badge.hidden = !r.double; badge.textContent = dblLabel(game.multiplier);
   $('#marquee').classList.toggle('is-double', r.double);
   $('#question').textContent = r.question;
+  fitQuestion();
   renderBoard();
   $$('#strikes .strike-slot').forEach((s, i) => s.classList.toggle('on', i < r.strikes));
   $('#strikes').setAttribute('aria-label', `${t('strike')}: ${r.strikes} / 3`);
@@ -1392,6 +1400,57 @@ function renderGame(){
   updateManualPanel(); Lights.kick();
   updateBrand();
 }
+/* Shrink very long questions so they never squeeze the board: keep the question block within ~27% of the game height. */
+function fitQuestion(){
+  const q = $('#question'), g = $('#screen-game'); if (!q || !g || g.hidden) return;
+  q.style.setProperty('transition', 'none', 'important'); q.style.fontSize = '';
+  const budget = Math.max(70, g.clientHeight * .27);
+  for (let i = 0; i < 8 && q.scrollHeight > budget; i++) {
+    const fs = parseFloat(getComputedStyle(q).fontSize);
+    if (fs <= 18) break;
+    q.style.fontSize = Math.max(18, Math.floor(fs * Math.max(.8, Math.sqrt(budget / q.scrollHeight) * .98))) + 'px';
+  }
+}
+/* Teacher controls fold into a thin strip after ~3 s without the mouse near them, so the projected board stays clean. */
+const CtlBar = {
+  IDLE:3000, t:0, near:false, kbd:false, tabAt:0,
+  wrap(){ return $('#consoleWrap'); },
+  blocked(){
+    if (screen !== 'game' || !game || $('#screen-game').classList.contains('clean')) return true;
+    if (Modal.isOpen() || anyPopOpen() || cdState || (cur() && stealPending(cur()))) return true;
+    return this.near || this.kbd;
+  },
+  expand(){ const w = this.wrap(); if (w.classList.contains('collapsed')) { w.classList.remove('collapsed'); w.removeAttribute('title'); } },
+  collapse(){ const w = this.wrap(); if (!w.classList.contains('collapsed')) { w.classList.add('collapsed'); w.title = t('ctlPeek'); } },
+  poke(){ this.expand(); this.arm(); },
+  arm(){ clearTimeout(this.t); if (screen !== 'game') return; this.t = setTimeout(() => this.check(), this.IDLE); },
+  check(){ if (this.blocked()) { this.t = setTimeout(() => this.check(), 1000); return; } this.collapse(); },
+  reset(){ clearTimeout(this.t); this.near = false; this.expand(); },
+  nearPoint(x, y){
+    const w = this.wrap(); if (!w.offsetParent) return false;
+    const rc = w.getBoundingClientRect();
+    if (w.classList.contains('collapsed')) return y >= Math.min(rc.top - 40, innerHeight - 70);
+    return y >= rc.top - 50 && y <= rc.bottom + 30;
+  },
+  init(){
+    const w = this.wrap();
+    document.addEventListener('mousemove', e => {
+      if (screen !== 'game') return;
+      const n = this.nearPoint(e.clientX, e.clientY) || !!e.target.closest('#pointsPop');
+      if (n) { this.near = true; this.poke(); }
+      else if (this.near) { this.near = false; this.arm(); }
+    }, { passive:true });
+    document.documentElement.addEventListener('mouseleave', () => { if (this.near) { this.near = false; this.arm(); } });
+    w.addEventListener('pointerdown', e => {
+      if (w.classList.contains('collapsed')) { e.preventDefault(); this.poke(); return; }
+      this.arm();
+    });
+    document.addEventListener('keydown', e => { if (e.key === 'Tab') this.tabAt = Date.now(); }, { capture:true });
+    document.addEventListener('pointerdown', () => { if (this.kbd) { this.kbd = false; this.arm(); } }, { capture:true });
+    w.addEventListener('focusin', () => { if (Date.now() - this.tabAt < 600) this.kbd = true; this.poke(); });
+    w.addEventListener('focusout', e => { if (!w.contains(e.relatedTarget)) { this.kbd = false; this.arm(); } });
+  }
+};
 function pulsePodium(tm){ const p = $(tm === 'A' ? '#podA' : '#podB'); p.animate && p.animate([{transform:'translateY(-4px) scale(1)'},{transform:'translateY(-4px) scale(1.05)'},{transform:'translateY(-4px) scale(1)'}], {duration:350}); }
 function bumpTile(i){ const tl = $(`#board .tile[data-i="${i}"]`); if (!tl) return; tl.classList.remove('bump'); void tl.offsetWidth; tl.classList.add('bump'); }
 function flashX2(i){ const tl = $(`#board .tile[data-i="${i}"]`); if (!tl) return; tl.classList.remove('x2flash'); void tl.offsetWidth; tl.classList.add('x2flash'); setTimeout(() => tl.classList.remove('x2flash'), 2200); }
@@ -1490,7 +1549,7 @@ function togglePoints(force){
   const p = $('#pointsPop'), open = force != null ? force : p.hidden;
   if (!open) releaseFocus(p, $('#cbPoints'));
   p.hidden = !open; $('#cbPoints').setAttribute('aria-expanded', open);
-  if (open) { $('#mpErr').hidden = true; updateManualPanel(); setTimeout(() => { $('#mpBase').focus(); $('#mpBase').select(); }, 20); }
+  if (open) { CtlBar.poke(); $('#mpErr').hidden = true; updateManualPanel(); setTimeout(() => { $('#mpBase').focus(); $('#mpBase').select(); }, 20); }
 }
 
 /* ================= rendering: results ================= */
@@ -1748,7 +1807,7 @@ function setScreen(name){
   if (name !== 'game') stopTimer();
   if (name !== 'results') Confetti.clear();
   if (name === 'setup') { renderSetup(); keepAwake(false); }
-  if (name === 'game') { boardSig = ''; renderGame(); keepAwake(true); }
+  if (name === 'game') { boardSig = ''; renderGame(); keepAwake(true); CtlBar.poke(); } else CtlBar.reset();
   if (name === 'results') { renderResults(); keepAwake(true); }
   Lights.kick();
   updateBrand();
@@ -3043,8 +3102,8 @@ document.addEventListener('click', e => {
     case 'stealOK': stealSuccess(); break;
     case 'stealFail': stealFail(); break;
     case 'swapSteal': swapSteal(); break;
-    case 'hideControls': $('#screen-game').classList.add('clean'); $('#showCtl').hidden = false; closePops(); break;
-    case 'showControls': $('#screen-game').classList.remove('clean'); $('#showCtl').hidden = true; break;
+    case 'hideControls': $('#screen-game').classList.add('clean'); $('#showCtl').hidden = false; closePops(); fitQuestion(); break;
+    case 'showControls': $('#screen-game').classList.remove('clean'); $('#showCtl').hidden = true; CtlBar.poke(); fitQuestion(); break;
     case 'playAgain': restartGame(false); break;
     case 'backBoard': if (game) { game.finished = false; saveGame(); Confetti.clear(); setScreen('game'); } break;
     case 'exportResults': openResultsExport(); break;
@@ -3063,7 +3122,8 @@ document.addEventListener('fullscreenchange', updateFsIcon);
 document.addEventListener('webkitfullscreenchange', updateFsIcon);
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && screen === 'game') keepAwake(true); });
 let rsT = 0;
-window.addEventListener('resize', () => { clearTimeout(rsT); rsT = setTimeout(() => { if (screen === 'game' && game) renderBoard(); }, 120); });
+window.addEventListener('resize', () => { clearTimeout(rsT); rsT = setTimeout(() => { if (screen === 'game' && game) { fitQuestion(); renderBoard(); } }, 120); });
+CtlBar.init();
 if (window.ResizeObserver) { let lastCols = 0; new ResizeObserver(() => { if (screen !== 'game' || !game) return; const c = boardCols(cur().answers.length); if (c !== lastCols) { lastCols = c; renderBoard(); } }).observe($('#board')); }
 
 document.addEventListener('keydown', e => {
@@ -3084,7 +3144,7 @@ document.addEventListener('keydown', e => {
   if (screen !== 'game' || !game) return;
   if (/^[0-9]$/.test(k)) { e.preventDefault(); const i = k === '0' ? 9 : parseInt(k, 10) - 1; revealTile(i); return; }
   const map = { a:() => setTurn('A'), b:() => setTurn('B'), x:strike, r:revealNext, t:toggleTimer, u:undo, n:nextRound,
-    h:() => { const g = $('#screen-game'); const c = !g.classList.contains('clean'); g.classList.toggle('clean', c); $('#showCtl').hidden = !c; if (c) closePops(); } };
+    h:() => { const g = $('#screen-game'); const c = !g.classList.contains('clean'); g.classList.toggle('clean', c); $('#showCtl').hidden = !c; if (c) closePops(); else CtlBar.poke(); fitQuestion(); } };
   if (map[k]) { e.preventDefault(); map[k](); }
 });
 
