@@ -385,6 +385,7 @@ body[data-screen="setup"] .toast{bottom:calc(84px + env(safe-area-inset-bottom,0
 .lvl-chip{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 9px;border-radius:999px;border:1px solid rgba(60,211,255,.5);color:var(--neon-2);background:rgba(4,8,30,.5);white-space:nowrap}
 .lvl-chip.starters{border-color:rgba(62,240,160,.6);color:#a9f8d2}
 .lvl-chip.flyers{border-color:rgba(255,99,212,.6);color:#ffc2ee}
+.lvl-chip.ket{border-color:rgba(255,166,77,.65);color:#ffd9b0}
 .set-item.unplayed{border-color:rgba(255,200,61,.6);background:linear-gradient(90deg,rgba(255,200,61,.13),rgba(4,8,30,.45) 55%)}
 .set-item.current{border-color:rgba(62,240,160,.7);box-shadow:0 0 0 1px rgba(62,240,160,.3)}
 .np-badge,.cur-badge{display:inline-block;margin-left:6px;font-size:12px;font-weight:700;padding:1px 8px;border-radius:999px;vertical-align:1px;white-space:nowrap}
@@ -400,6 +401,16 @@ body[data-screen="setup"] .toast{bottom:calc(84px + env(safe-area-inset-bottom,0
 .sum-stats{margin:0;padding-left:20px;display:grid;gap:4px}
 .sum-stats b{color:var(--gold-2);font-variant-numeric:tabular-nums}
 .xl-status{margin:0;color:var(--neon-2);font-size:14px}
+.gs-status{margin:0;font-size:14px;color:var(--muted);display:flex;align-items:center;gap:8px}
+.gs-status.busy{color:var(--neon-2)}
+.gs-status.warn{color:#ffd9a0}
+.gs-spin{width:16px;height:16px;flex:none;border-radius:50%;border:2px solid rgba(60,211,255,.3);border-top-color:var(--neon-2);animation:gsSpin .8s linear infinite}
+@keyframes gsSpin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.gs-spin{animation-duration:2.4s}}
+.gs-empty{margin:0;padding:12px 14px;border-radius:12px;border:1px dashed rgba(255,200,61,.55);background:rgba(255,200,61,.08)}
+.gs-foot{display:grid;gap:4px}
+.gs-bad{color:#ffc1ca}
+.gs-bad .link{color:#ffc1ca}
 
 /* ---------- responsive ---------- */
 @media (max-width:900px),(max-aspect-ratio:1/1){
@@ -613,8 +624,8 @@ const uid = () => Math.random().toString(36).slice(2, 10);
 const clampInt = (v, lo, hi, d) => { const n = parseInt(v, 10); return Number.isFinite(n) ? Math.min(hi, Math.max(lo, n)) : d; };
 const reduceMotion = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
 const MAX_ROUNDS = 30, MAX_ANSWERS = 20, MAX_HISTORY = 80;
-const KEY = { config:'feud.v1.config', game:'feud.v1.game', sets:'feud.v1.sets', audio:'feud.v1.audio', screen:'feud.v1.screen', library:'feud.v1.library', classes:'feud.v1.classes' };
-const LEVELS = ['starters', 'movers', 'flyers'];
+const KEY = { config:'feud.v1.config', game:'feud.v1.game', sets:'feud.v1.sets', audio:'feud.v1.audio', screen:'feud.v1.screen', library:'feud.v1.library', classes:'feud.v1.classes', sheet:'feud.v1.sheet', sheetCache:'feud.v1.sheetcache' };
+const LEVELS = ['starters', 'movers', 'flyers', 'ket'];
 const guards = {};
 function guard(k, ms){ const n = performance.now(); if (guards[k] && n - guards[k] < ms) return false; guards[k] = n; return true; }
 
@@ -708,14 +719,14 @@ en:{
   resTitle:'Export results', resText:'A summary of the game you can paste into a document or keep as a file.',
   ssTitle:'Saved sets', ssText:'Question sets saved in this browser on this device.', ssName:'Name for this set', ssSave:'Save current set', ssLoad:'Load', ssDelete:'Delete', ssEmpty:'No saved sets yet.',
   ssSaved:'Saved “{name}”.', ssUpdated:'Updated “{name}”.', ssLoaded:'Loaded “{name}”.', ssLoadQ:'Load “{name}”?', ssLoadText:'It replaces the questions in the editor. A game in progress is not affected.', ssRounds:'{n} rounds', ssDelQ:'Delete “{name}”?', ssDelText:'This removes the saved set from this browser.', ssNoStore:'This browser is blocking storage, so sets can’t be saved. Use Export instead.', ssFull:'Browser storage is full. Delete an old set or use Export.',
-  raTitle:'Reset all data?', raText:'This deletes your questions, saved sets, the current game and sound settings from this browser, then loads the sample questions. Your question library and classes are kept. Export anything you want to keep first.', raOK:'Delete everything', raDone:'All data was reset.',
+  raTitle:'Reset all data?', raText:'This deletes your questions, saved sets, the current game and sound settings from this browser, then loads the sample questions. Your question library, classes and Google Sheet link are kept. Export anything you want to keep first.', raOK:'Delete everything', raDone:'All data was reset.',
   storageWarn:'This browser is blocking storage for this page (for example a private window, or blocked site data). The game works, but your questions and scores disappear when you close it. Use Export to keep a copy.',
   drQ:'Delete Round {n}?', drText:'Its question and {k} answers will be removed.', drOK:'Delete round',
   spTitle:'Sound', soundOn:'Sound on', muteAll:'Mute all', music:'Background music', musicVol:'Music volume', sfxVol:'Effects volume', test:'Test sound',
   soundNote:'Browsers only allow sound after a click, so sound starts with your first click.', noAudio:'This browser can’t play generated sound. The game works without it.',
   muted:'Sound muted.', unmuted:'Sound on.', fsFail:'Fullscreen isn’t available in this view. Open the game in its own browser tab and try again.',
   stealToast:'{team} steals {n} points!', clearedToast:'Board cleared!', dflt:'(default)', bonusCol:'Bonus',
-  lv_starters:'Starters', lv_movers:'Movers', lv_flyers:'Flyers',
+  lv_starters:'Starters', lv_movers:'Movers', lv_flyers:'Flyers', lv_ket:'KET (A2 Key)',
   clsTitle:'Class & question library', fClass:'Class', noClass:'— No class —', manageClasses:'Classes', importExcel:'Import Excel', openLibrary:'Question library', libCount:'{n} sets in the library',
   clsPick:'Choose a class to see the question sets for its level.', clsNone:'No classes yet. Press Classes to add one, for example 1A · Starters.',
   clsNoSets:'No {level} sets in the library yet. Import a reviewed Excel file.', clsSetsFor:'{level} sets for class {cls}',
@@ -731,14 +742,31 @@ en:{
   lbExport:'Back up library', lbImport:'Restore backup', lbExTitle:'Library backup', lbExText:'Every question set and class as one JSON file. Keep it safe, or load it on another computer with Restore backup.',
   lbImTitle:'Restore library backup', lbImText:'Choose a library backup .json file, or paste its text. It is merged into the library: a set with the same level and topic is updated, and a class with the same name keeps its history.',
   lbImGo:'Restore and merge', lbImBad:'This isn’t a library backup. {why}', lbImWhy:'It has no list of sets.', lbImDone:'Restored {s} sets and {c} classes.',
-  xlTitle:'Import reviewed Excel', xlText:'Choose a question-set workbook (.xlsx) after you have reviewed it. Only rows marked in the Approved column (Y, Yes, X, ✓, OK, Có, Duyệt, 1, TRUE) are imported. Each topic on the Starters, Movers and Flyers sheets becomes one set; importing the same level and topic again updates that set.',
+  xlTitle:'Import reviewed Excel', xlText:'Choose a question-set workbook (.xlsx) after you have reviewed it. Only rows marked in the Approved column (Y, Yes, X, ✓, OK, Có, Duyệt, 1, TRUE) are imported. Each topic on the Starters, Movers, Flyers and KET sheets becomes one set; importing the same level and topic again updates that set.',
   xlFile:'Choose an .xlsx file', xlLoading:'Reading the file…', xlOffline:'The Excel reader couldn’t be loaded. Excel import needs an internet connection — check the connection and try again. JSON import works offline.',
-  xlBadFile:'This file couldn’t be read as an Excel workbook.', xlNoSheets:'No sheet named Starters, Movers or Flyers was found in this workbook.',
+  xlBadFile:'This file couldn’t be read as an Excel workbook.', xlNoSheets:'No sheet named Starters, Movers, Flyers or KET was found in this workbook.',
   xsTitle:'Excel import summary', xsFile:'File: {name}', xsAdded:'New sets: <b>{n}</b>', xsUpdated:'Updated sets: <b>{n}</b>', xsRounds:'Rounds imported: <b>{n}</b> ({a} new, {r} replaced)', xsSkipped:'Rows skipped: <b>{n}</b>',
   xsUnapproved:'{n} rows not approved yet (Approved cell empty or not a yes value)', xsErrors:'Rows with problems ({n}) — fix them in Excel and import again:', xsNothing:'Nothing was imported: no approved rows were found.',
   xsNew:'new', xsUpd:'updated', xsSetLine:'{level} · {topic} — {rounds} in the set', xsMore:'…and {n} more.', xsOpenLib:'Open library',
   xeRow:'Sheet {sheet}, row {row}: {msg}', xeTopic:'Topic is empty.', xeQuestion:'Question is empty.', xeQLong:'Question is longer than 200 characters.', xeNoAns:'No answers.',
-  xeAnsNoPts:'Answer {a} has no points.', xePtsNoAns:'Points {a} has no answer.', xePts:'Points {a} must be a whole number from 0 to 999 (found “{v}”).', xeALong:'Answer {a} is longer than 80 characters.'
+  xeAnsNoPts:'Answer {a} has no points.', xePtsNoAns:'Points {a} has no answer.', xePts:'Points {a} must be a whole number from 0 to 999 (found “{v}”).', xeALong:'Answer {a} is longer than 80 characters.',
+  gsTitle:'Question bank (Google Sheet)', gsRefresh:'Refresh', gsLink:'Sheet link', gsLevel:'Level', gsLoading:'Loading questions from the Google Sheet…',
+  gsFrom:'Data from {d}', gsStale:'Couldn’t update just now — showing the saved copy from {d}.', gsNever:'The question bank hasn’t been loaded yet. Press Refresh.', gsUpdated:'Question bank updated.',
+  gsErrOffline:'This computer is offline. Connect to the internet and press Refresh.',
+  gsErrNet:'The Google Sheet couldn’t be reached. Check the internet connection, and check that the sheet is shared as “Anyone with the link”.',
+  gsErrPrivate:'The Google Sheet isn’t shared publicly. In Google Sheets press Share → General access → “Anyone with the link”, then press Refresh.',
+  gsErrNotFound:'No Google Sheet was found at this link. Check it under Sheet link.', gsErrHttp:'Google Sheets answered with error {code}. Try again in a minute.',
+  gsTabMissing:'The tab “{tab}” wasn’t found in the sheet, or its header row was changed. It needs the columns Set, Question, Answer 1, Points 1 and Approved.',
+  gsTabFail:'The {tab} tab couldn’t be loaded. Press Refresh to try again.',
+  gsNoSets:'No approved {level} sets yet. In the Google Sheet, put Y in the Approved column of each question you want to use, then press Refresh.',
+  gsWaiting:'{n} questions in this tab are waiting for approval (Approved empty or N).', gsWaiting1:'1 question in this tab is waiting for approval (Approved empty or N).',
+  gsSetsFor:'{level} sets in the sheet', gsQs:'{n} questions', gsQ1:'1 question',
+  gsHistNoClass:'Choose a class above to see which sets it has already played.', gsHistOther:'Play history shows when this level matches the class ({cls} · {level}).',
+  gsProblems:'{n} approved rows have problems and were skipped.', gsProblems1:'1 approved row has a problem and was skipped.', gsShowProblems:'Show problems',
+  gsProbTitle:'Rows skipped — {tab} tab', gsProbText:'Fix these rows in the Google Sheet, then press Refresh.', gsRow:'Row {row}{set}: {msg}', gsNoSet:'Set is empty.',
+  gsViewAria:'View {name}', gsUseQ:'Load “{name}”?', gsUseDone:'Loaded “{name}”. Press Preview or Start game.',
+  gsLinkTitle:'Google Sheet link', gsLinkText:'Paste the link of the question-bank sheet, or just its ID. The sheet must be shared as “Anyone with the link”. The game only reads the sheet; it never changes it.',
+  gsLinkField:'Sheet link or ID', gsLinkBad:'This doesn’t look like a Google Sheets link or ID.', gsLinkDefault:'Use the default sheet', gsLinkSave:'Save and load', gsLinkOpen:'Open the sheet in Google Sheets', gsLinkSaved:'Sheet link saved.'
 },
 vi:{
   appName:'Classroom Feud', teamA:'Đội A', teamB:'Đội B',
@@ -789,14 +817,14 @@ vi:{
   resTitle:'Xuất kết quả', resText:'Bản tóm tắt trò chơi để dán vào tài liệu hoặc lưu thành file.',
   ssTitle:'Bộ câu hỏi đã lưu', ssText:'Các bộ câu hỏi được lưu trên trình duyệt của máy này.', ssName:'Tên bộ câu hỏi', ssSave:'Lưu bộ hiện tại', ssLoad:'Mở', ssDelete:'Xóa', ssEmpty:'Chưa có bộ nào được lưu.',
   ssSaved:'Đã lưu “{name}”.', ssUpdated:'Đã cập nhật “{name}”.', ssLoaded:'Đã mở “{name}”.', ssLoadQ:'Mở “{name}”?', ssLoadText:'Bộ này sẽ thay thế câu hỏi đang soạn. Trò chơi đang diễn ra không bị ảnh hưởng.', ssRounds:'{n} vòng', ssDelQ:'Xóa “{name}”?', ssDelText:'Bộ câu hỏi này sẽ bị xóa khỏi trình duyệt.', ssNoStore:'Trình duyệt đang chặn bộ nhớ nên không lưu được. Hãy dùng Xuất file.', ssFull:'Bộ nhớ trình duyệt đã đầy. Hãy xóa bớt bộ cũ hoặc dùng Xuất file.',
-  raTitle:'Xóa toàn bộ dữ liệu?', raText:'Thao tác này xóa câu hỏi, các bộ đã lưu, trò chơi hiện tại và cài đặt âm thanh khỏi trình duyệt, rồi nạp lại câu hỏi mẫu. Thư viện câu hỏi và danh sách lớp vẫn được giữ. Hãy xuất file những gì bạn muốn giữ trước.', raOK:'Xóa tất cả', raDone:'Đã xóa toàn bộ dữ liệu.',
+  raTitle:'Xóa toàn bộ dữ liệu?', raText:'Thao tác này xóa câu hỏi, các bộ đã lưu, trò chơi hiện tại và cài đặt âm thanh khỏi trình duyệt, rồi nạp lại câu hỏi mẫu. Thư viện câu hỏi, danh sách lớp và link Google Sheet vẫn được giữ. Hãy xuất file những gì bạn muốn giữ trước.', raOK:'Xóa tất cả', raDone:'Đã xóa toàn bộ dữ liệu.',
   storageWarn:'Trình duyệt đang chặn bộ nhớ cho trang này (ví dụ cửa sổ ẩn danh, hoặc đã chặn dữ liệu trang web). Trò chơi vẫn chạy, nhưng câu hỏi và điểm sẽ mất khi đóng trang. Hãy dùng Xuất file để giữ bản sao.',
   drQ:'Xóa Vòng {n}?', drText:'Câu hỏi và {k} đáp án của vòng này sẽ bị xóa.', drOK:'Xóa vòng',
   spTitle:'Âm thanh', soundOn:'Bật âm thanh', muteAll:'Tắt hết', music:'Nhạc nền', musicVol:'Âm lượng nhạc', sfxVol:'Âm lượng hiệu ứng', test:'Thử âm thanh',
   soundNote:'Trình duyệt chỉ cho phát âm thanh sau khi bạn bấm chuột, nên âm thanh bắt đầu từ lần bấm đầu tiên.', noAudio:'Trình duyệt này không phát được âm thanh. Trò chơi vẫn chạy bình thường.',
   muted:'Đã tắt âm thanh.', unmuted:'Đã bật âm thanh.', fsFail:'Không bật được toàn màn hình ở đây. Hãy mở trò chơi trong một tab riêng rồi thử lại.',
   stealToast:'{team} cướp được {n} điểm!', clearedToast:'Đã mở hết bảng!', dflt:'(mặc định)', bonusCol:'Nhân điểm',
-  lv_starters:'Starters', lv_movers:'Movers', lv_flyers:'Flyers',
+  lv_starters:'Starters', lv_movers:'Movers', lv_flyers:'Flyers', lv_ket:'KET (A2 Key)',
   clsTitle:'Lớp học & thư viện câu hỏi', fClass:'Lớp', noClass:'— Chưa chọn lớp —', manageClasses:'Quản lý lớp', importExcel:'Nhập Excel', openLibrary:'Thư viện câu hỏi', libCount:'Thư viện có {n} bộ',
   clsPick:'Chọn một lớp để xem các bộ câu hỏi của cấp độ lớp đó.', clsNone:'Chưa có lớp nào. Bấm Quản lý lớp để thêm, ví dụ 1A · Starters.',
   clsNoSets:'Thư viện chưa có bộ {level} nào. Hãy nhập một file Excel đã duyệt.', clsSetsFor:'Các bộ {level} cho lớp {cls}',
@@ -812,14 +840,31 @@ vi:{
   lbExport:'Sao lưu thư viện', lbImport:'Khôi phục bản sao lưu', lbExTitle:'Bản sao lưu thư viện', lbExText:'Toàn bộ bộ câu hỏi và lớp học trong một file JSON. Hãy cất giữ, hoặc mở trên máy khác bằng nút Khôi phục bản sao lưu.',
   lbImTitle:'Khôi phục bản sao lưu thư viện', lbImText:'Chọn file .json sao lưu thư viện, hoặc dán nội dung. Dữ liệu được gộp vào thư viện: bộ cùng cấp độ và chủ đề sẽ được cập nhật, lớp cùng tên giữ lịch sử chơi.',
   lbImGo:'Khôi phục và gộp', lbImBad:'Đây không phải bản sao lưu thư viện. {why}', lbImWhy:'Không có danh sách bộ câu hỏi.', lbImDone:'Đã khôi phục {s} bộ và {c} lớp.',
-  xlTitle:'Nhập file Excel đã duyệt', xlText:'Chọn file bộ câu hỏi (.xlsx) sau khi đã duyệt. Chỉ nhập các dòng được đánh dấu ở cột Approved (Y, Yes, X, ✓, OK, Có, Duyệt, 1, TRUE). Mỗi chủ đề trên sheet Starters, Movers, Flyers thành một bộ; nhập lại cùng cấp độ và chủ đề sẽ cập nhật bộ đó.',
+  xlTitle:'Nhập file Excel đã duyệt', xlText:'Chọn file bộ câu hỏi (.xlsx) sau khi đã duyệt. Chỉ nhập các dòng được đánh dấu ở cột Approved (Y, Yes, X, ✓, OK, Có, Duyệt, 1, TRUE). Mỗi chủ đề trên sheet Starters, Movers, Flyers, KET thành một bộ; nhập lại cùng cấp độ và chủ đề sẽ cập nhật bộ đó.',
   xlFile:'Chọn file .xlsx', xlLoading:'Đang đọc file…', xlOffline:'Không tải được bộ đọc Excel. Nhập Excel cần có kết nối Internet — hãy kiểm tra mạng rồi thử lại. Nhập file JSON vẫn dùng được khi không có mạng.',
-  xlBadFile:'Không đọc được file này dưới dạng Excel.', xlNoSheets:'Không tìm thấy sheet nào tên Starters, Movers hoặc Flyers trong file.',
+  xlBadFile:'Không đọc được file này dưới dạng Excel.', xlNoSheets:'Không tìm thấy sheet nào tên Starters, Movers, Flyers hoặc KET trong file.',
   xsTitle:'Kết quả nhập Excel', xsFile:'File: {name}', xsAdded:'Bộ mới: <b>{n}</b>', xsUpdated:'Bộ được cập nhật: <b>{n}</b>', xsRounds:'Số vòng đã nhập: <b>{n}</b> ({a} mới, {r} thay thế)', xsSkipped:'Dòng bị bỏ qua: <b>{n}</b>',
   xsUnapproved:'{n} dòng chưa duyệt (ô Approved trống hoặc không phải giá trị duyệt)', xsErrors:'Các dòng có lỗi ({n}) — sửa trong Excel rồi nhập lại:', xsNothing:'Không nhập được gì: không có dòng nào đã duyệt.',
   xsNew:'mới', xsUpd:'cập nhật', xsSetLine:'{level} · {topic} — bộ có {rounds}', xsMore:'…và {n} dòng khác.', xsOpenLib:'Mở thư viện',
   xeRow:'Sheet {sheet}, dòng {row}: {msg}', xeTopic:'Chưa có Topic.', xeQuestion:'Chưa có câu hỏi.', xeQLong:'Câu hỏi dài quá 200 ký tự.', xeNoAns:'Không có đáp án nào.',
-  xeAnsNoPts:'Đáp án {a} chưa có điểm.', xePtsNoAns:'Điểm {a} không có đáp án.', xePts:'Điểm {a} phải là số nguyên từ 0 đến 999 (đang là “{v}”).', xeALong:'Đáp án {a} dài quá 80 ký tự.'
+  xeAnsNoPts:'Đáp án {a} chưa có điểm.', xePtsNoAns:'Điểm {a} không có đáp án.', xePts:'Điểm {a} phải là số nguyên từ 0 đến 999 (đang là “{v}”).', xeALong:'Đáp án {a} dài quá 80 ký tự.',
+  gsTitle:'Ngân hàng câu hỏi (Google Sheet)', gsRefresh:'Tải lại', gsLink:'Link Google Sheet', gsLevel:'Cấp độ', gsLoading:'Đang tải câu hỏi từ Google Sheet…',
+  gsFrom:'Dữ liệu lúc {d}', gsStale:'Chưa cập nhật được — đang dùng bản đã lưu lúc {d}.', gsNever:'Chưa tải ngân hàng câu hỏi. Bấm Tải lại.', gsUpdated:'Đã cập nhật ngân hàng câu hỏi.',
+  gsErrOffline:'Máy đang không có mạng. Kết nối Internet rồi bấm Tải lại.',
+  gsErrNet:'Không kết nối được tới Google Sheet. Kiểm tra Internet, và kiểm tra sheet đã chia sẻ “Bất kỳ ai có đường liên kết”.',
+  gsErrPrivate:'Google Sheet chưa được chia sẻ công khai. Trong Google Sheets bấm Chia sẻ → Quyền truy cập chung → “Bất kỳ ai có đường liên kết”, rồi bấm Tải lại.',
+  gsErrNotFound:'Không tìm thấy Google Sheet theo link này. Kiểm tra lại ở nút Link Google Sheet.', gsErrHttp:'Google Sheets báo lỗi {code}. Thử lại sau ít phút.',
+  gsTabMissing:'Không tìm thấy tab “{tab}” trong sheet, hoặc dòng tiêu đề đã bị đổi. Tab cần có các cột Set, Question, Answer 1, Points 1 và Approved.',
+  gsTabFail:'Không tải được tab {tab}. Bấm Tải lại để thử lại.',
+  gsNoSets:'Chưa có bộ {level} nào được duyệt. Trong Google Sheet, ghi Y vào cột Approved của mỗi câu muốn dùng, rồi bấm Tải lại.',
+  gsWaiting:'Tab này có {n} câu đang chờ duyệt (Approved trống hoặc N).', gsWaiting1:'Tab này có 1 câu đang chờ duyệt (Approved trống hoặc N).',
+  gsSetsFor:'Các bộ {level} trong sheet', gsQs:'{n} câu', gsQ1:'1 câu',
+  gsHistNoClass:'Chọn lớp ở trên để xem lớp đã chơi những bộ nào.', gsHistOther:'Lịch sử chơi chỉ hiện khi cấp độ trùng với lớp ({cls} · {level}).',
+  gsProblems:'{n} dòng đã duyệt bị lỗi nên bị bỏ qua.', gsProblems1:'1 dòng đã duyệt bị lỗi nên bị bỏ qua.', gsShowProblems:'Xem lỗi',
+  gsProbTitle:'Dòng bị bỏ qua — tab {tab}', gsProbText:'Sửa các dòng này trong Google Sheet rồi bấm Tải lại.', gsRow:'Dòng {row}{set}: {msg}', gsNoSet:'Cột Set đang trống.',
+  gsViewAria:'Xem {name}', gsUseQ:'Nạp “{name}”?', gsUseDone:'Đã nạp “{name}”. Bấm Xem trước hoặc Bắt đầu.',
+  gsLinkTitle:'Link Google Sheet', gsLinkText:'Dán link của sheet ngân hàng câu hỏi, hoặc chỉ ID của sheet. Sheet phải chia sẻ “Bất kỳ ai có đường liên kết”. Game chỉ đọc sheet, không bao giờ sửa sheet.',
+  gsLinkField:'Link hoặc ID của sheet', gsLinkBad:'Đây không giống link hoặc ID của Google Sheets.', gsLinkDefault:'Dùng sheet mặc định', gsLinkSave:'Lưu và tải', gsLinkOpen:'Mở sheet trong Google Sheets', gsLinkSaved:'Đã lưu link Google Sheet.'
 }};
 const HELP = {
 en: () => `
@@ -836,10 +881,16 @@ en: () => `
 <section><h3>Keyboard shortcuts</h3>${keysTable([['1 – 9, 0','Open answer 1–10 (scores for the answering team)'],['A / B','Choose the answering team'],['X','Strike'],['R','Reveal the next answer (no points)'],['T','Start or stop the timer'],['U · Ctrl+Z','Undo'],['N','Next round'],['H','Hide or show the controls'],['F','Fullscreen'],['M','Mute or unmute'],['?','Open this guide'],['Esc','Close a window']])}<p class="muted">Shortcuts are paused while you type in a box.</p></section>
 <section><h3>Classes and the question library</h3><ol>
 <li>Review the Excel question file: put <b>Y</b> (or X, ✓, OK, Có, Duyệt) in the <b>Approved</b> column of every question you want. Empty = not approved.</li>
-<li>Press <b>Import Excel</b>. Only approved rows are imported. Each topic on the Starters, Movers and Flyers sheets becomes one set in the <b>Question library</b>. Importing the same level and topic again updates that set.</li>
+<li>Press <b>Import Excel</b>. Only approved rows are imported. Each topic on the Starters, Movers, Flyers and KET sheets becomes one set in the <b>Question library</b>. Importing the same level and topic again updates that set.</li>
 <li>Press <b>Classes</b> to add your classes, each with a level (for example 1A · Starters, 2A · Movers).</li>
 <li>Choose a class under <b>Class &amp; question library</b>. You see the sets for its level, how often this class played each one, and the sets it has never played (highlighted). Press <b>Use this set</b>, then <b>Preview</b> or <b>Start game</b>. Starting the game records it in the class history.</li></ol>
 <p>Use <b>Back up library</b> in the Question library to keep a copy of every set and class, and <b>Restore backup</b> to load it on another computer.</p></section>
+<section><h3>Question bank (Google Sheet)</h3><ol>
+<li>The question bank is a Google Sheet with one tab per level: <b>Starters</b>, <b>Movers</b>, <b>Flyers</b> and <b>KET</b>. Each set (for example <i>Movers 3</i>) has about 5 questions on different topics; one row = one round.</li>
+<li>Read the questions in the sheet and put <b>Y</b> in the <b>Approved</b> column of every question you want to use. Empty or N = not approved, so the game ignores it.</li>
+<li>In Game setup, under <b>Question bank (Google Sheet)</b>, choose the level (it follows the class you chose), then press <b>Use this set</b> on a set. Its questions go into the editor and the title becomes the set name; team names, multiplier and timer stay the same. Press <b>Preview</b> or <b>Start game</b>. Starting records the set in the class history, and sets this class hasn’t played are highlighted.</li>
+<li>After changing the sheet, press <b>Refresh</b>. The game keeps the last copy it loaded, so it still works without internet (it shows when that copy is from).</li></ol>
+<p>The sheet must be shared as “Anyone with the link”. To use a different sheet, press <b>Sheet link</b> and paste its link. The game only reads the sheet; it never changes it.</p></section>
 <section><h3>Saving and sharing</h3><p>Questions, saved sets and the current game save automatically in this browser on this device. They don’t follow you to another computer, a private window, or a browser whose data was cleared. Anyone you share the link with sees the sample questions, not yours. To move or share a set, use <b>Export</b>, send the file, and load it with <b>Import</b>.</p>${storeLine()}</section>`,
 vi: () => `
 <section><h3>Trước giờ học</h3><p>Nhập câu hỏi cho mỗi vòng và cho điểm từng đáp án — đáp án càng phổ biến điểm càng cao. Hai vòng cuối tự động nhân ×2; bạn có thể đổi hệ số hoặc tự chọn vòng trong mục Thông tin trò chơi. Bấm <b>Xem trước</b> để kiểm tra bảng, rồi bấm <b>Bắt đầu</b>.</p></section>
@@ -855,10 +906,16 @@ vi: () => `
 <section><h3>Phím tắt</h3>${keysTable([['1 – 9, 0','Mở đáp án 1–10 (cộng điểm cho đội đang trả lời)'],['A / B','Chọn đội trả lời'],['X','Đánh dấu sai'],['R','Mở đáp án tiếp theo (không tính điểm)'],['T','Bật/tắt đồng hồ'],['U · Ctrl+Z','Hoàn tác'],['N','Vòng tiếp'],['H','Ẩn/hiện bảng điều khiển'],['F','Toàn màn hình'],['M','Tắt/bật tiếng'],['?','Mở hướng dẫn này'],['Esc','Đóng cửa sổ']])}<p class="muted">Phím tắt tạm dừng khi bạn đang gõ trong ô nhập.</p></section>
 <section><h3>Lớp học và thư viện câu hỏi</h3><ol>
 <li>Duyệt file Excel câu hỏi: ghi <b>Y</b> (hoặc X, ✓, OK, Có, Duyệt) vào cột <b>Approved</b> của mỗi câu muốn dùng. Để trống = chưa duyệt.</li>
-<li>Bấm <b>Nhập Excel</b>. Chỉ các dòng đã duyệt được nhập. Mỗi chủ đề trên sheet Starters, Movers, Flyers thành một bộ trong <b>Thư viện câu hỏi</b>. Nhập lại cùng cấp độ và chủ đề sẽ cập nhật bộ đó.</li>
+<li>Bấm <b>Nhập Excel</b>. Chỉ các dòng đã duyệt được nhập. Mỗi chủ đề trên sheet Starters, Movers, Flyers, KET thành một bộ trong <b>Thư viện câu hỏi</b>. Nhập lại cùng cấp độ và chủ đề sẽ cập nhật bộ đó.</li>
 <li>Bấm <b>Quản lý lớp</b> để thêm các lớp, mỗi lớp một cấp độ (ví dụ 1A · Starters, 2A · Movers).</li>
 <li>Chọn lớp ở mục <b>Lớp học &amp; thư viện câu hỏi</b>. Bạn sẽ thấy các bộ của cấp độ đó, số lần lớp đã chơi từng bộ, và các bộ lớp chưa chơi (được tô sáng). Bấm <b>Dùng bộ này</b>, rồi <b>Xem trước</b> hoặc <b>Bắt đầu</b>. Khi bắt đầu, lượt chơi được ghi vào lịch sử của lớp.</li></ol>
 <p>Trong Thư viện câu hỏi, bấm <b>Sao lưu thư viện</b> để giữ bản sao mọi bộ câu hỏi và lớp học, và <b>Khôi phục bản sao lưu</b> để mở trên máy khác.</p></section>
+<section><h3>Ngân hàng câu hỏi (Google Sheet)</h3><ol>
+<li>Ngân hàng câu hỏi là một Google Sheet, mỗi cấp độ một tab: <b>Starters</b>, <b>Movers</b>, <b>Flyers</b> và <b>KET</b>. Mỗi bộ (ví dụ <i>Movers 3</i>) có khoảng 5 câu thuộc các chủ đề khác nhau; mỗi dòng là một vòng chơi.</li>
+<li>Đọc câu hỏi trong sheet và ghi <b>Y</b> vào cột <b>Approved</b> của mỗi câu muốn dùng. Để trống hoặc N = chưa duyệt, game sẽ bỏ qua.</li>
+<li>Trên màn hình Thiết lập, ở mục <b>Ngân hàng câu hỏi (Google Sheet)</b>, chọn cấp độ (tự theo lớp đã chọn), rồi bấm <b>Dùng bộ này</b> ở một bộ. Câu hỏi được nạp vào phần soạn, tên trò chơi = tên bộ; tên đội, hệ số nhân và thời gian giữ nguyên. Bấm <b>Xem trước</b> hoặc <b>Bắt đầu</b>. Khi bắt đầu, bộ được ghi vào lịch sử của lớp; các bộ lớp chưa chơi được tô vàng.</li>
+<li>Sau khi sửa sheet, bấm <b>Tải lại</b>. Game giữ bản tải gần nhất nên vẫn dùng được khi mất mạng (có ghi dữ liệu lúc nào).</li></ol>
+<p>Sheet phải chia sẻ “Bất kỳ ai có đường liên kết”. Muốn dùng sheet khác, bấm <b>Link Google Sheet</b> và dán link. Game chỉ đọc sheet, không bao giờ sửa sheet.</p></section>
 <section><h3>Lưu và chia sẻ</h3><p>Câu hỏi, các bộ đã lưu và trò chơi hiện tại được tự động lưu trên trình duyệt của máy này. Dữ liệu không đi theo bạn sang máy khác, cửa sổ ẩn danh, hoặc trình duyệt đã xóa dữ liệu. Người mở đường link bạn chia sẻ sẽ thấy câu hỏi mẫu, không phải câu hỏi của bạn. Để chuyển hoặc chia sẻ bộ câu hỏi, bấm <b>Xuất file</b>, gửi file đó, rồi mở bằng <b>Nhập file</b>.</p>${storeLine()}</section>`
 };
 const STORE_LINE = {
@@ -919,7 +976,7 @@ function normalizeConfig(raw){
     sortAnswers: c.sortAnswers !== false,
     timerSeconds: clampInt(c.timerSeconds, 3, 180, 15),
     sample: !!c.sample,
-    classId: str(c.classId, 20), libSetId: str(c.libSetId, 20),
+    classId: str(c.classId, 20), libSetId: str(c.libSetId, 120),
     rounds: c.rounds.slice(0, MAX_ROUNDS).filter(r => r && typeof r === 'object').map(r => {
       const list = Array.isArray(r.answers) ? r.answers : [];
       return {
@@ -1430,6 +1487,7 @@ function renderSetup(){
   <div class="setup-head"><h1>${esc(t('setupTitle'))}</h1><p class="lead">${esc(t('setupLead'))}</p>${cfg.sample ? `<p class="sample-note" id="sampleNote">${esc(t('sampleNote'))}</p>` : ''}</div>
   ${store.ok ? '' : `<div class="card warn" role="alert">${esc(t('storageWarn'))}</div>`}
   ${classCardHTML()}
+  ${sheetCardHTML()}
   <section class="card" aria-labelledby="detailsH">
     <h2 id="detailsH">${esc(t('detailsTitle'))}</h2>
     <div class="grid-fields">
@@ -1497,7 +1555,8 @@ function onSetupChange(e){
     if (el.checked && cfg.rounds.filter(x => x.double && x !== r).length >= 2) { el.checked = false; toast(t('maxTwoBonus'), 'bad'); return; }
     r.double = el.checked; markEdited(); saveCfgNow(); renderSetup(); refocus(`#dbl-${r.id}`); return;
   }
-  if (el.id === 'cfgClass') { cfg.classId = el.value; saveCfgNow(); renderSetup(); refocus('#cfgClass'); return; }
+  if (el.id === 'cfgClass') { cfg.classId = el.value; saveCfgNow(); const c = currentClass(); if (c) setGsPrefs({ id:gsPrefs().id, level:c.level }); renderSetup(); refocus('#cfgClass'); return; }
+  if (el.id === 'gsLevel') { setGsPrefs({ id:gsPrefs().id, level:LEVELS.includes(el.value) ? el.value : '' }); renderGsCard(); return; }
   const k = el.dataset.cfg; if (!k) return;
   if (k === 'lang') { setLang(el.value); return; }
   if (k === 'multiplier') cfg.multiplier = clampInt(el.value, 2, 5, 2);
@@ -1790,7 +1849,7 @@ async function deleteSet(id){
 async function resetAll(){
   const ok = await confirmBox({ title:t('raTitle'), text:t('raText'), ok:t('raOK'), danger:true });
   if (!ok) return;
-  Object.keys(KEY).forEach(n => { if (n !== 'library' && n !== 'classes') store.del(KEY[n]); });
+  Object.keys(KEY).forEach(n => { if (!['library', 'classes', 'sheet', 'sheetCache'].includes(n)) store.del(KEY[n]); });
   cfg = sampleConfig(LANG); game = null; showErrors = false;
   shown.A = shown.B = null;
   saveCfgNow(); setScreen('setup'); toast(t('raDone'));
@@ -1837,12 +1896,14 @@ function mergeSet(lib, level, topic, rounds, now){
 function currentClass(){ return cfg.classId ? getClasses().find(c => c.id === cfg.classId) || null : null; }
 function recordPlay(){
   const list = getClasses(), cls = list.find(c => c.id === cfg.classId);
-  const set = cfg.libSetId ? getLibrary().find(s => s.id === cfg.libSetId) : null;
-  if (!cls || !set || set.level !== cls.level) return;
-  const h = cls.history[set.id] || { n:0, last:0 };
-  cls.history[set.id] = { n:(h.n || 0) + 1, last:Date.now() };
+  const id = cfg.libSetId || '';
+  /* Google Sheet sets have ids like gs:<level>:<set name>; library sets use their library id */
+  const level = id.startsWith('gs:') ? id.split(':')[1] : (getLibrary().find(s => s.id === id) || {}).level;
+  if (!cls || !id || !level || level !== cls.level) return;
+  const h = cls.history[id] || { n:0, last:0 };
+  cls.history[id] = { n:(h.n || 0) + 1, last:Date.now() };
   saveClasses(list);
-  game.classId = cls.id; game.libSetId = set.id;
+  game.classId = cls.id; game.libSetId = id;
 }
 function playedLine(h){ return !h || !h.n ? t('neverPlayed') : h.n === 1 ? t('played1', {d:fmtDate(h.last)}) : t('playedN', {n:h.n, d:fmtDate(h.last)}); }
 
@@ -1972,7 +2033,7 @@ function restoreLibrary(raw, err){
     let ex = classes.find(x => qKey(x.name) === qKey(name));
     if (!ex) { const cid = str(c.id, 20); ex = { id: cid && !classes.some(x => x.id === cid) ? cid : uid(), name, level:c.level, history:{} }; classes.push(ex); }
     Object.entries(c.history && typeof c.history === 'object' ? c.history : {}).forEach(([sid, h]) => {
-      const to = idMap[sid] || sid; if (!h || !lib.some(s => s.id === to)) return;
+      const to = idMap[sid] || sid; if (!h || !(to.startsWith('gs:') || lib.some(s => s.id === to))) return;
       const cur = ex.history[to] || { n:0, last:0 };
       ex.history[to] = { n:Math.max(cur.n || 0, Number(h.n) || 0), last:Math.max(cur.last || 0, Number(h.last) || 0) };
     });
@@ -2083,6 +2144,23 @@ async function importExcelFile(file){
   renderSetup();
   showExcelSummary(file.name, parsed, touched, added, replaced);
 }
+/* question + answer/points cells → { probs, answers } (shared by Excel import and the Google Sheet bank); get(k) returns [text, rawPoints] */
+function checkQA(question, n, get){
+  const probs = [], answers = [];
+  if (!question) probs.push(t('xeQuestion')); else if (question.length > 200) probs.push(t('xeQLong'));
+  for (let k = 0; k < n; k++) {
+    const [text, raw] = get(k), ps = String(raw == null ? '' : raw).trim();
+    if (!text && ps === '') continue;
+    if (!text) { probs.push(t('xePtsNoAns', {a:k + 1})); continue; }
+    if (text.length > 80) { probs.push(t('xeALong', {a:k + 1})); continue; }
+    if (ps === '') { probs.push(t('xeAnsNoPts', {a:k + 1})); continue; }
+    const v = typeof raw === 'number' ? raw : (/^\d{1,3}(?:\.0+)?$/.test(ps) ? parseInt(ps, 10) : NaN);
+    if (!Number.isInteger(v) || v < 0 || v > 999) { probs.push(t('xePts', {a:k + 1, v:ps})); continue; }
+    answers.push({ text, points:v });
+  }
+  if (question && !answers.length && !probs.length) probs.push(t('xeNoAns'));
+  return { probs, answers };
+}
 function cellVal(X, ws, r, c){ const cell = ws[X.utils.encode_cell({ r, c })]; if (!cell || cell.v == null) return ''; return cell.v; }
 function parseWorkbook(X, wb){
   const out = { sheets:0, groups:[], unapproved:0, errors:[] };
@@ -2098,21 +2176,8 @@ function parseWorkbook(X, wb){
       if (!any) continue;
       const ap = String(v(18)).normalize('NFC').trim().replace(/\s+/g, '').toLowerCase();
       if (!APPROVED.includes(ap)) { out.unapproved++; continue; }
-      const probs = [], topic = s(0), question = s(1);
-      if (!topic) probs.push(t('xeTopic'));
-      if (!question) probs.push(t('xeQuestion')); else if (question.length > 200) probs.push(t('xeQLong'));
-      const answers = [];
-      for (let k = 0; k < 8; k++) {
-        const text = s(2 + k * 2), raw = v(3 + k * 2), ps = String(raw).trim();
-        if (!text && ps === '') continue;
-        if (!text) { probs.push(t('xePtsNoAns', {a:k + 1})); continue; }
-        if (text.length > 80) { probs.push(t('xeALong', {a:k + 1})); continue; }
-        if (ps === '') { probs.push(t('xeAnsNoPts', {a:k + 1})); continue; }
-        const n = typeof raw === 'number' ? raw : (/^\d{1,3}$/.test(ps) ? parseInt(ps, 10) : NaN);
-        if (!Number.isInteger(n) || n < 0 || n > 999) { probs.push(t('xePts', {a:k + 1, v:ps})); continue; }
-        answers.push({ text, points:n });
-      }
-      if (question && !answers.length && !probs.length) probs.push(t('xeNoAns'));
+      const topic = s(0), question = s(1), qa = checkQA(question, 8, k => [s(2 + k * 2), v(3 + k * 2)]), answers = qa.answers;
+      const probs = (topic ? [] : [t('xeTopic')]).concat(qa.probs);
       if (probs.length) { out.errors.push(t('xeRow', {sheet:name.trim(), row:r + 1, msg:probs.join(' ')})); continue; }
       let g = out.groups.find(x => x.level === lv && qKey(x.topic) === qKey(topic));
       if (!g) { g = { level:lv, topic, rounds:[] }; out.groups.push(g); }
@@ -2132,6 +2197,212 @@ function showExcelSummary(fileName, p, touched, added, replaced){
     ${setLines ? `<ul class="sum-stats">${setLines}</ul>` : ''}
     ${p.errors.length ? `<p><b>${esc(t('xsErrors', {n:p.errors.length}))}</b></p><ul class="err-list">${errs}</ul>` : ''}`,
     actions:[{ label:t('close'), close:true }, { label:t('xsOpenLib'), icon:'book', kind:'gold', onClick:openLibrary }] });
+}
+
+/* ---- Google Sheet question bank (format: SHEET-BANK.md) ---- */
+const SHEET_DEFAULT = '17W9UR-HAxUWoh-Lb8RQV37EIOTfJ30ZDTOHhBDUfOv8';
+const SHEET_TABS = { starters:'Starters', movers:'Movers', flyers:'Flyers', ket:'KET' };
+const SHEET_ID_RE = /^[A-Za-z0-9_-]{20,100}$/;
+const gs = { loading:false, err:'', code:0, mem:null, prefs:null };
+const gsUrl = (id, lv) => `https://docs.google.com/spreadsheets/d/${encodeURIComponent(id)}/gviz/tq?tqx=out:csv&headers=1&sheet=${encodeURIComponent(SHEET_TABS[lv])}`;
+const gsEditUrl = id => `https://docs.google.com/spreadsheets/d/${encodeURIComponent(id)}/edit`;
+function sheetIdFrom(s){
+  s = String(s || '').trim();
+  const m = s.match(/\/spreadsheets\/(?:u\/\d+\/)?d\/([A-Za-z0-9_-]+)/) || s.match(/[?&]id=([A-Za-z0-9_-]+)/);
+  const id = m ? m[1] : s;
+  return SHEET_ID_RE.test(id) ? id : '';
+}
+function gsPrefs(){ const p = store.get(KEY.sheet) || gs.prefs || {}; return { id:typeof p.id === 'string' && SHEET_ID_RE.test(p.id) ? p.id : SHEET_DEFAULT, level:LEVELS.includes(p.level) ? p.level : '' }; }
+function setGsPrefs(p){ gs.prefs = p; store.set(KEY.sheet, p); }
+function gsLevel(){ const p = gsPrefs(), c = currentClass(); return p.level || (c ? c.level : 'starters'); }
+function gsCache(){ const c = store.get(KEY.sheetCache) || gs.mem; return c && c.id === gsPrefs().id && c.tabs && typeof c.tabs === 'object' ? c : null; }
+function fmtTime(ts){ const d = new Date(ts); return isNaN(d) ? '' : `${pad2(d.getHours())}:${pad2(d.getMinutes())} ${fmtDate(ts)}`; }
+
+/* CSV (RFC 4180): quoted fields, "" escapes, commas and line breaks inside quotes, BOM, CRLF */
+function parseCSV(text){
+  text = String(text == null ? '' : text).replace(/^﻿/, '');
+  const rows = []; let row = [], f = '', q = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (q) { if (ch === '"') { if (text[i + 1] === '"') { f += '"'; i++; } else q = false; } else f += ch; }
+    else if (ch === '"') q = true;
+    else if (ch === ',') { row.push(f); f = ''; }
+    else if (ch === '\n' || ch === '\r') { if (ch === '\r' && text[i + 1] === '\n') i++; row.push(f); rows.push(row); row = []; f = ''; }
+    else f += ch;
+  }
+  if (f !== '' || row.length) { row.push(f); rows.push(row); }
+  return rows;
+}
+/* one tab → sets (grouped by Set, in sheet order), unapproved count and row problems; columns found by header name */
+function parseSheetTab(lv, csv){
+  const out = { sets:[], unapproved:0, errors:[], missing:false };
+  const rows = parseCSV(csv), hk = s => String(s || '').normalize('NFC').trim().replace(/\s+/g, ' ').toLowerCase();
+  const head = (rows[0] || []).map(hk), col = n => head.indexOf(n);
+  const ci = { set:col('set'), topic:col('topic'), q:col('question'), ap:col('approved') };
+  if (ci.set < 0 || ci.q < 0 || ci.ap < 0 || col('answer 1') < 0 || col('points 1') < 0) { out.missing = true; return out; }
+  const ans = []; for (let k = 1; k <= MAX_ANSWERS; k++) { const a = col('answer ' + k), p = col('points ' + k); if (a >= 0 || p >= 0) ans.push({ a, p }); }
+  const byKey = {};
+  for (let r = 1; r < rows.length; r++) {
+    const row = rows[r], cell = c => c < 0 || row[c] == null ? '' : String(row[c]).replace(/[\u0000-\u001f\u007f]/g, ' ').trim();
+    if (!row.some(v => String(v).trim() !== '')) continue;
+    const ap = cell(ci.ap).normalize('NFC').replace(/\s+/g, '').toLowerCase();
+    if (!APPROVED.includes(ap)) { out.unapproved++; continue; }
+    const name = cell(ci.set).replace(/\s+/g, ' '), topic = cell(ci.topic), question = cell(ci.q);
+    const qa = checkQA(question, ans.length, k => [cell(ans[k].a), cell(ans[k].p)]);
+    if (!name) qa.probs.unshift(t('gsNoSet'));
+    if (qa.probs.length) { out.errors.push(t('gsRow', {row:r + 1, set:name ? ` (${name})` : '', msg:qa.probs.join(' ')})); continue; }
+    const key = qKey(name);
+    let s = byKey[key];
+    if (!s) { s = byKey[key] = { id:`gs:${lv}:${key}`.slice(0, 120), level:lv, name, topics:[], rounds:[] }; out.sets.push(s); }
+    if (topic && !s.topics.some(x => qKey(x) === qKey(topic))) s.topics.push(topic);
+    s.rounds.push({ question, topic, answers:qa.answers });
+  }
+  return out;
+}
+function gsTab(lv){
+  const c = gsCache(), tab = c && c.tabs[lv];
+  if (!tab) return null;
+  if (typeof tab.csv !== 'string') return { fail:tab.err || 'net' };
+  const p = parseSheetTab(lv, tab.csv);
+  return p.missing ? { fail:'missing' } : p;
+}
+function gsFindSet(id){ const lv = String(id || '').split(':')[1]; if (!LEVELS.includes(lv)) return null; const p = gsTab(lv); return p && p.sets ? p.sets.find(s => s.id === id) || null : null; }
+
+async function gsFetchTab(id, lv){
+  const ctl = window.AbortController ? new AbortController() : null, to = setTimeout(() => { if (ctl) ctl.abort(); }, 20000);
+  try {
+    const res = await fetch(gsUrl(id, lv), { cache:'no-store', credentials:'omit', signal:ctl ? ctl.signal : undefined });
+    if (res.status === 404) return { err:'notfound' };
+    if (res.status === 401 || res.status === 403) return { err:'private' };
+    if (!res.ok) return { err:'http', code:res.status };
+    const text = await res.text();
+    if (/^\s*</.test(text)) return { err:'private' };
+    return { csv:text };
+  } catch(e){ return { err:'net' }; }
+  finally { clearTimeout(to); }
+}
+async function gsRefresh(silent){
+  if (gs.loading) return;
+  const id = gsPrefs().id;
+  gs.loading = true; gs.err = ''; renderGsCard();
+  const res = await Promise.all(LEVELS.map(lv => gsFetchTab(id, lv)));
+  gs.loading = false;
+  if (gsPrefs().id !== id) { renderGsCard(); return; }
+  if (!res.some(r => typeof r.csv === 'string')) {
+    const r = res.find(x => x.err !== 'net') || res[0];
+    gs.err = navigator.onLine === false ? 'offline' : r.err; gs.code = r.code || 0;
+    renderGsCard();
+    if (!silent) toast(gsErrText(), 'bad');
+    return;
+  }
+  const old = gsCache(), tabs = {};
+  LEVELS.forEach((lv, i) => {
+    const r = res[i];
+    if (typeof r.csv === 'string') tabs[lv] = { csv:r.csv };
+    else tabs[lv] = r.err === 'net' && old && old.tabs[lv] && typeof old.tabs[lv].csv === 'string' ? old.tabs[lv] : { err:r.err };
+  });
+  const cache = { id, at:Date.now(), tabs };
+  gs.mem = cache;
+  if (!store.set(KEY.sheetCache, cache)) store.del(KEY.sheetCache);
+  renderGsCard();
+  if (!silent) toast(t('gsUpdated'));
+}
+function gsErrText(){
+  return gs.err === 'offline' ? t('gsErrOffline') : gs.err === 'private' ? t('gsErrPrivate') : gs.err === 'notfound' ? t('gsErrNotFound') : gs.err === 'http' ? t('gsErrHttp', {code:gs.code}) : t('gsErrNet');
+}
+function renderGsCard(){
+  const el = $('#gsCard'); if (!el) return;
+  const a = document.activeElement, had = a && el.contains(a) ? (a.id ? '#' + a.id : a.dataset && a.dataset.act ? `[data-act="${a.dataset.act}"]` : '') : '';
+  el.outerHTML = sheetCardHTML();
+  if (had) { const f = $('#gsCard ' + had) || $('#gsLevel'); if (f && !f.disabled) f.focus({preventScroll:true}); else if ($('#gsLevel')) $('#gsLevel').focus({preventScroll:true}); }
+}
+const nQs = n => n === 1 ? t('gsQ1') : t('gsQs', {n});
+function sheetCardHTML(){
+  const lv = gsLevel(), cache = gsCache(), tab = gsTab(lv), cls = currentClass(), tabName = SHEET_TABS[lv];
+  const lvOpts = LEVELS.map(l => `<option value="${l}" ${l === lv ? 'selected' : ''}>${esc(lvName(l))}</option>`).join('');
+  let status = '', body = '';
+  if (gs.loading) status = `<p class="gs-status busy" role="status"><span class="gs-spin" aria-hidden="true"></span>${esc(t('gsLoading'))}</p>`;
+  else if (gs.err && cache) status = `<p class="gs-status warn" role="alert">${esc(gsErrText())} ${esc(t('gsStale', {d:fmtTime(cache.at)}))}</p>`;
+  else if (gs.err) status = `<p class="store-line bad" role="alert">${esc(gsErrText())}</p>`;
+  else if (cache) status = `<p class="gs-status" role="status">${esc(t('gsFrom', {d:fmtTime(cache.at)}))}</p>`;
+  else status = `<p class="gs-status" role="status">${esc(t('gsNever'))}</p>`;
+  if (tab && tab.fail) body = `<p class="store-line bad" role="alert">${esc(tab.fail === 'missing' ? t('gsTabMissing', {tab:tabName}) : t('gsTabFail', {tab:tabName}))}</p>`;
+  else if (tab) {
+    const extra = [];
+    if (tab.unapproved) extra.push(`<span>${esc(tab.unapproved === 1 ? t('gsWaiting1') : t('gsWaiting', {n:tab.unapproved}))}</span>`);
+    if (tab.errors.length) extra.push(`<span class="gs-bad">${esc(tab.errors.length === 1 ? t('gsProblems1') : t('gsProblems', {n:tab.errors.length}))} <button type="button" class="link" data-act="gsProblems">${esc(t('gsShowProblems'))}</button></span>`);
+    const foot = extra.length ? `<p class="hint gs-foot">${extra.join(' ')}</p>` : '';
+    if (!tab.sets.length) body = `<p class="gs-empty">${esc(t('gsNoSets', {level:lvName(lv)}))}</p>${foot}`;
+    else {
+      const withHist = !!cls && cls.level === lv;
+      const histNote = !cls ? t('gsHistNoClass') : withHist ? '' : t('gsHistOther', {cls:cls.name, level:lvName(cls.level)});
+      body = `<p class="lbl" id="gsSetsH">${esc(t('gsSetsFor', {level:lvName(lv)}))}</p>
+      <ul class="set-list cls-sets" aria-labelledby="gsSetsH">${tab.sets.map(s => {
+        const h = withHist ? cls.history[s.id] : null, np = withHist && (!h || !h.n), curr = cfg.libSetId === s.id;
+        const sub = nQs(s.rounds.length) + (s.topics.length ? ': ' + s.topics.join(', ') : '');
+        return `<li class="set-item ${np ? 'unplayed' : ''} ${curr ? 'current' : ''}"><div class="si-name"><b>${esc(s.name)}${np ? `<span class="np-badge">${esc(t('npBadge'))}</span>` : ''}${curr ? `<span class="cur-badge">${esc(t('curBadge'))}</span>` : ''}</b><span>${esc(sub)}</span>${withHist ? `<span>${esc(playedLine(h))}</span>` : ''}</div>
+        <button type="button" class="btn btn-sm" data-act="gsView" data-id="${esc(s.id)}" aria-label="${esc(t('gsViewAria', {name:s.name}))}">${ICON.eye}<span>${esc(t('lbView'))}</span></button>
+        <button type="button" class="btn btn-sm ${np ? 'btn-gold' : ''}" data-act="gsUse" data-id="${esc(s.id)}">${ICON.play}<span>${esc(t('useSet'))}</span></button></li>`;
+      }).join('')}</ul>${histNote ? `<p class="hint">${esc(histNote)}</p>` : ''}${foot}`;
+    }
+  }
+  return `<section class="card cls-card gs-card" id="gsCard" aria-labelledby="gsH" aria-busy="${gs.loading}">
+    <h2 id="gsH">${esc(t('gsTitle'))}</h2>
+    <div class="cls-top">
+      <div class="field"><label for="gsLevel">${esc(t('gsLevel'))}</label><select id="gsLevel">${lvOpts}</select></div>
+      <div class="cls-tools">
+        <button type="button" class="btn btn-sm btn-neon" data-act="gsRefresh" ${gs.loading ? 'disabled' : ''}>${ICON.refresh}<span>${esc(t('gsRefresh'))}</span></button>
+        <button type="button" class="btn btn-sm" data-act="gsLink">${ICON.gear}<span>${esc(t('gsLink'))}</span></button>
+      </div>
+    </div>
+    ${status}
+    ${body}
+  </section>`;
+}
+function gsShowProblems(){
+  const lv = gsLevel(), tab = gsTab(lv); if (!tab || !tab.errors) return;
+  const errs = tab.errors.slice(0, 80).map(e => `<li>${esc(e)}</li>`).join('') + (tab.errors.length > 80 ? `<li>${esc(t('xsMore', {n:tab.errors.length - 80}))}</li>` : '');
+  Modal.open({ title:t('gsProbTitle', {tab:SHEET_TABS[lv]}), wide:true, body:`<p class="muted">${esc(t('gsProbText'))}</p><ul class="err-list">${errs}</ul>
+    <p><a href="${esc(gsEditUrl(gsPrefs().id))}" target="_blank" rel="noopener" class="link">${esc(t('gsLinkOpen'))}</a></p>`,
+    actions:[{ label:t('close'), kind:'gold', close:true }] });
+}
+function gsViewSet(id){
+  const s = gsFindSet(id); if (!s) return;
+  Modal.open({ title:`${s.name} · ${lvName(s.level)}`, wide:true,
+    body:`<p class="muted">${esc(nQs(s.rounds.length) + (s.topics.length ? ': ' + s.topics.join(', ') : ''))}</p><ol class="lb-rounds">${s.rounds.map(r => `<li><b>${r.topic ? `<span class="lvl-chip">${esc(r.topic)}</span> ` : ''}${esc(r.question)}</b><span>${r.answers.map(a => `${esc(a.text)} (${a.points})`).join(' · ')}</span></li>`).join('')}</ol>`,
+    actions:[{ label:t('close'), close:true }, { label:t('useSet'), icon:'play', kind:'gold', onClick:() => { Modal.close(false); gsUseSet(s.id); } }] });
+}
+async function gsUseSet(id){
+  const s = gsFindSet(id); if (!s || !s.rounds.length) return;
+  if (!cfg.sample) {
+    const ok = await confirmBox({ title:t('gsUseQ', {name:s.name}), text:t('useText', {n:Math.min(s.rounds.length, MAX_ROUNDS)}), ok:t('useSet') });
+    if (!ok) return;
+  }
+  cfg.rounds = s.rounds.slice(0, MAX_ROUNDS).map(r => ({ id:uid(), question:r.question, double:false, answers:r.answers.map(a => ({ id:uid(), text:a.text, points:String(a.points) })) }));
+  cfg.title = s.name.slice(0, 80); cfg.libSetId = s.id; cfg.sample = false;
+  showErrors = false; saveCfgNow(); renderSetup();
+  toast(s.rounds.length > MAX_ROUNDS ? t('useTrunc', {max:MAX_ROUNDS, n:s.rounds.length}) : t('gsUseDone', {name:s.name}));
+  const rh = $('#roundsH'); if (rh) rh.scrollIntoView({block:'start', behavior:reduceMotion ? 'auto' : 'smooth'});
+}
+function openSheetLink(){
+  const p = gsPrefs();
+  Modal.open({ title:t('gsLinkTitle'), body:`<p class="muted">${esc(t('gsLinkText'))}</p>
+    <form id="glForm"><div class="field"><label for="glId">${esc(t('gsLinkField'))}</label><input type="text" id="glId" value="${esc(p.id)}" autocomplete="off" spellcheck="false"></div></form>
+    <p><a href="${esc(gsEditUrl(p.id))}" target="_blank" rel="noopener" class="link">${esc(t('gsLinkOpen'))}</a></p>
+    <p class="mp-err" id="glErr" role="alert" hidden></p>`,
+    actions:[{ label:t('cancel'), close:true }, { label:t('gsLinkDefault'), onClick:() => { $('#glId').value = SHEET_DEFAULT; $('#glId').focus(); } }, { label:t('gsLinkSave'), kind:'gold', icon:'check', onClick:saveSheetLink }],
+    focus:'#glId',
+    onOpen:() => { $('#glForm').addEventListener('submit', e => { e.preventDefault(); saveSheetLink(); }); } });
+}
+function saveSheetLink(){
+  const id = sheetIdFrom($('#glId').value);
+  if (!id) { const e = $('#glErr'); e.textContent = t('gsLinkBad'); e.hidden = false; $('#glId').focus(); return; }
+  const p = gsPrefs(), changed = id !== p.id;
+  setGsPrefs({ id, level:p.level });
+  Modal.close(false);
+  if (changed) { gs.err = ''; gs.mem = null; store.del(KEY.sheetCache); }
+  toast(t('gsLinkSaved'));
+  renderGsCard(); gsRefresh(true);
 }
 
 /* ================= sound (Web Audio, generated locally) ================= */
@@ -2362,6 +2633,11 @@ document.addEventListener('click', e => {
     case 'lbDelete': deleteLibrarySet(b.dataset.id); break;
     case 'cmEdit': editClass(b.dataset.id); break;
     case 'cmDelete': deleteClass(b.dataset.id); break;
+    case 'gsRefresh': gsRefresh(false); break;
+    case 'gsLink': openSheetLink(); break;
+    case 'gsUse': gsUseSet(b.dataset.id); break;
+    case 'gsView': gsViewSet(b.dataset.id); break;
+    case 'gsProblems': gsShowProblems(); break;
     case 'turnA': setTurn('A'); break;
     case 'turnB': setTurn('B'); break;
     case 'reveal': revealNext(); break;
@@ -2441,6 +2717,7 @@ function boot(hot){
   else if (want === 'results' && game && game.finished) setScreen('results');
   else setScreen('setup');
   if (!store.get(KEY.config)) saveCfgNow();
+  gsRefresh(true);
 }
 try { if (window.claude && window.claude.hot && window.claude.hot.snapshot) window.claude.hot.snapshot(() => ({ cfg, game, screen })); } catch(e){}
 if (window.claude && window.claude.hot && window.claude.hot.ready) window.claude.hot.ready(boot);
