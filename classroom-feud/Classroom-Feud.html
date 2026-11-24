@@ -375,6 +375,32 @@ body[data-screen="setup"] .toast{bottom:calc(84px + env(safe-area-inset-bottom,0
 .store-line{padding:10px 12px;border-radius:12px;background:rgba(62,240,160,.1);border:1px solid rgba(62,240,160,.35)}
 .store-line.bad{background:rgba(255,61,85,.12);border-color:rgba(255,61,85,.45)}
 
+/* ---------- classes & question library ---------- */
+.cls-card{display:grid;gap:14px}
+.cls-card h2{margin:0}
+.cls-top{display:flex;flex-wrap:wrap;align-items:end;gap:10px 12px}
+.cls-top .field{flex:1;min-width:200px;max-width:360px}
+.cls-tools{display:flex;flex-wrap:wrap;gap:8px}
+.cls-sets{max-height:420px;overflow:auto;padding-right:2px}
+.lvl-chip{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 9px;border-radius:999px;border:1px solid rgba(60,211,255,.5);color:var(--neon-2);background:rgba(4,8,30,.5);white-space:nowrap}
+.lvl-chip.starters{border-color:rgba(62,240,160,.6);color:#a9f8d2}
+.lvl-chip.flyers{border-color:rgba(255,99,212,.6);color:#ffc2ee}
+.set-item.unplayed{border-color:rgba(255,200,61,.6);background:linear-gradient(90deg,rgba(255,200,61,.13),rgba(4,8,30,.45) 55%)}
+.set-item.current{border-color:rgba(62,240,160,.7);box-shadow:0 0 0 1px rgba(62,240,160,.3)}
+.np-badge,.cur-badge{display:inline-block;margin-left:6px;font-size:12px;font-weight:700;padding:1px 8px;border-radius:999px;vertical-align:1px;white-space:nowrap}
+.np-badge{background:var(--gold);color:#2a1600}
+.cur-badge{background:rgba(62,240,160,.2);color:#bdfbe0;border:1px solid rgba(62,240,160,.55)}
+.si-name .si-sub{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center}
+.lib-group{display:grid;gap:8px}
+.lib-group h3{margin:4px 0 0;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--neon-2);display:flex;gap:8px;align-items:baseline}
+.lib-group h3 span{color:var(--dim);letter-spacing:.04em;text-transform:none;font-weight:600}
+.lb-rounds{margin:0;padding-left:24px;display:grid;gap:10px}
+.lb-rounds b{display:block}
+.lb-rounds span{font-size:14px;color:var(--muted)}
+.sum-stats{margin:0;padding-left:20px;display:grid;gap:4px}
+.sum-stats b{color:var(--gold-2);font-variant-numeric:tabular-nums}
+.xl-status{margin:0;color:var(--neon-2);font-size:14px}
+
 /* ---------- responsive ---------- */
 @media (max-width:900px),(max-aspect-ratio:1/1){
   .stage{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto 1fr;row-gap:clamp(14px,2vh,20px)}
@@ -587,7 +613,8 @@ const uid = () => Math.random().toString(36).slice(2, 10);
 const clampInt = (v, lo, hi, d) => { const n = parseInt(v, 10); return Number.isFinite(n) ? Math.min(hi, Math.max(lo, n)) : d; };
 const reduceMotion = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
 const MAX_ROUNDS = 30, MAX_ANSWERS = 20, MAX_HISTORY = 80;
-const KEY = { config:'feud.v1.config', game:'feud.v1.game', sets:'feud.v1.sets', audio:'feud.v1.audio', screen:'feud.v1.screen' };
+const KEY = { config:'feud.v1.config', game:'feud.v1.game', sets:'feud.v1.sets', audio:'feud.v1.audio', screen:'feud.v1.screen', library:'feud.v1.library', classes:'feud.v1.classes' };
+const LEVELS = ['starters', 'movers', 'flyers'];
 const guards = {};
 function guard(k, ms){ const n = performance.now(); if (guards[k] && n - guards[k] < ms) return false; guards[k] = n; return true; }
 
@@ -615,6 +642,9 @@ const ICON = {
   upload:'<svg class="i" viewBox="0 0 24 24"><path d="M12 15V4M7 9l5-5 5 5M4 15v4.5h16V15"/></svg>',
   download:'<svg class="i" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M4 15v4.5h16V15"/></svg>',
   play:'<svg class="i" viewBox="0 0 24 24" style="fill:currentColor;stroke:none"><path d="M7 4.5v15l12.5-7.5z"/></svg>',
+  users:'<svg class="i" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M21.5 20a6.5 6.5 0 0 0-4-6"/></svg>',
+  book:'<svg class="i" viewBox="0 0 24 24"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5z"/><path d="M20 5.5A1.5 1.5 0 0 0 18.5 4H13v16h5.5a1.5 1.5 0 0 0 1.5-1.5z"/></svg>',
+  sheet:'<svg class="i" viewBox="0 0 24 24"><rect x="4" y="3.5" width="16" height="17" rx="1.5"/><path d="M4 9h16M4 14.5h16M10 9v11.5"/></svg>',
   gear:'<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>'
 };
 
@@ -678,13 +708,37 @@ en:{
   resTitle:'Export results', resText:'A summary of the game you can paste into a document or keep as a file.',
   ssTitle:'Saved sets', ssText:'Question sets saved in this browser on this device.', ssName:'Name for this set', ssSave:'Save current set', ssLoad:'Load', ssDelete:'Delete', ssEmpty:'No saved sets yet.',
   ssSaved:'Saved “{name}”.', ssUpdated:'Updated “{name}”.', ssLoaded:'Loaded “{name}”.', ssLoadQ:'Load “{name}”?', ssLoadText:'It replaces the questions in the editor. A game in progress is not affected.', ssRounds:'{n} rounds', ssDelQ:'Delete “{name}”?', ssDelText:'This removes the saved set from this browser.', ssNoStore:'This browser is blocking storage, so sets can’t be saved. Use Export instead.', ssFull:'Browser storage is full. Delete an old set or use Export.',
-  raTitle:'Reset all data?', raText:'This deletes your questions, saved sets, the current game and sound settings from this browser, then loads the sample questions. Export anything you want to keep first.', raOK:'Delete everything', raDone:'All data was reset.',
+  raTitle:'Reset all data?', raText:'This deletes your questions, saved sets, the current game and sound settings from this browser, then loads the sample questions. Your question library and classes are kept. Export anything you want to keep first.', raOK:'Delete everything', raDone:'All data was reset.',
   storageWarn:'This browser is blocking storage for this page (for example a private window, or blocked site data). The game works, but your questions and scores disappear when you close it. Use Export to keep a copy.',
   drQ:'Delete Round {n}?', drText:'Its question and {k} answers will be removed.', drOK:'Delete round',
   spTitle:'Sound', soundOn:'Sound on', muteAll:'Mute all', music:'Background music', musicVol:'Music volume', sfxVol:'Effects volume', test:'Test sound',
   soundNote:'Browsers only allow sound after a click, so sound starts with your first click.', noAudio:'This browser can’t play generated sound. The game works without it.',
   muted:'Sound muted.', unmuted:'Sound on.', fsFail:'Fullscreen isn’t available in this view. Open the game in its own browser tab and try again.',
-  stealToast:'{team} steals {n} points!', clearedToast:'Board cleared!', dflt:'(default)', bonusCol:'Bonus'
+  stealToast:'{team} steals {n} points!', clearedToast:'Board cleared!', dflt:'(default)', bonusCol:'Bonus',
+  lv_starters:'Starters', lv_movers:'Movers', lv_flyers:'Flyers',
+  clsTitle:'Class & question library', fClass:'Class', noClass:'— No class —', manageClasses:'Classes', importExcel:'Import Excel', openLibrary:'Question library', libCount:'{n} sets in the library',
+  clsPick:'Choose a class to see the question sets for its level.', clsNone:'No classes yet. Press Classes to add one, for example 1A · Starters.',
+  clsNoSets:'No {level} sets in the library yet. Import a reviewed Excel file.', clsSetsFor:'{level} sets for class {cls}',
+  playedN:'Played {n} times · last on {d}', played1:'Played once · last on {d}', neverPlayed:'Never played with this class', npBadge:'Not played', curBadge:'In the editor',
+  useSet:'Use this set', useQ:'Load “{topic}” ({level})?', useText:'Its {n} rounds replace the questions in the editor. Team names, multiplier and timer stay the same.', useDone:'Loaded “{topic}”. Press Preview or Start game.', useTrunc:'Loaded the first {max} of {n} rounds.',
+  cmTitle:'Classes', cmText:'Each class plays at one level. All classes of a level share that level’s sets, and each class keeps its own play history.', cmName:'Class name', cmNamePh:'e.g. 1A', cmLevel:'Level', cmAdd:'Add class', cmEmpty:'No classes yet.',
+  cmEdit:'Edit', cmDelete:'Delete', cmSave:'Save', cmEditTitle:'Edit class {name}', cmDup:'There is already a class called “{name}”.', cmNoName:'Type a class name.', cmAdded:'Added class {name}.', cmSaved:'Saved class {name}.',
+  cmDelQ:'Delete class {name}?', cmDelText:'Its play history is removed. Question sets stay in the library.', cmPlayed:'{n} games played', cmEditAria:'Edit class {name}', cmDelAria:'Delete class {name}',
+  lbTitle:'Question library', lbText:'Question sets imported from reviewed Excel files and stored in this browser. Each set is one topic at one level.', lbSearch:'Search by topic', lbSearchPh:'e.g. Food',
+  lbEmpty:'The library is empty. Press Import Excel to add reviewed question sets.', lbNoMatch:'No sets match “{q}”.', lbRounds:'{n} rounds', lbRound1:'1 round', lbUpdated:'updated {d}', lbSets:'{n} sets',
+  lbView:'View', lbDelete:'Delete', lbBack:'Back to library', lbViewAria:'View {topic}', lbDelAria:'Delete {topic}',
+  lbDelQ:'Delete “{topic}” ({level})?', lbDelText:'The set is removed from the library and from every class’s history. Back up the library first if you might need it again.', lbDeleted:'Deleted “{topic}”.',
+  lbExport:'Back up library', lbImport:'Restore backup', lbExTitle:'Library backup', lbExText:'Every question set and class as one JSON file. Keep it safe, or load it on another computer with Restore backup.',
+  lbImTitle:'Restore library backup', lbImText:'Choose a library backup .json file, or paste its text. It is merged into the library: a set with the same level and topic is updated, and a class with the same name keeps its history.',
+  lbImGo:'Restore and merge', lbImBad:'This isn’t a library backup. {why}', lbImWhy:'It has no list of sets.', lbImDone:'Restored {s} sets and {c} classes.',
+  xlTitle:'Import reviewed Excel', xlText:'Choose a question-set workbook (.xlsx) after you have reviewed it. Only rows marked in the Approved column (Y, Yes, X, ✓, OK, Có, Duyệt, 1, TRUE) are imported. Each topic on the Starters, Movers and Flyers sheets becomes one set; importing the same level and topic again updates that set.',
+  xlFile:'Choose an .xlsx file', xlLoading:'Reading the file…', xlOffline:'The Excel reader couldn’t be loaded. Excel import needs an internet connection — check the connection and try again. JSON import works offline.',
+  xlBadFile:'This file couldn’t be read as an Excel workbook.', xlNoSheets:'No sheet named Starters, Movers or Flyers was found in this workbook.',
+  xsTitle:'Excel import summary', xsFile:'File: {name}', xsAdded:'New sets: <b>{n}</b>', xsUpdated:'Updated sets: <b>{n}</b>', xsRounds:'Rounds imported: <b>{n}</b> ({a} new, {r} replaced)', xsSkipped:'Rows skipped: <b>{n}</b>',
+  xsUnapproved:'{n} rows not approved yet (Approved cell empty or not a yes value)', xsErrors:'Rows with problems ({n}) — fix them in Excel and import again:', xsNothing:'Nothing was imported: no approved rows were found.',
+  xsNew:'new', xsUpd:'updated', xsSetLine:'{level} · {topic} — {rounds} in the set', xsMore:'…and {n} more.', xsOpenLib:'Open library',
+  xeRow:'Sheet {sheet}, row {row}: {msg}', xeTopic:'Topic is empty.', xeQuestion:'Question is empty.', xeQLong:'Question is longer than 200 characters.', xeNoAns:'No answers.',
+  xeAnsNoPts:'Answer {a} has no points.', xePtsNoAns:'Points {a} has no answer.', xePts:'Points {a} must be a whole number from 0 to 999 (found “{v}”).', xeALong:'Answer {a} is longer than 80 characters.'
 },
 vi:{
   appName:'Classroom Feud', teamA:'Đội A', teamB:'Đội B',
@@ -735,13 +789,37 @@ vi:{
   resTitle:'Xuất kết quả', resText:'Bản tóm tắt trò chơi để dán vào tài liệu hoặc lưu thành file.',
   ssTitle:'Bộ câu hỏi đã lưu', ssText:'Các bộ câu hỏi được lưu trên trình duyệt của máy này.', ssName:'Tên bộ câu hỏi', ssSave:'Lưu bộ hiện tại', ssLoad:'Mở', ssDelete:'Xóa', ssEmpty:'Chưa có bộ nào được lưu.',
   ssSaved:'Đã lưu “{name}”.', ssUpdated:'Đã cập nhật “{name}”.', ssLoaded:'Đã mở “{name}”.', ssLoadQ:'Mở “{name}”?', ssLoadText:'Bộ này sẽ thay thế câu hỏi đang soạn. Trò chơi đang diễn ra không bị ảnh hưởng.', ssRounds:'{n} vòng', ssDelQ:'Xóa “{name}”?', ssDelText:'Bộ câu hỏi này sẽ bị xóa khỏi trình duyệt.', ssNoStore:'Trình duyệt đang chặn bộ nhớ nên không lưu được. Hãy dùng Xuất file.', ssFull:'Bộ nhớ trình duyệt đã đầy. Hãy xóa bớt bộ cũ hoặc dùng Xuất file.',
-  raTitle:'Xóa toàn bộ dữ liệu?', raText:'Thao tác này xóa câu hỏi, các bộ đã lưu, trò chơi hiện tại và cài đặt âm thanh khỏi trình duyệt, rồi nạp lại câu hỏi mẫu. Hãy xuất file những gì bạn muốn giữ trước.', raOK:'Xóa tất cả', raDone:'Đã xóa toàn bộ dữ liệu.',
+  raTitle:'Xóa toàn bộ dữ liệu?', raText:'Thao tác này xóa câu hỏi, các bộ đã lưu, trò chơi hiện tại và cài đặt âm thanh khỏi trình duyệt, rồi nạp lại câu hỏi mẫu. Thư viện câu hỏi và danh sách lớp vẫn được giữ. Hãy xuất file những gì bạn muốn giữ trước.', raOK:'Xóa tất cả', raDone:'Đã xóa toàn bộ dữ liệu.',
   storageWarn:'Trình duyệt đang chặn bộ nhớ cho trang này (ví dụ cửa sổ ẩn danh, hoặc đã chặn dữ liệu trang web). Trò chơi vẫn chạy, nhưng câu hỏi và điểm sẽ mất khi đóng trang. Hãy dùng Xuất file để giữ bản sao.',
   drQ:'Xóa Vòng {n}?', drText:'Câu hỏi và {k} đáp án của vòng này sẽ bị xóa.', drOK:'Xóa vòng',
   spTitle:'Âm thanh', soundOn:'Bật âm thanh', muteAll:'Tắt hết', music:'Nhạc nền', musicVol:'Âm lượng nhạc', sfxVol:'Âm lượng hiệu ứng', test:'Thử âm thanh',
   soundNote:'Trình duyệt chỉ cho phát âm thanh sau khi bạn bấm chuột, nên âm thanh bắt đầu từ lần bấm đầu tiên.', noAudio:'Trình duyệt này không phát được âm thanh. Trò chơi vẫn chạy bình thường.',
   muted:'Đã tắt âm thanh.', unmuted:'Đã bật âm thanh.', fsFail:'Không bật được toàn màn hình ở đây. Hãy mở trò chơi trong một tab riêng rồi thử lại.',
-  stealToast:'{team} cướp được {n} điểm!', clearedToast:'Đã mở hết bảng!', dflt:'(mặc định)', bonusCol:'Nhân điểm'
+  stealToast:'{team} cướp được {n} điểm!', clearedToast:'Đã mở hết bảng!', dflt:'(mặc định)', bonusCol:'Nhân điểm',
+  lv_starters:'Starters', lv_movers:'Movers', lv_flyers:'Flyers',
+  clsTitle:'Lớp học & thư viện câu hỏi', fClass:'Lớp', noClass:'— Chưa chọn lớp —', manageClasses:'Quản lý lớp', importExcel:'Nhập Excel', openLibrary:'Thư viện câu hỏi', libCount:'Thư viện có {n} bộ',
+  clsPick:'Chọn một lớp để xem các bộ câu hỏi của cấp độ lớp đó.', clsNone:'Chưa có lớp nào. Bấm Quản lý lớp để thêm, ví dụ 1A · Starters.',
+  clsNoSets:'Thư viện chưa có bộ {level} nào. Hãy nhập một file Excel đã duyệt.', clsSetsFor:'Các bộ {level} cho lớp {cls}',
+  playedN:'Đã chơi {n} lần · lần cuối {d}', played1:'Đã chơi 1 lần · lần cuối {d}', neverPlayed:'Lớp này chưa chơi bộ này', npBadge:'Chưa chơi', curBadge:'Đang soạn',
+  useSet:'Dùng bộ này', useQ:'Mở “{topic}” ({level})?', useText:'{n} vòng của bộ này sẽ thay thế câu hỏi đang soạn. Tên đội, hệ số nhân và thời gian giữ nguyên.', useDone:'Đã mở “{topic}”. Bấm Xem trước hoặc Bắt đầu.', useTrunc:'Đã mở {max} vòng đầu trong {n} vòng.',
+  cmTitle:'Quản lý lớp', cmText:'Mỗi lớp chơi ở một cấp độ. Các lớp cùng cấp độ dùng chung bộ câu hỏi của cấp đó, và mỗi lớp có lịch sử chơi riêng.', cmName:'Tên lớp', cmNamePh:'VD: 1A', cmLevel:'Cấp độ', cmAdd:'Thêm lớp', cmEmpty:'Chưa có lớp nào.',
+  cmEdit:'Sửa', cmDelete:'Xóa', cmSave:'Lưu', cmEditTitle:'Sửa lớp {name}', cmDup:'Đã có lớp tên “{name}”.', cmNoName:'Hãy nhập tên lớp.', cmAdded:'Đã thêm lớp {name}.', cmSaved:'Đã lưu lớp {name}.',
+  cmDelQ:'Xóa lớp {name}?', cmDelText:'Lịch sử chơi của lớp sẽ bị xóa. Các bộ câu hỏi vẫn còn trong thư viện.', cmPlayed:'Đã chơi {n} trận', cmEditAria:'Sửa lớp {name}', cmDelAria:'Xóa lớp {name}',
+  lbTitle:'Thư viện câu hỏi', lbText:'Các bộ câu hỏi nhập từ file Excel đã duyệt, lưu trên trình duyệt này. Mỗi bộ là một chủ đề ở một cấp độ.', lbSearch:'Tìm theo chủ đề', lbSearchPh:'VD: Food',
+  lbEmpty:'Thư viện đang trống. Bấm Nhập Excel để thêm các bộ câu hỏi đã duyệt.', lbNoMatch:'Không có bộ nào khớp “{q}”.', lbRounds:'{n} vòng', lbRound1:'1 vòng', lbUpdated:'cập nhật {d}', lbSets:'{n} bộ',
+  lbView:'Xem', lbDelete:'Xóa', lbBack:'Về thư viện', lbViewAria:'Xem {topic}', lbDelAria:'Xóa {topic}',
+  lbDelQ:'Xóa “{topic}” ({level})?', lbDelText:'Bộ này sẽ bị xóa khỏi thư viện và khỏi lịch sử của mọi lớp. Hãy sao lưu thư viện trước nếu có thể cần lại.', lbDeleted:'Đã xóa “{topic}”.',
+  lbExport:'Sao lưu thư viện', lbImport:'Khôi phục bản sao lưu', lbExTitle:'Bản sao lưu thư viện', lbExText:'Toàn bộ bộ câu hỏi và lớp học trong một file JSON. Hãy cất giữ, hoặc mở trên máy khác bằng nút Khôi phục bản sao lưu.',
+  lbImTitle:'Khôi phục bản sao lưu thư viện', lbImText:'Chọn file .json sao lưu thư viện, hoặc dán nội dung. Dữ liệu được gộp vào thư viện: bộ cùng cấp độ và chủ đề sẽ được cập nhật, lớp cùng tên giữ lịch sử chơi.',
+  lbImGo:'Khôi phục và gộp', lbImBad:'Đây không phải bản sao lưu thư viện. {why}', lbImWhy:'Không có danh sách bộ câu hỏi.', lbImDone:'Đã khôi phục {s} bộ và {c} lớp.',
+  xlTitle:'Nhập file Excel đã duyệt', xlText:'Chọn file bộ câu hỏi (.xlsx) sau khi đã duyệt. Chỉ nhập các dòng được đánh dấu ở cột Approved (Y, Yes, X, ✓, OK, Có, Duyệt, 1, TRUE). Mỗi chủ đề trên sheet Starters, Movers, Flyers thành một bộ; nhập lại cùng cấp độ và chủ đề sẽ cập nhật bộ đó.',
+  xlFile:'Chọn file .xlsx', xlLoading:'Đang đọc file…', xlOffline:'Không tải được bộ đọc Excel. Nhập Excel cần có kết nối Internet — hãy kiểm tra mạng rồi thử lại. Nhập file JSON vẫn dùng được khi không có mạng.',
+  xlBadFile:'Không đọc được file này dưới dạng Excel.', xlNoSheets:'Không tìm thấy sheet nào tên Starters, Movers hoặc Flyers trong file.',
+  xsTitle:'Kết quả nhập Excel', xsFile:'File: {name}', xsAdded:'Bộ mới: <b>{n}</b>', xsUpdated:'Bộ được cập nhật: <b>{n}</b>', xsRounds:'Số vòng đã nhập: <b>{n}</b> ({a} mới, {r} thay thế)', xsSkipped:'Dòng bị bỏ qua: <b>{n}</b>',
+  xsUnapproved:'{n} dòng chưa duyệt (ô Approved trống hoặc không phải giá trị duyệt)', xsErrors:'Các dòng có lỗi ({n}) — sửa trong Excel rồi nhập lại:', xsNothing:'Không nhập được gì: không có dòng nào đã duyệt.',
+  xsNew:'mới', xsUpd:'cập nhật', xsSetLine:'{level} · {topic} — bộ có {rounds}', xsMore:'…và {n} dòng khác.', xsOpenLib:'Mở thư viện',
+  xeRow:'Sheet {sheet}, dòng {row}: {msg}', xeTopic:'Chưa có Topic.', xeQuestion:'Chưa có câu hỏi.', xeQLong:'Câu hỏi dài quá 200 ký tự.', xeNoAns:'Không có đáp án nào.',
+  xeAnsNoPts:'Đáp án {a} chưa có điểm.', xePtsNoAns:'Điểm {a} không có đáp án.', xePts:'Điểm {a} phải là số nguyên từ 0 đến 999 (đang là “{v}”).', xeALong:'Đáp án {a} dài quá 80 ký tự.'
 }};
 const HELP = {
 en: () => `
@@ -756,6 +834,12 @@ en: () => `
 <section><h3>Bonus rounds</h3><p>In a bonus round every point is multiplied once: answers, steals and points you add by hand. A tile worth 25 shows <b>50</b> with “25 × 2” under it.</p></section>
 <section><h3>Fixing mistakes</h3><p><b>Undo</b> reverses the last action — a reveal, strike, steal, turn change, point change or round change. <b>Reset round</b> hides every answer and removes that round’s points. <b>Points</b> adds or removes points by hand. <b>Timer</b> starts a countdown for the answering team.</p></section>
 <section><h3>Keyboard shortcuts</h3>${keysTable([['1 – 9, 0','Open answer 1–10 (scores for the answering team)'],['A / B','Choose the answering team'],['X','Strike'],['R','Reveal the next answer (no points)'],['T','Start or stop the timer'],['U · Ctrl+Z','Undo'],['N','Next round'],['H','Hide or show the controls'],['F','Fullscreen'],['M','Mute or unmute'],['?','Open this guide'],['Esc','Close a window']])}<p class="muted">Shortcuts are paused while you type in a box.</p></section>
+<section><h3>Classes and the question library</h3><ol>
+<li>Review the Excel question file: put <b>Y</b> (or X, ✓, OK, Có, Duyệt) in the <b>Approved</b> column of every question you want. Empty = not approved.</li>
+<li>Press <b>Import Excel</b>. Only approved rows are imported. Each topic on the Starters, Movers and Flyers sheets becomes one set in the <b>Question library</b>. Importing the same level and topic again updates that set.</li>
+<li>Press <b>Classes</b> to add your classes, each with a level (for example 1A · Starters, 2A · Movers).</li>
+<li>Choose a class under <b>Class &amp; question library</b>. You see the sets for its level, how often this class played each one, and the sets it has never played (highlighted). Press <b>Use this set</b>, then <b>Preview</b> or <b>Start game</b>. Starting the game records it in the class history.</li></ol>
+<p>Use <b>Back up library</b> in the Question library to keep a copy of every set and class, and <b>Restore backup</b> to load it on another computer.</p></section>
 <section><h3>Saving and sharing</h3><p>Questions, saved sets and the current game save automatically in this browser on this device. They don’t follow you to another computer, a private window, or a browser whose data was cleared. Anyone you share the link with sees the sample questions, not yours. To move or share a set, use <b>Export</b>, send the file, and load it with <b>Import</b>.</p>${storeLine()}</section>`,
 vi: () => `
 <section><h3>Trước giờ học</h3><p>Nhập câu hỏi cho mỗi vòng và cho điểm từng đáp án — đáp án càng phổ biến điểm càng cao. Hai vòng cuối tự động nhân ×2; bạn có thể đổi hệ số hoặc tự chọn vòng trong mục Thông tin trò chơi. Bấm <b>Xem trước</b> để kiểm tra bảng, rồi bấm <b>Bắt đầu</b>.</p></section>
@@ -769,6 +853,12 @@ vi: () => `
 <section><h3>Vòng nhân điểm</h3><p>Trong vòng nhân điểm, mọi điểm chỉ được nhân một lần: đáp án, cướp điểm và điểm cộng tay. Ô 25 điểm sẽ hiện <b>50</b> kèm dòng “25 × 2”.</p></section>
 <section><h3>Sửa nhầm lẫn</h3><p><b>Hoàn tác</b> đảo ngược thao tác vừa rồi — mở ô, sai, cướp điểm, đổi lượt, cộng/trừ điểm hoặc chuyển vòng. <b>Chơi lại vòng</b> ẩn lại mọi đáp án và bỏ điểm của vòng đó. <b>Điểm</b> cho phép cộng/trừ điểm bằng tay. <b>Đếm giờ</b> bật đồng hồ cho đội đang trả lời.</p></section>
 <section><h3>Phím tắt</h3>${keysTable([['1 – 9, 0','Mở đáp án 1–10 (cộng điểm cho đội đang trả lời)'],['A / B','Chọn đội trả lời'],['X','Đánh dấu sai'],['R','Mở đáp án tiếp theo (không tính điểm)'],['T','Bật/tắt đồng hồ'],['U · Ctrl+Z','Hoàn tác'],['N','Vòng tiếp'],['H','Ẩn/hiện bảng điều khiển'],['F','Toàn màn hình'],['M','Tắt/bật tiếng'],['?','Mở hướng dẫn này'],['Esc','Đóng cửa sổ']])}<p class="muted">Phím tắt tạm dừng khi bạn đang gõ trong ô nhập.</p></section>
+<section><h3>Lớp học và thư viện câu hỏi</h3><ol>
+<li>Duyệt file Excel câu hỏi: ghi <b>Y</b> (hoặc X, ✓, OK, Có, Duyệt) vào cột <b>Approved</b> của mỗi câu muốn dùng. Để trống = chưa duyệt.</li>
+<li>Bấm <b>Nhập Excel</b>. Chỉ các dòng đã duyệt được nhập. Mỗi chủ đề trên sheet Starters, Movers, Flyers thành một bộ trong <b>Thư viện câu hỏi</b>. Nhập lại cùng cấp độ và chủ đề sẽ cập nhật bộ đó.</li>
+<li>Bấm <b>Quản lý lớp</b> để thêm các lớp, mỗi lớp một cấp độ (ví dụ 1A · Starters, 2A · Movers).</li>
+<li>Chọn lớp ở mục <b>Lớp học &amp; thư viện câu hỏi</b>. Bạn sẽ thấy các bộ của cấp độ đó, số lần lớp đã chơi từng bộ, và các bộ lớp chưa chơi (được tô sáng). Bấm <b>Dùng bộ này</b>, rồi <b>Xem trước</b> hoặc <b>Bắt đầu</b>. Khi bắt đầu, lượt chơi được ghi vào lịch sử của lớp.</li></ol>
+<p>Trong Thư viện câu hỏi, bấm <b>Sao lưu thư viện</b> để giữ bản sao mọi bộ câu hỏi và lớp học, và <b>Khôi phục bản sao lưu</b> để mở trên máy khác.</p></section>
 <section><h3>Lưu và chia sẻ</h3><p>Câu hỏi, các bộ đã lưu và trò chơi hiện tại được tự động lưu trên trình duyệt của máy này. Dữ liệu không đi theo bạn sang máy khác, cửa sổ ẩn danh, hoặc trình duyệt đã xóa dữ liệu. Người mở đường link bạn chia sẻ sẽ thấy câu hỏi mẫu, không phải câu hỏi của bạn. Để chuyển hoặc chia sẻ bộ câu hỏi, bấm <b>Xuất file</b>, gửi file đó, rồi mở bằng <b>Nhập file</b>.</p>${storeLine()}</section>`
 };
 const STORE_LINE = {
@@ -829,6 +919,7 @@ function normalizeConfig(raw){
     sortAnswers: c.sortAnswers !== false,
     timerSeconds: clampInt(c.timerSeconds, 3, 180, 15),
     sample: !!c.sample,
+    classId: str(c.classId, 20), libSetId: str(c.libSetId, 20),
     rounds: c.rounds.slice(0, MAX_ROUNDS).filter(r => r && typeof r === 'object').map(r => {
       const list = Array.isArray(r.answers) ? r.answers : [];
       return {
@@ -1078,6 +1169,7 @@ async function startGame(){
   saveCfgNow();
   const rounds = v.rounds.map(r => ({ question:r.question, double:r.double, answers: cfg.sortAnswers ? r.answers.slice().sort((a, b) => b.points - a.points) : r.answers }));
   game = newGame({ title:cfg.title.trim() || t('appName'), teamA:cfg.teamA.trim() || t('teamA'), teamB:cfg.teamB.trim() || t('teamB'), multiplier:cfg.multiplier, timerSeconds:cfg.timerSeconds }, rounds);
+  recordPlay();
   showErrors = false;
   saveGame(); setScreen('game'); countdown(introRound);
 }
@@ -1337,6 +1429,7 @@ function renderSetup(){
   el.innerHTML = `${banner}
   <div class="setup-head"><h1>${esc(t('setupTitle'))}</h1><p class="lead">${esc(t('setupLead'))}</p>${cfg.sample ? `<p class="sample-note" id="sampleNote">${esc(t('sampleNote'))}</p>` : ''}</div>
   ${store.ok ? '' : `<div class="card warn" role="alert">${esc(t('storageWarn'))}</div>`}
+  ${classCardHTML()}
   <section class="card" aria-labelledby="detailsH">
     <h2 id="detailsH">${esc(t('detailsTitle'))}</h2>
     <div class="grid-fields">
@@ -1404,6 +1497,7 @@ function onSetupChange(e){
     if (el.checked && cfg.rounds.filter(x => x.double && x !== r).length >= 2) { el.checked = false; toast(t('maxTwoBonus'), 'bad'); return; }
     r.double = el.checked; markEdited(); saveCfgNow(); renderSetup(); refocus(`#dbl-${r.id}`); return;
   }
+  if (el.id === 'cfgClass') { cfg.classId = el.value; saveCfgNow(); renderSetup(); refocus('#cfgClass'); return; }
   const k = el.dataset.cfg; if (!k) return;
   if (k === 'lang') { setLang(el.value); return; }
   if (k === 'multiplier') cfg.multiplier = clampInt(el.value, 2, 5, 2);
@@ -1657,9 +1751,10 @@ function doImport(){
   const txt = ($('#imText').value || '').trim();
   if (!txt) { showImErr(t('imEmpty')); return; }
   let raw; try { raw = JSON.parse(txt.replace(/^﻿/, '')); } catch(e){ showImErr(t('imBad', {why:t('imWhyJson')})); return; }
+  if (raw && raw.kind === 'library') { restoreLibrary(raw, showImErr); return; }
   let c; try { c = normalizeConfig(raw); } catch(e){ showImErr(t('imBad', {why:t('imWhyRounds')})); return; }
   if (!c.rounds.length) { showImErr(t('imBad', {why:t('imWhyRounds')})); return; }
-  c.lang = LANG; c.sample = false; cfg = c; showErrors = false; saveCfgNow();
+  c.lang = LANG; c.sample = false; c.classId = cfg.classId; c.libSetId = ''; cfg = c; showErrors = false; saveCfgNow();
   Modal.close(false); renderSetup(); toast(t('imDone', {name:cfg.title, n:cfg.rounds.length}));
 }
 function getSets(){ const s = store.get(KEY.sets); return Array.isArray(s) ? s.filter(x => x && x.set && x.name) : []; }
@@ -1683,7 +1778,7 @@ async function loadSet(id){
   const s = getSets().find(x => x.id === id); if (!s) return;
   const ok = await confirmBox({ title:t('ssLoadQ', {name:s.name}), text:t('ssLoadText'), ok:t('ssLoad') });
   if (!ok) { openSavedSets(); return; }
-  try { const c = normalizeConfig(s.set); c.lang = LANG; c.sample = false; cfg = c; } catch(e){ toast(t('imBad', {why:''}), 'bad'); return; }
+  try { const c = normalizeConfig(s.set); c.lang = LANG; c.sample = false; c.classId = cfg.classId; c.libSetId = ''; cfg = c; } catch(e){ toast(t('imBad', {why:''}), 'bad'); return; }
   showErrors = false; saveCfgNow(); renderSetup(); toast(t('ssLoaded', {name:s.name}));
 }
 async function deleteSet(id){
@@ -1695,10 +1790,348 @@ async function deleteSet(id){
 async function resetAll(){
   const ok = await confirmBox({ title:t('raTitle'), text:t('raText'), ok:t('raOK'), danger:true });
   if (!ok) return;
-  Object.values(KEY).forEach(k => store.del(k));
+  Object.keys(KEY).forEach(n => { if (n !== 'library' && n !== 'classes') store.del(KEY[n]); });
   cfg = sampleConfig(LANG); game = null; showErrors = false;
   shown.A = shown.B = null;
   saveCfgNow(); setScreen('setup'); toast(t('raDone'));
+}
+
+/* ================= question library & classes ================= */
+const lvName = lv => t('lv_' + lv);
+const nRounds = n => n === 1 ? t('lbRound1') : t('lbRounds', {n});
+const lvChip = lv => `<span class="lvl-chip ${lv}">${esc(lvName(lv))}</span>`;
+const qKey = s => String(s || '').normalize('NFC').trim().replace(/\s+/g, ' ').toLowerCase();
+const pad2 = n => (n < 10 ? '0' : '') + n;
+function fmtDate(ts){ const d = new Date(ts); return isNaN(d) ? '' : `${pad2(d.getDate())}/${pad2(d.getMonth() + 1)}/${d.getFullYear()}`; }
+function cleanRound(r){
+  if (!r || typeof r !== 'object') return null;
+  const question = str(r.question, 200).trim();
+  const answers = (Array.isArray(r.answers) ? r.answers : []).slice(0, MAX_ANSWERS).map(a => ({ text:str(a && a.text, 80).trim(), points:clampInt(a && a.points, 0, 999, -1) })).filter(a => a.text && a.points >= 0);
+  return question && answers.length ? { question, answers } : null;
+}
+function cleanSet(s){
+  if (!s || typeof s !== 'object' || !LEVELS.includes(s.level) || !Array.isArray(s.rounds)) return null;
+  const topic = str(s.topic, 80).trim(); if (!topic) return null;
+  const now = Date.now();
+  return { id:str(s.id, 20) || uid(), level:s.level, topic, rounds:s.rounds.map(cleanRound).filter(Boolean), importedAt:Number(s.importedAt) || now, updatedAt:Number(s.updatedAt) || now };
+}
+function getLibrary(){ const s = store.get(KEY.library); return Array.isArray(s) ? s.map(cleanSet).filter(Boolean) : []; }
+function getClasses(){
+  const s = store.get(KEY.classes);
+  return Array.isArray(s) ? s.filter(c => c && c.id && c.name && LEVELS.includes(c.level)).map(c => ({ id:c.id, name:str(c.name, 20), level:c.level, history: c.history && typeof c.history === 'object' ? c.history : {} })) : [];
+}
+function saveLibrary(lib){ if (store.set(KEY.library, lib)) return true; toast(store.ok ? t('ssFull') : t('ssNoStore'), 'bad'); return false; }
+function saveClasses(list){ if (store.set(KEY.classes, list)) return true; toast(store.ok ? t('ssFull') : t('ssNoStore'), 'bad'); return false; }
+function sortSets(a, b){ return LEVELS.indexOf(a.level) - LEVELS.indexOf(b.level) || a.topic.localeCompare(b.topic); }
+/* merge rounds into the set with the same level + topic (EXCEL-FORMAT.md): same question → replaced, new question → appended */
+function mergeSet(lib, level, topic, rounds, now){
+  let s = lib.find(x => x.level === level && qKey(x.topic) === qKey(topic)), isNew = false, added = 0, replaced = 0;
+  if (!s) { s = { id:uid(), level, topic:topic.trim(), rounds:[], importedAt:now, updatedAt:now }; lib.push(s); isNew = true; }
+  rounds.forEach(r => {
+    const i = s.rounds.findIndex(x => qKey(x.question) === qKey(r.question));
+    if (i >= 0) { s.rounds[i] = r; replaced++; } else { s.rounds.push(r); added++; }
+  });
+  s.updatedAt = now;
+  return { set:s, isNew, added, replaced };
+}
+function currentClass(){ return cfg.classId ? getClasses().find(c => c.id === cfg.classId) || null : null; }
+function recordPlay(){
+  const list = getClasses(), cls = list.find(c => c.id === cfg.classId);
+  const set = cfg.libSetId ? getLibrary().find(s => s.id === cfg.libSetId) : null;
+  if (!cls || !set || set.level !== cls.level) return;
+  const h = cls.history[set.id] || { n:0, last:0 };
+  cls.history[set.id] = { n:(h.n || 0) + 1, last:Date.now() };
+  saveClasses(list);
+  game.classId = cls.id; game.libSetId = set.id;
+}
+function playedLine(h){ return !h || !h.n ? t('neverPlayed') : h.n === 1 ? t('played1', {d:fmtDate(h.last)}) : t('playedN', {n:h.n, d:fmtDate(h.last)}); }
+
+function classCardHTML(){
+  const classes = getClasses(), lib = getLibrary(), cls = currentClass();
+  const opts = `<option value="">${esc(t('noClass'))}</option>` + classes.map(c => `<option value="${esc(c.id)}" ${cls && cls.id === c.id ? 'selected' : ''}>${esc(c.name)} · ${esc(lvName(c.level))}</option>`).join('');
+  let body;
+  if (!classes.length) body = `<p class="hint">${esc(t('clsNone'))}</p>`;
+  else if (!cls) body = `<p class="hint">${esc(t('clsPick'))}</p>`;
+  else {
+    const sets = lib.filter(s => s.level === cls.level);
+    if (!sets.length) body = `<p class="hint">${esc(t('clsNoSets', {level:lvName(cls.level)}))}</p>`;
+    else {
+      const hist = id => cls.history[id];
+      sets.sort((a, b) => {
+        const ha = hist(a.id), hb = hist(b.id), pa = ha && ha.n ? 1 : 0, pb = hb && hb.n ? 1 : 0;
+        return pa - pb || (pa ? (ha.last - hb.last) : 0) || a.topic.localeCompare(b.topic);
+      });
+      body = `<p class="lbl" id="clsSetsH">${esc(t('clsSetsFor', {level:lvName(cls.level), cls:cls.name}))}</p>
+      <ul class="set-list cls-sets" aria-labelledby="clsSetsH">${sets.map(s => {
+        const h = hist(s.id), np = !h || !h.n, curr = cfg.libSetId === s.id;
+        return `<li class="set-item ${np ? 'unplayed' : ''} ${curr ? 'current' : ''}"><div class="si-name"><b>${esc(s.topic)}${np ? `<span class="np-badge">${esc(t('npBadge'))}</span>` : ''}${curr ? `<span class="cur-badge">${esc(t('curBadge'))}</span>` : ''}</b><span>${esc(nRounds(s.rounds.length))} · ${esc(playedLine(h))}</span></div>
+        <button type="button" class="btn btn-sm" data-act="lbView" data-id="${esc(s.id)}" aria-label="${esc(t('lbViewAria', {topic:s.topic}))}">${ICON.eye}<span>${esc(t('lbView'))}</span></button>
+        <button type="button" class="btn btn-sm ${np ? 'btn-gold' : ''}" data-act="useSet" data-id="${esc(s.id)}">${ICON.play}<span>${esc(t('useSet'))}</span></button></li>`;
+      }).join('')}</ul>`;
+    }
+  }
+  return `<section class="card cls-card" aria-labelledby="clsH">
+    <h2 id="clsH">${esc(t('clsTitle'))}</h2>
+    <div class="cls-top">
+      <div class="field"><label for="cfgClass">${esc(t('fClass'))}</label><select id="cfgClass">${opts}</select></div>
+      <div class="cls-tools">
+        <button type="button" class="btn btn-sm" data-act="classes">${ICON.users}<span>${esc(t('manageClasses'))}</span></button>
+        <button type="button" class="btn btn-sm" data-act="library">${ICON.book}<span>${esc(t('openLibrary'))}</span></button>
+        <button type="button" class="btn btn-sm btn-neon" data-act="excel">${ICON.sheet}<span>${esc(t('importExcel'))}</span></button>
+      </div>
+    </div>
+    <p class="hint">${esc(t('libCount', {n:lib.length}))}</p>
+    ${body}
+  </section>`;
+}
+
+async function useLibrarySet(id){
+  const s = getLibrary().find(x => x.id === id); if (!s || !s.rounds.length) return;
+  if (!cfg.sample) {
+    const ok = await confirmBox({ title:t('useQ', {topic:s.topic, level:lvName(s.level)}), text:t('useText', {n:Math.min(s.rounds.length, MAX_ROUNDS)}), ok:t('useSet') });
+    if (!ok) return;
+  }
+  cfg.rounds = s.rounds.slice(0, MAX_ROUNDS).map(r => ({ id:uid(), question:r.question, double:false, answers:r.answers.map(a => ({ id:uid(), text:a.text, points:String(a.points) })) }));
+  cfg.title = s.topic; cfg.libSetId = s.id; cfg.sample = false;
+  showErrors = false; saveCfgNow(); renderSetup();
+  toast(s.rounds.length > MAX_ROUNDS ? t('useTrunc', {max:MAX_ROUNDS, n:s.rounds.length}) : t('useDone', {topic:s.topic}));
+  const sc = $('#setupScroll'), rh = $('#roundsH'); if (sc && rh) rh.scrollIntoView({block:'start', behavior:reduceMotion ? 'auto' : 'smooth'});
+}
+
+/* ---- library modal ---- */
+let lbQuery = '';
+function libListHTML(){
+  const lib = getLibrary();
+  if (!lib.length) return `<p class="muted">${esc(t('lbEmpty'))}</p>`;
+  const q = qKey(lbQuery), hit = lib.filter(s => !q || qKey(s.topic).includes(q));
+  if (!hit.length) return `<p class="muted">${esc(t('lbNoMatch', {q:lbQuery.trim()}))}</p>`;
+  return LEVELS.map(lv => {
+    const sets = hit.filter(s => s.level === lv).sort(sortSets); if (!sets.length) return '';
+    return `<section class="lib-group" aria-labelledby="lbg-${lv}"><h3 id="lbg-${lv}">${esc(lvName(lv))} <span>${esc(t('lbSets', {n:sets.length}))}</span></h3><ul class="set-list">${sets.map(s => `<li class="set-item"><div class="si-name"><b>${esc(s.topic)}</b><span>${esc(nRounds(s.rounds.length))} · ${esc(t('lbUpdated', {d:fmtDate(s.updatedAt)}))}</span></div>
+      <button type="button" class="btn btn-sm" data-act="lbView" data-id="${esc(s.id)}" aria-label="${esc(t('lbViewAria', {topic:s.topic}))}">${ICON.eye}<span>${esc(t('lbView'))}</span></button>
+      <button type="button" class="btn btn-sm btn-quiet" data-act="lbDelete" data-id="${esc(s.id)}" aria-label="${esc(t('lbDelAria', {topic:s.topic}))}">${ICON.trash}<span>${esc(t('lbDelete'))}</span></button></li>`).join('')}</ul></section>`;
+  }).join('');
+}
+function openLibrary(){
+  Modal.open({ title:t('lbTitle'), wide:true, body:`<p class="muted">${esc(t('lbText'))}</p>
+    <div class="field"><label for="lbSearch">${esc(t('lbSearch'))}</label><input type="text" id="lbSearch" value="${esc(lbQuery)}" placeholder="${esc(t('lbSearchPh'))}" autocomplete="off"></div>
+    <div id="lbList" style="display:grid;gap:14px" aria-live="polite">${libListHTML()}</div>`,
+    actions:[{ label:t('close'), close:true }, { label:t('lbExport'), icon:'download', onClick:exportLibrary }, { label:t('lbImport'), icon:'upload', onClick:openRestoreLibrary }, { label:t('importExcel'), icon:'sheet', kind:'gold', onClick:openExcelImport }],
+    focus:'#lbSearch',
+    onOpen:() => { $('#lbSearch').addEventListener('input', e => { lbQuery = e.target.value; $('#lbList').innerHTML = libListHTML(); }); } });
+}
+function viewLibrarySet(id){
+  const s = getLibrary().find(x => x.id === id); if (!s) return;
+  Modal.open({ title:`${s.topic} · ${lvName(s.level)}`, wide:true,
+    body:`<p class="muted">${esc(nRounds(s.rounds.length))} · ${esc(t('lbUpdated', {d:fmtDate(s.updatedAt)}))}</p><ol class="lb-rounds">${s.rounds.map(r => `<li><b>${esc(r.question)}</b><span>${r.answers.map(a => `${esc(a.text)} (${a.points})`).join(' · ')}</span></li>`).join('')}</ol>`,
+    actions:[{ label:t('lbBack'), onClick:openLibrary }, { label:t('useSet'), icon:'play', kind:'gold', onClick:() => { Modal.close(false); useLibrarySet(s.id); } }] });
+}
+async function deleteLibrarySet(id){
+  const lib = getLibrary(), s = lib.find(x => x.id === id); if (!s) return;
+  const fromSetup = !Modal.isOpen();
+  const ok = await confirmBox({ title:t('lbDelQ', {topic:s.topic, level:lvName(s.level)}), text:t('lbDelText'), ok:t('lbDelete'), danger:true });
+  if (ok && saveLibrary(lib.filter(x => x.id !== id))) {
+    const cls = getClasses(); cls.forEach(c => { delete c.history[id]; }); saveClasses(cls);
+    if (cfg.libSetId === id) { cfg.libSetId = ''; saveCfgNow(); }
+    toast(t('lbDeleted', {topic:s.topic}));
+  }
+  renderSetup();
+  if (!fromSetup) openLibrary();
+}
+function exportLibrary(){
+  const data = JSON.stringify({ app:'classroom-feud', kind:'library', version:1, exportedAt:new Date().toISOString(), sets:getLibrary(), classes:getClasses() }, null, 2);
+  const d = new Date(), stamp = `${d.getFullYear()}${pad2(d.getMonth() + 1)}${pad2(d.getDate())}`;
+  openTextExport(t('lbExTitle'), t('lbExText'), data, [{ label:t('downloadJson'), name:`feud-library-${stamp}.json`, data }]);
+}
+function openRestoreLibrary(){
+  Modal.open({ title:t('lbImTitle'), body:`<p class="muted">${esc(t('lbImText'))}</p>
+    <div class="field"><label for="lrFile">${esc(t('imFile'))}</label><input type="file" id="lrFile" accept=".json,application/json,text/plain"></div>
+    <div class="field"><label for="lrText">${esc(t('imPaste'))}</label><textarea class="code-box" id="lrText" spellcheck="false" style="min-height:140px"></textarea></div>
+    <p class="mp-err" id="lrErr" role="alert" hidden></p>`,
+    actions:[{ label:t('cancel'), onClick:openLibrary }, { label:t('lbImGo'), kind:'gold', icon:'upload', onClick:() => {
+      const err = m => { const e = $('#lrErr'); e.textContent = m; e.hidden = false; };
+      const txt = ($('#lrText').value || '').trim(); if (!txt) { err(t('imEmpty')); return; }
+      let raw; try { raw = JSON.parse(txt.replace(/^﻿/, '')); } catch(e){ err(t('lbImBad', {why:t('imWhyJson')})); return; }
+      restoreLibrary(raw, err);
+    } }],
+    focus:'#lrFile',
+    onOpen:() => { $('#lrFile').addEventListener('change', e => { const f = e.target.files && e.target.files[0]; if (!f) return; const rd = new FileReader(); rd.onload = () => { $('#lrText').value = String(rd.result || ''); }; rd.readAsText(f); }); } });
+}
+function restoreLibrary(raw, err){
+  if (!raw || !Array.isArray(raw.sets)) { err(t('lbImBad', {why:t('lbImWhy')})); return; }
+  const lib = getLibrary(), classes = getClasses(), idMap = {}, now = Date.now();
+  let ns = 0, nc = 0;
+  raw.sets.map(cleanSet).filter(Boolean).forEach(s => {
+    const m = mergeSet(lib, s.level, s.topic, s.rounds, now);
+    if (m.isNew) { m.set.importedAt = s.importedAt; if (!lib.some(x => x !== m.set && x.id === s.id)) m.set.id = s.id; }
+    idMap[s.id] = m.set.id; ns++;
+  });
+  (Array.isArray(raw.classes) ? raw.classes : []).forEach(c => {
+    if (!c || !LEVELS.includes(c.level)) return;
+    const name = str(c.name, 20).trim(); if (!name) return;
+    let ex = classes.find(x => qKey(x.name) === qKey(name));
+    if (!ex) { const cid = str(c.id, 20); ex = { id: cid && !classes.some(x => x.id === cid) ? cid : uid(), name, level:c.level, history:{} }; classes.push(ex); }
+    Object.entries(c.history && typeof c.history === 'object' ? c.history : {}).forEach(([sid, h]) => {
+      const to = idMap[sid] || sid; if (!h || !lib.some(s => s.id === to)) return;
+      const cur = ex.history[to] || { n:0, last:0 };
+      ex.history[to] = { n:Math.max(cur.n || 0, Number(h.n) || 0), last:Math.max(cur.last || 0, Number(h.last) || 0) };
+    });
+    nc++;
+  });
+  if (!saveLibrary(lib) || !saveClasses(classes)) return;
+  Modal.close(false); renderSetup(); toast(t('lbImDone', {s:ns, c:nc}));
+}
+
+/* ---- classes modal ---- */
+function openClasses(){
+  const list = getClasses();
+  const opts = sel => LEVELS.map(lv => `<option value="${lv}" ${lv === sel ? 'selected' : ''}>${esc(lvName(lv))}</option>`).join('');
+  const items = list.length ? `<ul class="set-list">${list.map(c => {
+    const games = Object.values(c.history).reduce((s, h) => s + (h && h.n || 0), 0);
+    return `<li class="set-item"><div class="si-name"><b>${esc(c.name)} ${lvChip(c.level)}</b><span>${esc(t('cmPlayed', {n:games}))}</span></div>
+      <button type="button" class="btn btn-sm" data-act="cmEdit" data-id="${esc(c.id)}" aria-label="${esc(t('cmEditAria', {name:c.name}))}">${ICON.gear}<span>${esc(t('cmEdit'))}</span></button>
+      <button type="button" class="btn btn-sm btn-quiet" data-act="cmDelete" data-id="${esc(c.id)}" aria-label="${esc(t('cmDelAria', {name:c.name}))}">${ICON.trash}<span>${esc(t('cmDelete'))}</span></button></li>`;
+  }).join('')}</ul>` : `<p class="muted">${esc(t('cmEmpty'))}</p>`;
+  Modal.open({ title:t('cmTitle'), body:`<p class="muted">${esc(t('cmText'))}</p>
+    <form class="inline-form" id="cmForm"><div class="field"><label for="cmName">${esc(t('cmName'))}</label><input type="text" id="cmName" maxlength="20" placeholder="${esc(t('cmNamePh'))}" autocomplete="off"></div>
+    <div class="field" style="flex:0 1 160px;min-width:140px"><label for="cmLevel">${esc(t('cmLevel'))}</label><select id="cmLevel">${opts('starters')}</select></div>
+    <button type="submit" class="btn btn-gold" ${store.ok ? '' : 'disabled'}>${ICON.plus}<span>${esc(t('cmAdd'))}</span></button></form>
+    <p class="mp-err" id="cmErr" role="alert" hidden></p>${items}`,
+    actions:[{ label:t('close'), close:true }], focus:'#cmName',
+    onOpen:() => { $('#cmForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const name = $('#cmName').value.trim(), level = $('#cmLevel').value, err = $('#cmErr');
+      if (!name) { err.textContent = t('cmNoName'); err.hidden = false; $('#cmName').focus(); return; }
+      const all = getClasses();
+      if (all.some(c => qKey(c.name) === qKey(name))) { err.textContent = t('cmDup', {name}); err.hidden = false; $('#cmName').focus(); return; }
+      const c = { id:uid(), name, level, history:{} }; all.push(c);
+      if (!saveClasses(all)) return;
+      if (!currentClass()) { cfg.classId = c.id; saveCfgNow(); }
+      renderSetup(); openClasses(); toast(t('cmAdded', {name}));
+    }); } });
+}
+function editClass(id){
+  const c = getClasses().find(x => x.id === id); if (!c) return;
+  Modal.open({ title:t('cmEditTitle', {name:c.name}), body:`<form class="inline-form" id="ceForm"><div class="field"><label for="ceName">${esc(t('cmName'))}</label><input type="text" id="ceName" maxlength="20" value="${esc(c.name)}" autocomplete="off"></div>
+    <div class="field" style="flex:0 1 160px;min-width:140px"><label for="ceLevel">${esc(t('cmLevel'))}</label><select id="ceLevel">${LEVELS.map(lv => `<option value="${lv}" ${lv === c.level ? 'selected' : ''}>${esc(lvName(lv))}</option>`).join('')}</select></div></form>
+    <p class="mp-err" id="ceErr" role="alert" hidden></p>`,
+    actions:[{ label:t('cancel'), onClick:openClasses }, { label:t('cmSave'), kind:'gold', icon:'check', onClick:() => $('#ceForm').requestSubmit ? $('#ceForm').requestSubmit() : $('#ceForm').dispatchEvent(new Event('submit', {cancelable:true})) }],
+    focus:'#ceName',
+    onOpen:() => { $('#ceForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const name = $('#ceName').value.trim(), err = $('#ceErr'), all = getClasses(), me = all.find(x => x.id === id); if (!me) return;
+      if (!name) { err.textContent = t('cmNoName'); err.hidden = false; return; }
+      if (all.some(x => x.id !== id && qKey(x.name) === qKey(name))) { err.textContent = t('cmDup', {name}); err.hidden = false; return; }
+      me.name = name; me.level = $('#ceLevel').value;
+      if (!saveClasses(all)) return;
+      renderSetup(); openClasses(); toast(t('cmSaved', {name}));
+    }); } });
+}
+async function deleteClass(id){
+  const all = getClasses(), c = all.find(x => x.id === id); if (!c) return;
+  const ok = await confirmBox({ title:t('cmDelQ', {name:c.name}), text:t('cmDelText'), ok:t('cmDelete'), danger:true });
+  if (ok && saveClasses(all.filter(x => x.id !== id)) && cfg.classId === id) { cfg.classId = ''; saveCfgNow(); }
+  renderSetup(); openClasses();
+}
+
+/* ---- Excel import (format: EXCEL-FORMAT.md) ---- */
+const XLSX_URL = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+const APPROVED = ['y', 'yes', 'x', '✓', '✔', 'ok', 'có', 'co', 'duyệt', '1', 'true'];
+let xlsxLoading = null;
+function loadXLSX(){
+  if (window.XLSX && window.XLSX.read) return Promise.resolve(window.XLSX);
+  if (xlsxLoading) return xlsxLoading;
+  xlsxLoading = new Promise((res, rej) => {
+    const s = document.createElement('script'); s.src = XLSX_URL; s.async = true; s.crossOrigin = 'anonymous';
+    const fail = () => { xlsxLoading = null; s.remove(); rej(new Error('offline')); };
+    const to = setTimeout(fail, 20000);
+    s.onload = () => { clearTimeout(to); if (window.XLSX && window.XLSX.read) res(window.XLSX); else fail(); };
+    s.onerror = () => { clearTimeout(to); fail(); };
+    document.head.appendChild(s);
+  });
+  return xlsxLoading;
+}
+function openExcelImport(){
+  Modal.open({ title:t('xlTitle'), body:`<p class="muted">${esc(t('xlText'))}</p>
+    <div class="field"><label for="xlFile">${esc(t('xlFile'))}</label><input type="file" id="xlFile" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"></div>
+    <p class="xl-status" id="xlStatus" role="status" hidden></p>
+    <p class="mp-err" id="xlErr" role="alert" hidden></p>`,
+    actions:[{ label:t('cancel'), close:true }], focus:'#xlFile',
+    onOpen:() => { $('#xlFile').addEventListener('change', e => { const f = e.target.files && e.target.files[0]; if (f) importExcelFile(f); }); } });
+}
+async function importExcelFile(file){
+  const st = $('#xlStatus'), er = $('#xlErr'), inp = $('#xlFile');
+  const fail = m => { if (st) st.hidden = true; if (er) { er.textContent = m; er.hidden = false; } if (inp) { inp.disabled = false; inp.value = ''; } };
+  if (er) er.hidden = true;
+  if (st) { st.textContent = t('xlLoading'); st.hidden = false; }
+  if (inp) inp.disabled = true;
+  let X, buf;
+  try { X = await loadXLSX(); } catch(e){ fail(t('xlOffline')); return; }
+  try { buf = await file.arrayBuffer(); } catch(e){ fail(t('xlBadFile')); return; }
+  let wb; try { wb = X.read(new Uint8Array(buf), { type:'array' }); } catch(e){ fail(t('xlBadFile')); return; }
+  const parsed = parseWorkbook(X, wb);
+  if (!parsed.sheets) { fail(t('xlNoSheets')); return; }
+  const lib = getLibrary(), now = Date.now(), touched = [];
+  let added = 0, replaced = 0;
+  parsed.groups.forEach(g => {
+    const m = mergeSet(lib, g.level, g.topic, g.rounds, now);
+    added += m.added; replaced += m.replaced;
+    const prev = touched.find(x => x.set === m.set);
+    if (!prev) touched.push({ set:m.set, isNew:m.isNew });
+  });
+  if (touched.length && !saveLibrary(lib)) { fail(store.ok ? t('ssFull') : t('ssNoStore')); return; }
+  renderSetup();
+  showExcelSummary(file.name, parsed, touched, added, replaced);
+}
+function cellVal(X, ws, r, c){ const cell = ws[X.utils.encode_cell({ r, c })]; if (!cell || cell.v == null) return ''; return cell.v; }
+function parseWorkbook(X, wb){
+  const out = { sheets:0, groups:[], unapproved:0, errors:[] };
+  wb.SheetNames.forEach(name => {
+    const lv = name.trim().replace(/\s+/g, ' ').toLowerCase();
+    if (!LEVELS.includes(lv)) return;
+    out.sheets++;
+    const ws = wb.Sheets[name]; if (!ws || !ws['!ref']) return;
+    const range = X.utils.decode_range(ws['!ref']);
+    for (let r = 1; r <= range.e.r; r++) {
+      const v = c => cellVal(X, ws, r, c), s = c => String(v(c)).replace(/[\u0000-\u001f\u007f]/g, ' ').trim();
+      let any = false; for (let c = 0; c < 18; c++) if (s(c) !== '') { any = true; break; }
+      if (!any) continue;
+      const ap = String(v(18)).normalize('NFC').trim().replace(/\s+/g, '').toLowerCase();
+      if (!APPROVED.includes(ap)) { out.unapproved++; continue; }
+      const probs = [], topic = s(0), question = s(1);
+      if (!topic) probs.push(t('xeTopic'));
+      if (!question) probs.push(t('xeQuestion')); else if (question.length > 200) probs.push(t('xeQLong'));
+      const answers = [];
+      for (let k = 0; k < 8; k++) {
+        const text = s(2 + k * 2), raw = v(3 + k * 2), ps = String(raw).trim();
+        if (!text && ps === '') continue;
+        if (!text) { probs.push(t('xePtsNoAns', {a:k + 1})); continue; }
+        if (text.length > 80) { probs.push(t('xeALong', {a:k + 1})); continue; }
+        if (ps === '') { probs.push(t('xeAnsNoPts', {a:k + 1})); continue; }
+        const n = typeof raw === 'number' ? raw : (/^\d{1,3}$/.test(ps) ? parseInt(ps, 10) : NaN);
+        if (!Number.isInteger(n) || n < 0 || n > 999) { probs.push(t('xePts', {a:k + 1, v:ps})); continue; }
+        answers.push({ text, points:n });
+      }
+      if (question && !answers.length && !probs.length) probs.push(t('xeNoAns'));
+      if (probs.length) { out.errors.push(t('xeRow', {sheet:name.trim(), row:r + 1, msg:probs.join(' ')})); continue; }
+      let g = out.groups.find(x => x.level === lv && qKey(x.topic) === qKey(topic));
+      if (!g) { g = { level:lv, topic, rounds:[] }; out.groups.push(g); }
+      const dup = g.rounds.findIndex(x => qKey(x.question) === qKey(question));
+      if (dup >= 0) g.rounds[dup] = { question, answers }; else g.rounds.push({ question, answers });
+    }
+  });
+  return out;
+}
+function showExcelSummary(fileName, p, touched, added, replaced){
+  const nNew = touched.filter(x => x.isNew).length, skipped = p.unapproved + p.errors.length, rounds = added + replaced;
+  const setLines = touched.slice().sort((a, b) => sortSets(a.set, b.set)).map(x => `<li>${esc(t('xsSetLine', {level:lvName(x.set.level), topic:x.set.topic, rounds:nRounds(x.set.rounds.length)}))} <span class="${x.isNew ? 'np-badge' : 'cur-badge'}">${esc(x.isNew ? t('xsNew') : t('xsUpd'))}</span></li>`).join('');
+  const errs = p.errors.slice(0, 50).map(e => `<li>${esc(e)}</li>`).join('') + (p.errors.length > 50 ? `<li>${esc(t('xsMore', {n:p.errors.length - 50}))}</li>` : '');
+  Modal.open({ title:t('xsTitle'), wide:true, body:`<p class="muted">${esc(t('xsFile', {name:fileName}))}</p>
+    ${rounds ? '' : `<p class="store-line bad" role="alert">${esc(t('xsNothing'))}</p>`}
+    <ul class="sum-stats"><li>${t('xsAdded', {n:nNew})}</li><li>${t('xsUpdated', {n:touched.length - nNew})}</li><li>${t('xsRounds', {n:rounds, a:added, r:replaced})}</li><li>${t('xsSkipped', {n:skipped})}${p.unapproved ? ` — ${esc(t('xsUnapproved', {n:p.unapproved}))}` : ''}</li></ul>
+    ${setLines ? `<ul class="sum-stats">${setLines}</ul>` : ''}
+    ${p.errors.length ? `<p><b>${esc(t('xsErrors', {n:p.errors.length}))}</b></p><ul class="err-list">${errs}</ul>` : ''}`,
+    actions:[{ label:t('close'), close:true }, { label:t('xsOpenLib'), icon:'book', kind:'gold', onClick:openLibrary }] });
 }
 
 /* ================= sound (Web Audio, generated locally) ================= */
@@ -1921,6 +2354,14 @@ document.addEventListener('click', e => {
     case 'gotoErr': gotoErr(+b.dataset.ei); break;
     case 'ssLoad': loadSet(b.dataset.sid); break;
     case 'ssDelete': deleteSet(b.dataset.sid); break;
+    case 'library': openLibrary(); break;
+    case 'excel': openExcelImport(); break;
+    case 'classes': openClasses(); break;
+    case 'useSet': useLibrarySet(b.dataset.id); break;
+    case 'lbView': viewLibrarySet(b.dataset.id); break;
+    case 'lbDelete': deleteLibrarySet(b.dataset.id); break;
+    case 'cmEdit': editClass(b.dataset.id); break;
+    case 'cmDelete': deleteClass(b.dataset.id); break;
     case 'turnA': setTurn('A'); break;
     case 'turnB': setTurn('B'); break;
     case 'reveal': revealNext(); break;
