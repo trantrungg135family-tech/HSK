@@ -2,6 +2,8 @@
 
 Trò chơi kiểu "Family Feud" cho lớp học tiếng Anh, gói trong một file duy nhất: `Classroom-Feud.html`. Mở file bằng Chrome hoặc Edge là chơi được; không cần cài đặt. Dữ liệu (câu hỏi, thư viện, lớp học, trận đang chơi) được lưu trên trình duyệt của máy đang dùng.
 
+Âm thanh và hiệu ứng (ô điểm cao nhất, vòng nhân điểm, sai, cướp điểm…) lấy từ các gói CC0 trên itch.io và được nhúng sẵn trong file: xem [SOUNDS.md](SOUNDS.md).
+
 ## Quy trình chính: Google Sheet → duyệt → chọn bộ → chơi
 
 Ngân hàng câu hỏi chính là Google Sheet **NGÂN HÀNG CÂU HỎI CLASSROOM FEUD** ([mở sheet](https://docs.google.com/spreadsheets/d/17W9UR-HAxUWoh-Lb8RQV37EIOTfJ30ZDTOHhBDUfOv8/edit)). Định dạng chi tiết: [SHEET-BANK.md](SHEET-BANK.md).
