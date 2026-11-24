@@ -175,7 +175,7 @@ input[type=range]{width:100%;accent-color:var(--gold)}
 }
 
 /* ---------- game stage ---------- */
-.game{display:grid;grid-template-rows:1fr auto auto;gap:clamp(6px,1.2vh,12px);padding-block:clamp(8px,1.4vh,16px);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));overflow-y:auto;overflow-x:hidden}
+.game{display:grid;grid-template-rows:1fr auto auto auto;gap:clamp(6px,1.2vh,12px);padding-block:clamp(8px,1.4vh,16px);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));overflow-y:auto;overflow-x:hidden}
 .stage{display:grid;grid-template-columns:minmax(120px,15%) minmax(0,1fr) minmax(120px,15%);gap:clamp(10px,1.6vw,26px)}
 .podium{--tc:var(--team-a);--tc-rgb:var(--a-rgb);position:relative;align-self:center;display:grid;justify-items:center;gap:clamp(4px,1vh,10px);padding:clamp(18px,2.6vh,30px) 10px clamp(12px,2vh,22px);border-radius:20px;background:linear-gradient(180deg,rgba(26,36,112,.85),rgba(8,12,44,.92));border:2px solid rgba(var(--tc-rgb),.35);box-shadow:0 10px 30px rgba(0,0,0,.35);transition:transform .3s,box-shadow .3s,border-color .3s;cursor:pointer}
 .podium.team-b{--tc:var(--team-b);--tc-rgb:var(--b-rgb)}
@@ -302,6 +302,25 @@ input[type=range]{width:100%;accent-color:var(--gold)}
 .show-controls{position:absolute;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));opacity:.55;z-index:5}
 .show-controls:hover,.show-controls:focus-visible{opacity:1}
 .game.clean .console-wrap{display:none}
+/* type-in answer box: the teacher types what a student said, the game checks it */
+.ans-bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px 10px;margin:0 auto;width:min(980px,100%)}
+.ans-bar[hidden]{display:none}
+.ans-field{position:relative;flex:1 1 320px;max-width:560px;display:flex;align-items:center}
+.ans-field svg{position:absolute;left:12px;width:18px;height:18px;color:var(--neon-2);pointer-events:none}
+#ansInput{width:100%;min-height:46px;padding:6px 74px 6px 40px;border-radius:12px;border:1px solid rgba(139,233,255,.45);background:rgba(4,8,30,.82);color:var(--ink);font:600 17px/1.2 var(--f-ui);box-shadow:0 0 14px rgba(60,211,255,.16)}
+#ansInput:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 2px rgba(255,200,61,.35),0 0 18px rgba(255,200,61,.3)}
+#ansInput:disabled{opacity:.55;cursor:not-allowed}
+#ansInput::placeholder{color:var(--dim);font-weight:500}
+.ans-field kbd{position:absolute;right:10px;pointer-events:none}
+.ans-bar.steal-mode #ansInput{border-color:rgba(var(--b-rgb),.8);box-shadow:0 0 16px rgba(var(--b-rgb),.35)}
+.ans-msg{min-height:0;font-weight:700;font-size:15px;color:var(--gold-2);display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px}
+.ans-msg:empty{display:none}
+.ans-msg.ok{color:var(--green)}
+.ans-msg.bad{color:#ff9aa8}
+.ans-msg .btn{min-height:38px;padding:4px 12px;font-size:14px}
+.ans-msg kbd{margin-left:4px}
+.game.clean .ans-bar{opacity:.35;transition:opacity .2s}
+.game.clean .ans-bar:focus-within,.game.clean .ans-bar:hover{opacity:1}
 /* auto-collapsed console: a thin strip at the bottom edge, expands on hover / focus / tap */
 .ctl-handle{display:none}
 .console-wrap.collapsed{grid-template-rows:0fr;min-height:12px;cursor:pointer}
@@ -628,6 +647,11 @@ body[data-screen="setup"] .toast{bottom:calc(84px + env(safe-area-inset-bottom,0
         </div>
       </div>
 
+      <form class="ans-bar" id="ansBar" autocomplete="off" novalidate>
+        <div class="ans-field"><span data-ico="search"></span><input type="text" id="ansInput" maxlength="80" spellcheck="false" autocapitalize="off" enterkeyhint="done"><kbd>Enter</kbd></div>
+        <div class="ans-msg" id="ansMsg" role="status" aria-live="polite"></div>
+      </form>
+
       <div class="console-wrap" id="consoleWrap">
         <span class="ctl-handle" id="ctlHandle" aria-hidden="true"></span>
         <div class="pop points-pop" id="pointsPop" hidden role="dialog" aria-labelledby="mpTitle">
@@ -762,6 +786,7 @@ const ICON = {
   eyeoff:'<svg class="i" viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M10.6 5.1A10 10 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4"/><path d="M6.6 6.6A17 17 0 0 0 2 12s3.6 7 10 7a9.6 9.6 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>',
   x:'<svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>',
   check:'<svg class="i" viewBox="0 0 24 24"><path d="M4.5 12.5l5 5L19.5 7"/></svg>',
+  search:'<svg class="i" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5"/></svg>',
   clock:'<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9.5 2.5h5"/></svg>',
   plusminus:'<svg class="i" viewBox="0 0 24 24"><path d="M7 4v8M3 8h8M13 18h8"/><path d="M19 4L5 20" opacity=".5"/></svg>',
   arrow:'<svg class="i" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
@@ -793,6 +818,8 @@ const I18N = {
 en:{
   foBtn:'Face-off', foTitle:'FACE-OFF!', foReady:'Hands ready… wait for GO!', foGo:'GO! Press your key!', foEarly:'Too early!', foWon:'{team} buzzed first!', foBy:'{s} s slower', foSkip:'Skip', foToast:'{team} answers first', uFaceoff:'face-off',
   fFaceoff:'Face-off buzzer at the start of each round (keys Q / P)',
+  fAnsBox:'Answer box: type what a student says and the game checks it', ansPh:'Type the student’s answer, press Enter', ansPhSteal:'Steal! Type {team}’s one guess, press Enter', ansPhOver:'Round over — press Next round (N)', ansLabel:'Student’s answer',
+  ansOk:'✓ {a}', ansAlready:'Already on the board: {a}', ansWrong:'✗ “{s}” is not on the board', ansStealOk:'✓ Steal! {a}', ansStealWrong:'✗ “{s}” — steal failed', ansMaybe:'Did you mean “{a}”?', ansMaybeRev:'Did you mean “{a}”? (already on the board)', ansYes:'Yes, reveal', ansYesRev:'Yes', ansNo:'No, strike', ansNoSteal:'No, steal fails', ansCancel:'Cancel',
   spPreset:'Classroom volume', spQuiet:'Quiet', spNormal:'Normal', spStage:'Stage', spCrowd:'Crowd cheers and “aww”', spVoice:'Voice callouts (English)', spRoll:'Drum roll while you hold a tile (key or mouse)',
   lsN_stars:'Star fireworks', lsD_stars:'Fireworks in the team’s colour on top answers, steals, a cleared board and the winner',
   lsN_badges:'Banners and crown', lsD_badges:'Crown on the leading team, “LEAD CHANGE!” and “3 IN A ROW!” banners',
@@ -909,6 +936,8 @@ en:{
 vi:{
   foBtn:'Bấm chuông', foTitle:'BẤM CHUÔNG!', foReady:'Đặt tay sẵn… chờ hiệu lệnh GO!', foGo:'GO! Bấm phím của đội!', foEarly:'Bấm sớm quá!', foWon:'{team} bấm trước!', foBy:'chậm hơn {s} giây', foSkip:'Bỏ qua', foToast:'{team} được trả lời trước', uFaceoff:'bấm chuông',
   fFaceoff:'Bấm chuông giành lượt ở đầu mỗi vòng (phím Q / P)',
+  fAnsBox:'Ô gõ đáp án: gõ câu học sinh nói, game tự kiểm tra', ansPh:'Gõ câu trả lời của học sinh rồi nhấn Enter', ansPhSteal:'Cướp điểm! Gõ câu đoán của {team} rồi nhấn Enter', ansPhOver:'Vòng đã xong — bấm Vòng tiếp (N)', ansLabel:'Câu trả lời của học sinh',
+  ansOk:'✓ {a}', ansAlready:'Đáp án này đã có trên bảng: {a}', ansWrong:'✗ “{s}” không có trên bảng', ansStealOk:'✓ Cướp điểm thành công! {a}', ansStealWrong:'✗ “{s}” — cướp điểm thất bại', ansMaybe:'Có phải ý là “{a}”?', ansMaybeRev:'Có phải ý là “{a}”? (đã có trên bảng)', ansYes:'Đúng, mở ô', ansYesRev:'Đúng', ansNo:'Không, tính sai', ansNoSteal:'Không, cướp thất bại', ansCancel:'Hủy',
   spPreset:'Âm lượng lớp học', spQuiet:'Lớp yên tĩnh', spNormal:'Bình thường', spStage:'Sân khấu', spCrowd:'Tiếng khán giả reo hò và “ôi…”', spVoice:'Giọng đọc tiếng Anh', spRoll:'Trống dồn khi giữ ô (phím hoặc chuột)',
   lsN_stars:'Pháo hoa sao', lsD_stars:'Pháo hoa màu đội khi mở ô điểm cao nhất, cướp điểm, mở hết bảng và đội thắng',
   lsN_badges:'Băng rôn và vương miện', lsD_badges:'Vương miện cho đội dẫn đầu, băng rôn “LEAD CHANGE!” và “3 IN A ROW!”',
@@ -1033,8 +1062,9 @@ en: () => `
 <li><b>Reveal</b> shows the next hidden answer without giving points — use it to show the rest of the board.</li>
 <li>Turns never change on their own. Press <b>Next round</b> when you are ready.</li></ol></section>
 <section><h3>Bonus rounds</h3><p>In a bonus round every point is multiplied once: answers, steals and points you add by hand. A tile worth 25 shows <b>50</b> with “25 × 2” under it.</p></section>
+<section><h3>Answer box</h3><p>Under the board there is a box. Type what the student said and press <kbd>Enter</kbd> — you don’t need to remember the answers. If it matches a hidden answer, the tile opens for the answering team (with a short drum roll). If it is already on the board, nothing happens and you see “Already on the board”. If it isn’t on the board, it counts as a strike. During a steal, a match wins the steal and no match means the steal fails. Small spelling mistakes, capital letters, “a / the”, plurals and -ing are fine, and “football” matches “Playing football”. When the game isn’t sure (for example “cat” for “car”) it asks <b>Did you mean …?</b>: <kbd>Enter</kbd> = yes, <kbd>Backspace</kbd> = no (strike), <kbd>Esc</kbd> = cancel. Write other ways to say an answer after a slash, e.g. <i>TV / Television</i>: only “TV” shows on the board. Clicking tiles and the keys still work. Turn the box off under Game details.</p></section>
 <section><h3>Fixing mistakes</h3><p><b>Undo</b> reverses the last action — a reveal, strike, steal, turn change, point change or round change. <b>Reset round</b> hides every answer and removes that round’s points. <b>Points</b> adds or removes points by hand. <b>Timer</b> starts a countdown for the answering team.</p></section>
-<section><h3>Keyboard shortcuts</h3>${keysTable([['1 – 9, 0','Open answer 1–10 (scores for the answering team)'],['A / B','Choose the answering team'],['X','Strike'],['R','Reveal the next answer (no points)'],['T','Start or stop the timer'],['U · Ctrl+Z','Undo'],['N','Next round'],['H','Hide or show the controls'],['F','Fullscreen'],['M','Mute or unmute'],['?','Open this guide'],['Esc','Close a window']])}<p class="muted">Shortcuts are paused while you type in a box.</p></section>
+<section><h3>Keyboard shortcuts</h3>${keysTable([['/ · Enter','Go to the answer box (Esc leaves it)'],['1 – 9, 0','Open answer 1–10 (scores for the answering team)'],['A / B','Choose the answering team'],['X','Strike'],['R','Reveal the next answer (no points)'],['T','Start or stop the timer'],['U · Ctrl+Z','Undo'],['N','Next round'],['H','Hide or show the controls'],['F','Fullscreen'],['M','Mute or unmute'],['?','Open this guide'],['Esc','Close a window']])}<p class="muted">Shortcuts are paused while you type in a box.</p></section>
 <section><h3>Classes and the question library</h3><ol>
 <li>Review the Excel question file: put <b>Y</b> (or X, ✓, OK, Có, Duyệt) in the <b>Approved</b> column of every question you want. Empty = not approved.</li>
 <li>Press <b>Import Excel</b>. Only approved rows are imported. Each topic on the Starters, Movers, Flyers and KET sheets becomes one set in the <b>Question library</b>. Importing the same level and topic again updates that set.</li>
@@ -1065,8 +1095,9 @@ vi: () => `
 <li><b>Mở đáp án</b> mở đáp án ẩn tiếp theo mà không tính điểm — dùng để cho cả lớp xem phần còn lại.</li>
 <li>Lượt chơi không tự đổi. Bấm <b>Vòng tiếp</b> khi bạn sẵn sàng.</li></ol></section>
 <section><h3>Vòng nhân điểm</h3><p>Trong vòng nhân điểm, mọi điểm chỉ được nhân một lần: đáp án, cướp điểm và điểm cộng tay. Ô 25 điểm sẽ hiện <b>50</b> kèm dòng “25 × 2”.</p></section>
+<section><h3>Ô gõ đáp án</h3><p>Dưới bảng có một ô nhập. Gõ câu học sinh vừa nói rồi nhấn <kbd>Enter</kbd> — bạn không cần nhớ đáp án. Nếu trùng một đáp án đang ẩn, ô đó lật ra và cộng điểm cho đội đang trả lời (có trống dồn ngắn). Nếu đáp án đã có trên bảng thì không tính sai, chỉ hiện “Đáp án này đã có trên bảng”. Nếu không có trên bảng thì tính một lần sai. Khi đang cướp điểm: trùng đáp án = cướp thành công, không trùng = cướp thất bại. Game bỏ qua lỗi chính tả nhỏ, chữ hoa, “a / the”, số nhiều, đuôi -ing, và “football” vẫn khớp “Playing football”. Khi chưa chắc (ví dụ “cat” với “car”) game hỏi <b>Có phải ý là …?</b>: <kbd>Enter</kbd> = đúng, <kbd>Backspace</kbd> = không (tính sai), <kbd>Esc</kbd> = hủy. Muốn chấp nhận nhiều cách nói, ghi sau dấu gạch chéo, ví dụ <i>TV / Television</i>: trên bảng chỉ hiện “TV”. Bấm ô và phím tắt vẫn dùng được như cũ. Tắt ô này trong Thông tin trò chơi.</p></section>
 <section><h3>Sửa nhầm lẫn</h3><p><b>Hoàn tác</b> đảo ngược thao tác vừa rồi — mở ô, sai, cướp điểm, đổi lượt, cộng/trừ điểm hoặc chuyển vòng. <b>Chơi lại vòng</b> ẩn lại mọi đáp án và bỏ điểm của vòng đó. <b>Điểm</b> cho phép cộng/trừ điểm bằng tay. <b>Đếm giờ</b> bật đồng hồ cho đội đang trả lời.</p></section>
-<section><h3>Phím tắt</h3>${keysTable([['1 – 9, 0','Mở đáp án 1–10 (cộng điểm cho đội đang trả lời)'],['A / B','Chọn đội trả lời'],['X','Đánh dấu sai'],['R','Mở đáp án tiếp theo (không tính điểm)'],['T','Bật/tắt đồng hồ'],['U · Ctrl+Z','Hoàn tác'],['N','Vòng tiếp'],['H','Ẩn/hiện bảng điều khiển'],['F','Toàn màn hình'],['M','Tắt/bật tiếng'],['?','Mở hướng dẫn này'],['Esc','Đóng cửa sổ']])}<p class="muted">Phím tắt tạm dừng khi bạn đang gõ trong ô nhập.</p></section>
+<section><h3>Phím tắt</h3>${keysTable([['/ · Enter','Vào ô gõ đáp án (Esc để thoát ra)'],['1 – 9, 0','Mở đáp án 1–10 (cộng điểm cho đội đang trả lời)'],['A / B','Chọn đội trả lời'],['X','Đánh dấu sai'],['R','Mở đáp án tiếp theo (không tính điểm)'],['T','Bật/tắt đồng hồ'],['U · Ctrl+Z','Hoàn tác'],['N','Vòng tiếp'],['H','Ẩn/hiện bảng điều khiển'],['F','Toàn màn hình'],['M','Tắt/bật tiếng'],['?','Mở hướng dẫn này'],['Esc','Đóng cửa sổ']])}<p class="muted">Phím tắt tạm dừng khi bạn đang gõ trong ô nhập.</p></section>
 <section><h3>Lớp học và thư viện câu hỏi</h3><ol>
 <li>Duyệt file Excel câu hỏi: ghi <b>Y</b> (hoặc X, ✓, OK, Có, Duyệt) vào cột <b>Approved</b> của mỗi câu muốn dùng. Để trống = chưa duyệt.</li>
 <li>Bấm <b>Nhập Excel</b>. Chỉ các dòng đã duyệt được nhập. Mỗi chủ đề trên sheet Starters, Movers, Flyers, KET thành một bộ trong <b>Thư viện câu hỏi</b>. Nhập lại cùng cấp độ và chủ đề sẽ cập nhật bộ đó.</li>
@@ -1118,7 +1149,7 @@ function sampleConfig(lang){
   const L = lang === 'vi' ? 'vi' : 'en';
   return {
     version:1, title:'Classroom Feud', teamA:I18N[L].teamA, teamB:I18N[L].teamB, lang:L,
-    multiplier:2, doubleMode:'auto', sortAnswers:true, timerSeconds:15, sample:true,
+    multiplier:2, doubleMode:'auto', sortAnswers:true, timerSeconds:15, answerBox:true, sample:true,
     rounds:[
       R('Name a popular hobby for teenagers.', [['Playing video games',32],['Reading books',24],['Playing football',18],['Drawing',12],['Collecting things',8],['Gardening',6]]),
       R('Name something people do to stay healthy.', [['Do exercise',35],['Eat fruit and vegetables',25],['Go to bed early',16],['Drink lots of water',12],['Wash your hands',7],['Go cycling',5]]),
@@ -1146,6 +1177,7 @@ function normalizeConfig(raw){
     sortAnswers: c.sortAnswers !== false,
     timerSeconds: clampInt(c.timerSeconds, 3, 180, 15),
     faceoff: c.faceoff === true,
+    answerBox: c.answerBox !== false,
     sample: !!c.sample,
     classId: str(c.classId, 20), libSetId: str(c.libSetId, 120),
     rounds: c.rounds.slice(0, MAX_ROUNDS).filter(r => r && typeof r === 'object').map(r => {
@@ -1165,7 +1197,7 @@ function normalizeConfig(raw){
 }
 function exportableSet(c){
   return {
-    title:c.title.trim(), teamA:c.teamA.trim(), teamB:c.teamB.trim(), multiplier:c.multiplier, doubleMode:c.doubleMode, sortAnswers:c.sortAnswers, timerSeconds:c.timerSeconds, faceoff:!!c.faceoff,
+    title:c.title.trim(), teamA:c.teamA.trim(), teamB:c.teamB.trim(), multiplier:c.multiplier, doubleMode:c.doubleMode, sortAnswers:c.sortAnswers, timerSeconds:c.timerSeconds, faceoff:!!c.faceoff, answerBox:c.answerBox !== false,
     rounds:c.rounds.map(r => ({ question:r.question.trim(), double:!!r.double, answers:r.answers.filter(a => a.text.trim() || String(a.points).trim()).map(a => ({ text:a.text.trim(), points: /^\d{1,3}$/.test(String(a.points).trim()) ? parseInt(a.points, 10) : String(a.points).trim() })) }))
   };
 }
@@ -1369,7 +1401,7 @@ function nextRound(){
   if (!game) return;
   if (!guard('nav', 700)) return;
   if (game.index < game.rounds.length - 1) {
-    push({k:'next'}); game.index++; streakReset(); Hold.cancel(false); stopTimer(); closePops(); commit(); introRound();
+    push({k:'next'}); game.index++; streakReset(); Hold.cancel(false); Ans.stop(); stopTimer(); closePops(); commit(); introRound();
   } else finishGame();
 }
 function finishGame(){
@@ -1381,7 +1413,7 @@ async function resetRound(){
   const ok = await confirmBox({ title:t('rrTitle'), text:t('rrText', {a:teamName('A'), b:teamName('B'), pa:r.earned.A, pb:r.earned.B}), ok:t('rrOK'), danger:true });
   if (!ok) return;
   push({k:'reset'});
-  game.rounds[game.index] = freshRound(r);
+  game.rounds[game.index] = freshRound(r); Ans.stop();
   stopTimer(); commit(); Sound.fx('softReveal'); toast(t('toastReset'));
 }
 function undo(){
@@ -1395,7 +1427,7 @@ function undo(){
   game = prev;
   stopTimer();
   saveGame();
-  Hold.cancel(false);
+  Hold.cancel(false); Ans.stop();
   if (screen !== 'game') setScreen('game'); else { syncLeader(); renderGame(); }
   Sound.fx('blip'); toast(t('undone', {what:describe(h.label)}));
 }
@@ -1445,9 +1477,9 @@ function tileHTML(r, i, m, revealed){
   const a = r.answers[i], fin = a.points * m;
   const by = r.by ? r.by[i] : null;
   const cls = 'tile' + (revealed ? ' revealed' : '') + (by === 'A' ? ' by-a' : by === 'B' ? ' by-b' : revealed ? ' by-none' : '');
-  return `<button type="button" class="${cls}" data-i="${i}" aria-label="${esc(revealed ? `${i+1}. ${a.text} — ${fin}` : `${t('answerPh')} ${i+1}`)}"><span class="tile-inner">`
+  return `<button type="button" class="${cls}" data-i="${i}" aria-label="${esc(revealed ? `${i+1}. ${shownText(a.text)} — ${fin}` : `${t('answerPh')} ${i+1}`)}"><span class="tile-inner">`
     + `<span class="face front"><span class="tnum">${i+1}</span></span>`
-    + `<span class="face back"><span class="ans-text">${esc(a.text)}</span><span class="pts"><b>${fin}</b>${m > 1 ? `<small>${a.points} × ${m}</small>` : ''}</span>${m > 1 ? `<span class="stamp">×${m}</span>` : ''}</span>`
+    + `<span class="face back"><span class="ans-text">${esc(shownText(a.text))}</span><span class="pts"><b>${fin}</b>${m > 1 ? `<small>${a.points} × ${m}</small>` : ''}</span>${m > 1 ? `<span class="stamp">×${m}</span>` : ''}</span>`
     + `</span></button>`;
 }
 function blankHTML(){ return '<div class="tile blank" aria-hidden="true"><span class="tile-inner"><span class="face front"></span></span></div>'; }
@@ -1478,7 +1510,7 @@ function renderBoard(){
     tile.classList.toggle('by-b', r.by[i] === 'B');
     tile.classList.toggle('by-none', rev && !r.by[i]);
     const a = r.answers[i];
-    tile.setAttribute('aria-label', rev ? `${i+1}. ${a.text} — ${a.points * m}` : `${t('answerPh')} ${i+1}`);
+    tile.setAttribute('aria-label', rev ? `${i+1}. ${shownText(a.text)} — ${a.points * m}` : `${t('answerPh')} ${i+1}`);
   });
 }
 function renderGame(){
@@ -1524,7 +1556,7 @@ function renderGame(){
   $('#cbUndo').disabled = !game.history.length;
   const last = game.index >= game.rounds.length - 1;
   $('#nextLabel').textContent = last ? t('finish') : t('nextRound');
-  updateManualPanel(); Lights.kick();
+  updateManualPanel(); Lights.kick(); Ans.sync();
   updateBrand();
 }
 /* Shrink very long questions so they never squeeze the board: keep the question block within ~27% of the game height. */
@@ -1680,7 +1712,7 @@ const FaceOff = {
   open(){
     if (!game || screen !== 'game' || this.on) return;
     const r = cur(); if (isOver(r) || stealPending(r)) return;
-    Hold.cancel(false); closePops();
+    Hold.cancel(false); closePops(); const ai = $('#ansInput'); if (ai && document.activeElement === ai) ai.blur();
     this.on = true; this.armed = false; this.done = false; this.first = null; this.lock = {A:0, B:0};
     const el = $('#faceoff'); el.hidden = false; el.classList.remove('armed');
     $('#foNameA').textContent = teamName('A'); $('#foNameB').textContent = teamName('B');
@@ -1728,6 +1760,192 @@ const FaceOff = {
     if (k === 'q') { if (this.done) this.late('A'); else this.press('A'); return true; }
     if (k === 'p') { if (this.done) this.late('B'); else this.press('B'); return true; }
     return false;
+  }
+};
+/* ---- type-in answer box: matcher ----
+   Answer text may hold alternatives after "/" ("TV / Television"); only the first part shows on the board.
+   "Tet (Lunar New Year)" also matches "Tet" and "Lunar New Year". */
+function shownText(s){ const p = String(s || '').split('/')[0].trim(); return p || String(s || ''); }
+const AM = {
+  NUM:{zero:0,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19,twenty:20,thirty:30,forty:40,fifty:50,hundred:100},
+  DROP:new Set(['a','an','the']),
+  LEAD:new Set(['some','my','your','his','her','our','their','to']),
+  /* words too common to count as a match on their own ("go" must not match "Go cycling") */
+  WEAK:new Set(['by','on','in','at','to','of','for','with','from','and','or','go','do','play','eat','drink','have','has','make','get','take','be','is','are','people','thing','some','lot','very','it','you','we','they','i']),
+  stem(w){
+    if (/^\d+$/.test(w) || w.length <= 3) return w;
+    if (w.length > 4 && w.endsWith('ies')) w = w.slice(0, -3) + 'y';
+    else if (w.length > 4 && /(ss|x|z|ch|sh)es$/.test(w)) w = w.slice(0, -2);
+    else if (w.length > 3 && w.endsWith('s') && !w.endsWith('ss') && !w.endsWith('us')) w = w.slice(0, -1);
+    if (w.length > 5 && w.endsWith('ing')) w = AM.undouble(w.slice(0, -3));
+    else if (w.length > 4 && w.endsWith('ed')) w = AM.undouble(w.slice(0, -2));
+    if (w.length > 3 && w.endsWith('e')) w = w.slice(0, -1);
+    return w;
+  },
+  undouble(w){ return /([b-df-hj-np-tv-z])\1$/.test(w) && !/(ll|ss|zz)$/.test(w) ? w.slice(0, -1) : w; },
+  tokens(s, raw){
+    const x = String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[đĐ]/g, 'd').toLowerCase()
+      .replace(/&/g, ' and ').replace(/['’`]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+    let w = x ? x.split(' ') : [];
+    w = w.map(k => k in AM.NUM ? String(AM.NUM[k]) : k).filter(k => !AM.DROP.has(k));
+    while (w.length > 1 && AM.LEAD.has(w[0])) w.shift();
+    return raw ? w : w.map(AM.stem);
+  },
+  /* every way an answer can be said: "/" alternatives, plus the part outside and inside (brackets) */
+  forms(text, raw){
+    const out = [];
+    String(text || '').split('/').forEach(part => {
+      const p = part.trim(); if (!p) return;
+      out.push(p);
+      const inner = p.match(/\(([^)]*)\)/g);
+      if (inner) { out.push(p.replace(/\([^)]*\)/g, ' ')); inner.forEach(s => out.push(s.slice(1, -1))); }
+    });
+    return out.map(s => AM.tokens(s, raw)).filter(t => t.length);
+  },
+  lev(a, b){
+    if (a === b) return 0; if (!a.length) return b.length; if (!b.length) return a.length;
+    let pp = null, prev = Array.from({length:b.length + 1}, (_, j) => j);
+    for (let i = 1; i <= a.length; i++) {
+      const row = [i];
+      for (let j = 1; j <= b.length; j++) {
+        row[j] = Math.min(prev[j] + 1, row[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+        if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) row[j] = Math.min(row[j], pp[j - 2] + 1);   /* swapped letters = one typo */
+      }
+      pp = prev; prev = row;
+    }
+    return prev[b.length];
+  },
+  /* typo tolerance by the shorter length: edits allowed for a sure match; one more edit = "did you mean?" */
+  sureEdits(n){ return n <= 5 ? 0 : n <= 8 ? 1 : n <= 13 ? 2 : 3; },
+  strong(t){ return t.some(w => !AM.WEAK.has(w) && !AM.WEAK.has(AM.stem(w)) && w.length >= 3); },
+  /* compare typed tokens q with one answer form f: {s:score 0..1, sure:bool} */
+  compare(q, f){
+    if (q.join(' ') === f.join(' ') || q.join('') === f.join('')) return { s:1, sure:true };
+    let best = { s:0, sure:false };
+    const take = (s, sure) => { if (s > best.s) best = { s, sure }; };
+    /* whole-word containment either way, if the shorter side has a real content word */
+    const [sh, lg] = q.length <= f.length ? [q, f] : [f, q];
+    if (AM.strong(sh)) for (let k = 0; k + sh.length <= lg.length; k++) if (lg.slice(k, k + sh.length).join(' ') === sh.join(' ')) { take(0.95, true); break; }
+    /* typos: whole strings, then windows of the longer side as long as the shorter side */
+    const fuzzy = (a, b) => {
+      const A = a.join(' '), B = b.join(' '), n = Math.min(A.length, B.length), d = Math.min(AM.lev(A, B), AM.lev(a.join(''), b.join('')));
+      const ok = AM.sureEdits(n);
+      if (d <= ok) take(0.9 - d / (n * 4), true); else if (d === ok + 1) take(0.7 - d / (n * 4), false);
+    };
+    fuzzy(q, f);
+    if (AM.strong(sh) && sh.length < lg.length) for (let k = 0; k + sh.length <= lg.length; k++) {
+      const win = lg.slice(k, k + sh.length); if (AM.strong(win)) fuzzy(sh, win);
+    }
+    return best;
+  },
+  /* best answer for the typed text: {i, sure, s} or null */
+  match(typed, answers){
+    let best = null;
+    /* once with simple stemming (plural, -ing, -ed), once as typed so typos inside endings still count */
+    [false, true].forEach(raw => {
+      const q = AM.tokens(typed, raw); if (!q.length) return;
+      answers.forEach((a, i) => AM.forms(a.text, raw).forEach(f => {
+        const c = AM.compare(q, f); if (!c.s) return;
+        if (!best || c.s > best.s) best = { i, sure:c.sure, s:c.s };
+      }));
+    });
+    return best;
+  }
+};
+/* ---- type-in answer box: controller ---- */
+const Ans = {
+  pending:null, busy:0, msgT:0,
+  el(){ return $('#ansInput'); },
+  on(){ return cfg.answerBox !== false; },
+  sync(){
+    const bar = $('#ansBar'); if (!bar) return;
+    const show = this.on() && !!game && screen === 'game';
+    bar.hidden = !show; if (!show) { this.clearPrompt(); return; }
+    const r = cur(), inp = this.el(), over = isOver(r), steal = stealPending(r);
+    inp.disabled = over;
+    inp.placeholder = over ? t('ansPhOver') : steal ? t('ansPhSteal', {team:teamName(r.steal)}) : t('ansPh');
+    inp.setAttribute('aria-label', t('ansLabel'));
+    bar.classList.toggle('steal-mode', steal);
+    if (over && this.pending) this.clearPrompt();
+  },
+  focus(){ if (!this.on() || !game || screen !== 'game') return; const i = this.el(); if (i.disabled) { toast(t('ansPhOver')); return; } CtlBar.poke(); i.focus(); i.select(); },
+  say(html, kind, ms){
+    const m = $('#ansMsg'); clearTimeout(this.msgT);
+    m.className = 'ans-msg' + (kind ? ' ' + kind : ''); m.innerHTML = html;
+    if (ms) this.msgT = setTimeout(() => { if (!this.pending) m.innerHTML = ''; }, ms);
+  },
+  clearPrompt(){ this.pending = null; clearTimeout(this.msgT); const m = $('#ansMsg'); if (m) m.innerHTML = ''; },
+  submit(){
+    const inp = this.el(), raw = inp.value.trim();
+    if (this.pending) { this.yes(); return; }
+    if (!game || screen !== 'game' || !raw || this.busy) return;
+    const r = cur(); if (isOver(r)) { this.sync(); return; }
+    const m = AM.match(raw, r.answers);
+    if (m && m.sure) { this.accept(m.i); return; }
+    if (m) {
+      this.pending = { i:m.i, raw };
+      const a = shownText(r.answers[m.i].text), rev = r.revealed[m.i], steal = stealPending(r);
+      this.say(`<span>${esc(t(rev ? 'ansMaybeRev' : 'ansMaybe', {a}))}</span>`
+        + `<button type="button" class="btn btn-ok" data-ans="yes">${esc(t(rev ? 'ansYesRev' : 'ansYes'))}<kbd>Enter</kbd></button>`
+        + `<button type="button" class="btn btn-danger" data-ans="no">${esc(t(steal ? 'ansNoSteal' : 'ansNo'))}<kbd>⌫</kbd></button>`
+        + `<button type="button" class="btn" data-ans="cancel">${esc(t('ansCancel'))}<kbd>Esc</kbd></button>`, '');
+      Sound.fx('blip');
+      return;
+    }
+    this.reject(raw);
+  },
+  yes(){ const p = this.pending; if (!p) return; this.clearPrompt(); if (game && !isOver(cur())) this.accept(p.i); else this.sync(); },
+  no(){ const p = this.pending; if (!p) return; this.clearPrompt(); if (game && !isOver(cur())) this.reject(p.raw); else this.sync(); },
+  cancel(){ this.clearPrompt(); this.el().focus(); },
+  done(){ const inp = this.el(); inp.value = ''; this.sync(); if (!inp.disabled) inp.focus(); },
+  accept(i){
+    const r = cur(), a = shownText(r.answers[i].text);
+    if (r.revealed[i]) { bumpTile(i); Sound.fx('blip'); this.say(esc(t('ansAlready', {a})), '', 3500); this.done(); return; }
+    if (stealPending(r)) { this.say(esc(t('ansStealOk', {a})), 'ok', 3500); revealTile(i); this.done(); return; }
+    this.say(esc(t('ansOk', {a})), 'ok', 3000);
+    if (Hold.eligible(i)) {
+      /* a short drum roll before the flip, like a quick hold on the number key */
+      const gid = game.id, idx = game.index;
+      Hold.begin(i, null);
+      this.el().value = '';
+      this.busy = setTimeout(() => {
+        this.busy = 0;
+        if (Hold.i === i && game && game.id === gid && game.index === idx) Hold.release(true);
+        this.done();
+      }, 1100);
+      return;
+    }
+    revealTile(i); this.done();
+  },
+  reject(raw){
+    const r = cur();
+    if (stealPending(r)) { this.say(esc(t('ansStealWrong', {s:raw})), 'bad', 3500); stealFail(); this.done(); return; }
+    this.say(esc(t('ansWrong', {s:raw})), 'bad', 3000);
+    strike(); this.done();
+  },
+  /* drop a pending prompt / drum roll (undo, next round, leaving the game) */
+  stop(){ if (this.busy) { clearTimeout(this.busy); this.busy = 0; } this.clearPrompt(); },
+  init(){
+    const inp = this.el();
+    $('#ansBar').addEventListener('submit', e => { e.preventDefault(); this.submit(); });
+    $('#ansMsg').addEventListener('click', e => {
+      const b = e.target.closest('[data-ans]'); if (!b) return;
+      const k = b.dataset.ans; if (k === 'yes') this.yes(); else if (k === 'no') this.no(); else this.cancel();
+    });
+    inp.addEventListener('keydown', e => {
+      if (FaceOff.on || cdState) return;
+      e.stopPropagation();   /* game shortcuts never fire while typing here */
+      if (this.pending) {
+        if (e.key === 'Enter') { e.preventDefault(); this.yes(); return; }
+        if (e.key === 'Backspace') { e.preventDefault(); this.no(); return; }
+        if (e.key === 'Escape') { e.preventDefault(); this.cancel(); return; }
+        if (e.key.length === 1) this.clearPrompt();   /* typing again starts a new answer */
+        return;
+      }
+      if (e.key === 'Escape') { e.preventDefault(); inp.blur(); return; }
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && !inp.value) { e.preventDefault(); undo(); }
+    });
+    inp.addEventListener('focus', () => CtlBar.poke());
   }
 };
 function showSplash(r){
@@ -1940,6 +2158,7 @@ function renderSetup(){
       <div class="field"><label for="cfgTimer">${esc(t('fTimer'))}</label><input type="number" id="cfgTimer" data-cfg="timerSeconds" min="3" max="180" step="1" value="${cfg.timerSeconds}"></div>
       <div class="field"><span class="lbl" aria-hidden="true">&nbsp;</span><label class="check-row" for="cfgSort"><input type="checkbox" id="cfgSort" data-cfg="sortAnswers" ${cfg.sortAnswers ? 'checked' : ''}><span>${esc(t('fSort'))}</span></label></div>
       <div class="field"><span class="lbl" aria-hidden="true">&nbsp;</span><label class="check-row" for="cfgFaceoff"><input type="checkbox" id="cfgFaceoff" data-cfg="faceoff" ${cfg.faceoff ? 'checked' : ''}><span>${esc(t('fFaceoff'))}</span></label></div>
+      <div class="field"><span class="lbl" aria-hidden="true">&nbsp;</span><label class="check-row" for="cfgAnsBox"><input type="checkbox" id="cfgAnsBox" data-cfg="answerBox" ${cfg.answerBox !== false ? 'checked' : ''}><span>${esc(t('fAnsBox'))}</span></label></div>
     </div>
   </section>
   <section class="rounds" aria-labelledby="roundsH">
@@ -2004,6 +2223,7 @@ function onSetupChange(e){
   else if (k === 'doubleMode') cfg.doubleMode = el.value === 'custom' ? 'custom' : 'auto';
   else if (k === 'sortAnswers') cfg.sortAnswers = el.checked;
   else if (k === 'faceoff') cfg.faceoff = el.checked;
+  else if (k === 'answerBox') cfg.answerBox = el.checked;
   else if (k === 'timerSeconds') { cfg.timerSeconds = clampInt(el.value, 3, 180, 15); el.value = cfg.timerSeconds; }
   else return;
   markEdited(); saveCfgNow();
@@ -2104,7 +2324,7 @@ function setScreen(name){
   $('#btnResume').hidden = !(name === 'setup' && game && !game.finished);
   store.set(KEY.screen, name);
   closePops();
-  if (name !== 'game') { stopTimer(); Hold.cancel(false); FaceOff.close(); }
+  if (name !== 'game') { stopTimer(); Hold.cancel(false); FaceOff.close(); Ans.stop(); }
   if (name === 'game') syncLeader();
   if (name !== 'results') Confetti.clear();
   if (name === 'setup') { renderSetup(); keepAwake(false); }
@@ -3596,6 +3816,7 @@ document.addEventListener('visibilitychange', () => { if (document.visibilitySta
 let rsT = 0;
 window.addEventListener('resize', () => { clearTimeout(rsT); rsT = setTimeout(() => { if (screen === 'game' && game) { fitQuestion(); renderBoard(); } }, 120); });
 CtlBar.init();
+Ans.init();
 if (window.ResizeObserver) { let lastCols = 0; new ResizeObserver(() => { if (screen !== 'game' || !game) return; const c = boardCols(cur().answers.length); if (c !== lastCols) { lastCols = c; renderBoard(); } }).observe($('#board')); }
 
 /* hold-to-drum-roll: releasing the held number key reveals; holding the mouse on a tile rolls until the click */
@@ -3631,6 +3852,7 @@ document.addEventListener('keydown', e => {
   if (k === 'm') { e.preventDefault(); toggleMute(); return; }
   if (e.key === '?') { e.preventDefault(); openHelp(); return; }
   if (screen !== 'game' || !game) return;
+  if (Ans.on() && !anyPopOpen() && (e.key === '/' || (e.key === 'Enter' && (!tg || tg === document.body)))) { e.preventDefault(); Ans.focus(); return; }
   if (/^[0-9]$/.test(k)) { e.preventDefault(); const i = k === '0' ? 9 : parseInt(k, 10) - 1; if (Hold.eligible(i)) Hold.begin(i, e.code); else revealTile(i); return; }
   const map = { a:() => setTurn('A'), b:() => setTurn('B'), x:strike, r:revealNext, t:toggleTimer, u:undo, n:nextRound, o:() => FaceOff.open(),
     h:() => { const g = $('#screen-game'); const c = !g.classList.contains('clean'); g.classList.toggle('clean', c); $('#showCtl').hidden = !c; if (c) closePops(); else CtlBar.poke(); fitQuestion(); } };

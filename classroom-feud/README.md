@@ -4,6 +4,23 @@ Trò chơi kiểu "Family Feud" cho lớp học tiếng Anh, gói trong một fi
 
 Âm thanh và hiệu ứng (ô điểm cao nhất, vòng nhân điểm, sai, cướp điểm…) lấy từ các gói CC0 trên itch.io và được nhúng sẵn trong file: xem [SOUNDS.md](SOUNDS.md).
 
+## Ô gõ đáp án (game tự chấm)
+
+Dưới bảng đáp án có một ô nhập. Học sinh nói đáp án, giáo viên gõ lại rồi nhấn **Enter**; không cần nhớ đáp án, không cần tự bấm ô hay phím X.
+
+- **Trùng một đáp án đang ẩn:** ô lật ra (có trống dồn ngắn), điểm cộng cho đội đang trả lời, tính cả chuỗi đúng và vòng nhân điểm.
+- **Trùng đáp án đã mở:** không tính sai, chỉ hiện "Đáp án này đã có trên bảng".
+- **Không có trên bảng:** tính một lần sai (như phím X); đủ 3 lần sai thì đội kia được cướp điểm.
+- **Khi đang cướp điểm:** gõ câu đoán của đội cướp; trùng đáp án = cướp thành công, không trùng = cướp thất bại.
+- **Chưa chắc chắn** (vd. "cat" với "By car", "boots" với "Books"): game hỏi *Có phải ý là "…"?* — **Enter** = đúng (mở ô), **Backspace** = không (tính sai / cướp thất bại), **Esc** = hủy để gõ lại.
+- **Vòng đã xong** (mở hết bảng hoặc đã cướp xong): ô bị khóa, nhắc bấm **Vòng tiếp** (N).
+- Phím tắt: **/** hoặc **Enter** (khi chưa chọn gì) để vào ô; **Esc** để thoát ra. Khi đang gõ trong ô, các phím tắt (số, X, R, N, Q/P, O…) không chạy. **Hoàn tác** (U, Ctrl+Z khi ô trống) vẫn đảo ngược được lần mở ô hay lần sai do ô tự chấm.
+- Bấm ô và phím số / X vẫn dùng như cũ. Muốn tắt ô gõ: bỏ chọn **Ô gõ đáp án** trong **Thông tin trò chơi**.
+
+Cách game so khớp: bỏ chữ hoa, dấu câu, dấu tiếng Việt, khoảng trắng thừa; bỏ *a / an / the* và *some / my…* ở đầu; "&" = "and"; số viết chữ = số ("two" = "2"); số nhiều, đuôi *-ing*, *-ed* coi như nhau ("banana" = "Bananas", "play football" = "Playing football"). Một phần đáp án cũng được nếu là từ có nghĩa ("football" khớp "Playing football", "bus" khớp "By bus"); các từ quá chung như *go, play, by, on, eat* đứng một mình không tính. Cho phép gõ sai chính tả theo độ dài: từ ≤ 5 chữ phải đúng (sai 1 chữ thì game hỏi lại), 6–8 chữ sai 1 chữ, 9–13 chữ sai 2 chữ, dài hơn sai 3 chữ; sai thêm một chữ nữa thì game hỏi lại. Hai chữ đảo chỗ ("raeding") tính là một lỗi.
+
+**Nhiều cách nói cho một đáp án:** ghi sau dấu gạch chéo, vd. `TV / Television` hay `Bike / Bicycle`; trên bảng chỉ hiện phần đầu ("TV"). Phần trong ngoặc cũng được chấp nhận: `Tet (Lunar New Year)` khớp "Tet" và "Lunar New Year". Game không tự biết từ đồng nghĩa ("bike" không khớp "By bicycle" nếu không ghi thêm).
+
 ## Quy trình chính: Google Sheet → duyệt → chọn bộ → chơi
 
 Ngân hàng câu hỏi chính là Google Sheet **NGÂN HÀNG CÂU HỎI CLASSROOM FEUD** ([mở sheet](https://docs.google.com/spreadsheets/d/17W9UR-HAxUWoh-Lb8RQV37EIOTfJ30ZDTOHhBDUfOv8/edit)). Định dạng chi tiết: [SHEET-BANK.md](SHEET-BANK.md).
