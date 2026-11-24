@@ -17,6 +17,8 @@ _Cập nhật: 2026-11-24 — bàn giao trước khi người dùng đổi tài 
 - Người dùng duyệt 100 câu trong Google Sheet.
 
 ## Đã xong gần đây
+- Light show (2026-11-24, e88242d): nút bóng đèn → 8 hiệu ứng ánh sáng canvas (`const Lights`), bật/tắt + nút Thử, preset Tắt/Nhẹ nhàng/Đã đời; mô tả trong `classroom-feud/SOUNDS.md`. Đã phân tích UI/UX trong chat (đề xuất: ẩn thanh điều khiển khi chiếu, câu hỏi to hơn, gọn màn thiết lập) — chưa làm, chờ người dùng chọn.
+- Sửa tải Google Sheet khi mở file bằng bấm đúp: dùng JSONP khi fetch bị chặn CORS.
 - Âm thanh + hiệu ứng (2026-11-24): 15 âm CC0 từ itch.io (Kronbits *200 Free SFX*, ObsydianX *Interface SFX Pack 1*) nhúng base64 Opus trong `Classroom-Feud.html` (`SFX_DATA`, phối trong `MIX` của module `Sound`, âm tổng hợp làm dự phòng). Hiệu ứng mới: nhãn TOP ANSWER cho ô điểm cao nhất, +điểm bay từ ô, pháo giấy, bảng rung khi sai, giọng "Time out!". Bảng ánh xạ trong `classroom-feud/SOUNDS.md`. Đã thử: giải mã đủ 15 âm, mở ô/sai ×3/cướp điểm không lỗi. Chưa nghe thử thật trên loa — chờ người dùng góp ý để đổi tiếng.
 - Google Sheet ngân hàng câu hỏi: tab `Hướng dẫn`, `Starters`, `Movers`, `Flyers`, `KET`; mỗi cấp 5 bộ × 5 câu (100 câu), tổng điểm mỗi câu 90–110, cột Approved có dropdown Y/N và đang trống.
 - Game (`classroom-feud/Classroom-Feud.html`): thẻ "Question bank (Google Sheet)" (chọn cấp → bộ, Refresh, Sheet link, cache offline), thêm cấp KET ở mọi nơi. Đã thử: tải sheet thật được, báo đúng "chưa có bộ nào được duyệt".
