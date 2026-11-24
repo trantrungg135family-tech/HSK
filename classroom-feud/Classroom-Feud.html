@@ -2315,8 +2315,45 @@ async function gsFetchTab(id, lv){
     const text = await res.text();
     if (/^\s*</.test(text)) return { err:'private' };
     return { csv:text };
-  } catch(e){ return { err:'net' }; }
+  } catch(e){
+    /* Opened by double-click (file://): Google sends no CORS header for that origin, so fetch fails. Load the tab as JSONP instead. */
+    clearTimeout(to);
+    return gsFetchTabJsonp(id, lv);
+  }
   finally { clearTimeout(to); }
+}
+let gsCbN = 0;
+function gsFetchTabJsonp(id, lv){
+  return new Promise(resolve => {
+    const name = '__feudGs' + Date.now().toString(36) + (++gsCbN), s = document.createElement('script');
+    let done = false;
+    const finish = r => { if (done) return; done = true; clearTimeout(tm); try { delete window[name]; } catch(e){ window[name] = undefined; } s.remove(); resolve(r); };
+    const tm = setTimeout(() => finish({ err:'net' }), 20000);
+    window[name] = resp => {
+      try {
+        if (!resp || resp.status === 'error' || !resp.table) {
+          const why = resp && resp.errors && resp.errors[0] ? String(resp.errors[0].reason || '') : '';
+          finish({ err: /access|permission|denied/i.test(why) ? 'private' : 'notfound' }); return;
+        }
+        finish({ csv: gsTableToCsv(resp.table) });
+      } catch(e){ finish({ err:'net' }); }
+    };
+    s.onerror = () => finish({ err:'net' });
+    s.src = `https://docs.google.com/spreadsheets/d/${encodeURIComponent(id)}/gviz/tq?tqx=${encodeURIComponent('responseHandler:' + name)}&headers=1&sheet=${encodeURIComponent(SHEET_TABS[lv])}&_=${Date.now()}`;
+    document.head.appendChild(s);
+  });
+}
+function gsTableToCsv(tb){
+  const q = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+  const cell = c => {
+    if (!c || c.v == null) return '';
+    if (typeof c.v === 'number') return Number.isInteger(c.v) ? String(c.v) : (c.f != null ? c.f : String(c.v));
+    if (typeof c.v === 'boolean') return c.v ? 'TRUE' : 'FALSE';
+    return c.f != null && typeof c.v !== 'string' ? c.f : c.v;
+  };
+  const lines = [(tb.cols || []).map(c => q(c.label || '')).join(',')];
+  (tb.rows || []).forEach(r => lines.push((tb.cols || []).map((_, i) => q(cell(r.c && r.c[i]))).join(',')));
+  return lines.join('\n');
 }
 async function gsRefresh(silent){
   if (gs.loading) return;
