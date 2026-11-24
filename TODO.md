@@ -5,7 +5,7 @@ _Cập nhật: 2026-11-24 — bàn giao trước khi người dùng đổi tài 
 ## Đang làm tiếp theo
 1. Đọc file này, chạy `git pull` (Git ở `C:\Program Files\Git\cmd\git.exe` nếu `git` không có trong PATH).
 2. Hỏi người dùng đã thử game chưa (âm thanh, ánh sáng, tải Google Sheet khi mở bằng bấm đúp) và có muốn đổi gì không.
-3. Câu hỏi đang chờ người dùng trả lời: **làm 3 cải thiện UI/UX ưu tiên** hay chưa? Ba việc đó, trong `classroom-feud/Classroom-Feud.html`:
+3. Người dùng đã chọn **để sau** 3 cải thiện UI/UX (2026-11-24) — đừng hỏi lại, chỉ làm khi người dùng nhắc. Ba việc đó, trong `classroom-feud/Classroom-Feud.html`:
    - Thanh điều khiển giáo viên (`.controls`, phím H đã có) tự thu thành dải mỏng khi không di chuột, để màn chiếu gọn.
    - Câu hỏi (`#question`) to hơn khoảng 1,5 lần.
    - Thông báo trong vòng (`#roundNote`, ví dụ "Team B stole 44 points!") và 3 ô X (`#strikes`) to hơn, đặt giữa.
@@ -19,7 +19,7 @@ _Cập nhật: 2026-11-24 — bàn giao trước khi người dùng đổi tài 
 | (không có) | | | | |
 
 ## Chờ (phụ thuộc / chờ người dùng)
-- Người dùng chọn có làm 3 cải thiện UI/UX ở trên không.
+- (UI/UX: người dùng hoãn, chờ người dùng nhắc lại.)
 - Người dùng nghe/xem thử âm thanh và ánh sáng trên loa/máy chiếu thật, góp ý tiếng hoặc hiệu ứng muốn đổi.
 - Người dùng duyệt 100 câu trong Google Sheet.
 
