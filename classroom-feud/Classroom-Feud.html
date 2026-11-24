@@ -1854,7 +1854,7 @@ const AM = {
 };
 /* ---- type-in answer box: controller ---- */
 const Ans = {
-  pending:null, busy:0, msgT:0,
+  pending:null, busy:0, queued:null, msgT:0,
   el(){ return $('#ansInput'); },
   on(){ return cfg.answerBox !== false; },
   sync(){
@@ -1878,7 +1878,9 @@ const Ans = {
   submit(){
     const inp = this.el(), raw = inp.value.trim();
     if (this.pending) { this.yes(); return; }
-    if (!game || screen !== 'game' || !raw || this.busy) return;
+    if (!game || screen !== 'game' || !raw) return;
+    /* a tile is still flipping: keep this answer and check it right after */
+    if (this.busy) { this.queued = raw; inp.value = ''; return; }
     const r = cur(); if (isOver(r)) { this.sync(); return; }
     const m = AM.match(raw, r.answers);
     if (m && m.sure) { this.accept(m.i); return; }
@@ -1911,7 +1913,10 @@ const Ans = {
       this.busy = setTimeout(() => {
         this.busy = 0;
         if (Hold.i === i && game && game.id === gid && game.index === idx) Hold.release(true);
-        this.done();
+        /* don't wipe what the teacher typed during the drum roll */
+        const inp = this.el(), q = this.queued; this.queued = null;
+        this.sync(); if (!inp.disabled) inp.focus();
+        if (q && !inp.disabled && game && game.id === gid && game.index === idx) { inp.value = q; this.submit(); }
       }, 1100);
       return;
     }
@@ -1924,7 +1929,7 @@ const Ans = {
     strike(); this.done();
   },
   /* drop a pending prompt / drum roll (undo, next round, leaving the game) */
-  stop(){ if (this.busy) { clearTimeout(this.busy); this.busy = 0; } this.clearPrompt(); },
+  stop(){ if (this.busy) { clearTimeout(this.busy); this.busy = 0; } this.queued = null; this.clearPrompt(); },
   init(){
     const inp = this.el();
     $('#ansBar').addEventListener('submit', e => { e.preventDefault(); this.submit(); });
