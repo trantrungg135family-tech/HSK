@@ -4,3 +4,4 @@
 
 # Tài liệu PDF (giáo trình có bản quyền, dung lượng lớn) - chỉ giữ ở máy
 *.pdf
+!docs/Huong-dan-Classroom-Feud.pdf

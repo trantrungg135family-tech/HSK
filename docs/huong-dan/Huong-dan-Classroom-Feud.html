@@ -1,0 +1,916 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Hướng dẫn Classroom Feud</title>
+<style>
+@page { size: A4; margin: 16mm 16mm 18mm 16mm;
+  @bottom-center { content: counter(page); font: 9pt "Segoe UI", Arial, sans-serif; color: #64748b; } }
+@page :first { @bottom-center { content: none; } }
+:root { --ink:#1e293b; --muted:#64748b; --accent:#b45309; --navy:#1e2a5a; --line:#e2e8f0; --why:#eef6ff; --whyb:#3b82f6; --warn:#fff7ed; --warnb:#f97316; --tip:#f0fdf4; --tipb:#16a34a; --mk:#e11d48; }
+* { box-sizing: border-box; }
+html, body { background:#fff; }
+body { font-family: "Segoe UI", "Arial", sans-serif; color: var(--ink); font-size: 10.5pt; line-height: 1.5; margin: 0; }
+h1 { font-size: 22pt; color: var(--navy); margin: 0 0 6pt; line-height:1.2; }
+h2 { font-size: 15pt; color: var(--navy); border-bottom: 2px solid var(--accent); padding-bottom: 3pt; margin: 16pt 0 8pt; break-after: avoid; }
+h3 { font-size: 12pt; color: var(--accent); margin: 12pt 0 5pt; break-after: avoid; }
+h4 { font-size: 10.5pt; margin: 8pt 0 3pt; break-after: avoid; }
+p { margin: 4pt 0 6pt; }
+ul, ol { margin: 3pt 0 7pt; padding-left: 18pt; }
+li { margin: 2pt 0; }
+a { color: #1d4ed8; text-decoration: none; }
+code, kbd { font-family: Consolas, "Courier New", monospace; font-size: 9.5pt; }
+code { background:#f1f5f9; padding: 0 3pt; border-radius: 3px; }
+kbd { display:inline-block; min-width: 16pt; text-align:center; padding: 0 4pt; border:1px solid #94a3b8; border-bottom-width:2px; border-radius:4px; background:#f8fafc; font-weight:600; }
+.page-break { break-before: page; }
+.part { break-before: page; }
+.part-title { background: var(--navy); color:#fff; padding: 10pt 14pt; border-radius: 8px; margin-bottom: 10pt; }
+.part-title .n { font-size: 10pt; letter-spacing: 2px; color:#fcd34d; text-transform: uppercase; }
+.part-title h1 { color:#fff; margin: 2pt 0 0; font-size: 19pt; }
+.box { border-left: 4px solid; border-radius: 6px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid; }
+.box > b:first-child, .box .t { display:block; margin-bottom: 2pt; }
+.why { background: var(--why); border-color: var(--whyb); }
+.why .t { color:#1d4ed8; }
+.warn { background: var(--warn); border-color: var(--warnb); }
+.warn .t { color:#c2410c; }
+.tip { background: var(--tip); border-color: var(--tipb); }
+.tip .t { color:#15803d; }
+table { border-collapse: collapse; width: 100%; margin: 6pt 0 10pt; font-size: 9.5pt; break-inside: auto; }
+th, td { border: 1px solid var(--line); padding: 3pt 6pt; vertical-align: top; text-align:left; }
+th { background: #f1f5f9; color: var(--navy); }
+tr { break-inside: avoid; }
+figure { margin: 8pt 0 10pt; break-inside: avoid; }
+figcaption { font-size: 9pt; color: var(--muted); margin-top: 3pt; }
+.shot { position: relative; display:block; line-height:0; border:1px solid #cbd5e1; border-radius: 6px; overflow: hidden; }
+.shot img { width: 100%; display:block; }
+.mk { position:absolute; transform: translate(-50%,-50%); width: 20px; height: 20px; border-radius: 50%; background: var(--mk); color:#fff; font: 700 11px/16px "Segoe UI", Arial; text-align:center; border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,.5); }
+.bx { position:absolute; border: 2.5px solid var(--mk); border-radius: 6px; box-shadow: 0 0 0 1px rgba(255,255,255,.6); }
+.legend { font-size: 9.5pt; margin: 4pt 0 0; padding-left: 0; list-style: none; columns: 2; column-gap: 14pt; }
+.legend li { break-inside: avoid; }
+.legend b.n { display:inline-block; width: 15px; height: 15px; border-radius: 50%; background: var(--mk); color:#fff; font-size: 8.5pt; text-align:center; line-height: 15px; margin-right: 4pt; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8pt; }
+.grid2 figure { margin: 4pt 0; }
+.steps { counter-reset: s; list-style: none; padding-left: 0; }
+.steps > li { counter-increment: s; position: relative; padding-left: 24pt; margin: 4pt 0; }
+.steps > li::before { content: counter(s); position:absolute; left:0; top: 0; width: 17pt; height: 17pt; border-radius: 50%; background: var(--accent); color:#fff; font-weight:700; font-size: 9pt; text-align:center; line-height: 17pt; }
+.cover { height: 255mm; display:flex; flex-direction: column; justify-content: center; text-align: center; }
+.cover .logo { font: 800 34pt "Segoe UI", Arial; color: var(--accent); letter-spacing: 2px; }
+.cover h1 { font-size: 26pt; margin-top: 8pt; }
+.cover .sub { font-size: 12pt; color: var(--muted); margin: 6pt 0 18pt; }
+.cover img { width: 75%; margin: 10pt auto; border-radius: 8px; border:1px solid #cbd5e1; }
+.toc { list-style: none; padding-left: 0; font-size: 11pt; }
+.toc li { margin: 3pt 0; }
+.toc ul { list-style: none; padding-left: 16pt; font-size: 10pt; margin: 1pt 0 5pt; }
+.toc a { color: var(--ink); }
+.toc .pn { color: var(--accent); font-weight: 700; margin-right: 6pt; }
+.small { font-size: 9pt; color: var(--muted); }
+.prompt { background:#1e293b; color:#e2e8f0; border-radius: 6px; padding: 6pt 10pt; font-size: 9.5pt; margin: 4pt 0 8pt; break-inside: avoid; }
+.prompt b { color:#fcd34d; }
+.cheat { font-size: 9.2pt; }
+.cheat h2 { margin-top: 0; }
+.cheat table { font-size: 8.8pt; margin: 3pt 0 6pt; }
+.cheat td, .cheat th { padding: 2pt 5pt; }
+.cheat td:first-child { width: 42%; white-space: nowrap; }
+.cheat .cols { display:grid; grid-template-columns: 1fr 1fr; gap: 10pt; }
+.cheat h3 { margin: 6pt 0 3pt; font-size: 11pt; }
+.cheat ol { margin: 2pt 0 4pt; }
+svg text { font-family: "Segoe UI", Arial, sans-serif; }
+</style>
+</head>
+<body>
+
+<!-- ============ BÌA ============ -->
+<section class="cover">
+  <div class="logo">CLASSROOM FEUD</div>
+  <h1>Hướng dẫn sử dụng và quản lý toàn bộ hệ thống</h1>
+  <div class="sub">Game trong lớp · Ngân hàng câu hỏi Google Sheet · Làm việc với Claude · Lưu trữ và cập nhật</div>
+  <img src="img/07-top-answer.jpg" alt="Màn chơi Classroom Feud">
+  <p class="small" style="margin-top:14pt">Tài liệu dành riêng cho thầy/cô — người quản lý cả hệ thống.<br>Phiên bản tháng 11/2026 · ảnh chụp từ bản web đang chạy thật.</p>
+</section>
+
+<!-- ============ MỤC LỤC ============ -->
+<section class="page-break">
+<h1>Mục lục</h1>
+<ul class="toc">
+  <li><span class="pn">0</span><a href="#tong-quan">Bức tranh tổng thể: mọi thứ nối với nhau thế nào</a></li>
+  <li><span class="pn">1</span><a href="#p1">Phần 1 — Dùng game trong lớp</a>
+    <ul>
+      <li><a href="#p1-mo">1.1 Mở game: link web hay file trên Desktop — và vì sao dữ liệu tách riêng</a></li>
+      <li><a href="#p1-setup">1.2 Màn Thiết lập</a></li>
+      <li><a href="#p1-lop">1.3 Lớp học và cấp độ</a></li>
+      <li><a href="#p1-chonbo">1.4 Chọn bộ câu hỏi: Google Sheet, thư viện, Excel</a></li>
+      <li><a href="#p1-luat">1.5 Luật chơi: lượt, sai, cướp điểm, vòng nhân điểm</a></li>
+      <li><a href="#p1-ogo">1.6 Ô gõ đáp án — game tự chấm thế nào</a></li>
+      <li><a href="#p1-tay">1.7 Điều khiển bằng tay và phím tắt</a></li>
+      <li><a href="#p1-vui">1.8 Bấm chuông, trống dồn, chuỗi đúng</a></li>
+      <li><a href="#p1-am">1.9 Âm thanh</a></li>
+      <li><a href="#p1-den">1.10 Hiệu ứng ánh sáng và “giảm chuyển động”</a></li>
+      <li><a href="#p1-kq">1.11 Màn kết quả, MVP, xuất kết quả</a></li>
+      <li><a href="#p1-maychieu">1.12 Mẹo dùng với máy chiếu</a></li>
+    </ul></li>
+  <li><span class="pn">2</span><a href="#p2">Phần 2 — Ngân hàng câu hỏi (Google Sheet)</a>
+    <ul>
+      <li><a href="#p2-cautruc">2.1 Cấu trúc tab và cột</a></li>
+      <li><a href="#p2-duyet">2.2 Đặt tên bộ và bước duyệt (Approved)</a></li>
+      <li><a href="#p2-tay">2.3 Tự thêm câu hỏi bằng tay</a></li>
+      <li><a href="#p2-claude">2.4 Nhờ Claude tạo bộ mới</a></li>
+      <li><a href="#p2-tai">2.5 Tải lại, bộ nhớ đệm và khi mất mạng</a></li>
+      <li><a href="#p2-chiase">2.6 Chia sẻ sheet và rủi ro “ai cũng sửa được”</a></li>
+      <li><a href="#p2-khac">2.7 Dùng một sheet khác</a></li>
+    </ul></li>
+  <li><span class="pn">3</span><a href="#p3">Phần 3 — Làm việc với Claude</a>
+    <ul>
+      <li><a href="#p3-context">3.1 Context là gì và vì sao phải giữ nó thấp</a></li>
+      <li><a href="#p3-relay">3.2 Phương pháp session-relay</a></li>
+      <li><a href="#p3-todo">3.3 TODO.md — trí nhớ bàn giao</a></li>
+      <li><a href="#p3-taikhoan">3.4 Đổi tài khoản Claude</a></li>
+      <li><a href="#p3-skill">3.5 Các skill đã tạo</a></li>
+      <li><a href="#p3-yeucau">3.6 Cách viết yêu cầu tốt</a></li>
+      <li><a href="#p3-kiemtra">3.7 Kiểm tra việc session phụ đã làm</a></li>
+      <li><a href="#p3-khong">3.8 Những việc Claude không làm được</a></li>
+    </ul></li>
+  <li><span class="pn">4</span><a href="#p4">Phần 4 — Lưu trữ và cập nhật</a>
+    <ul>
+      <li><a href="#p4-github">4.1 GitHub repo (công khai)</a></li>
+      <li><a href="#p4-commit">4.2 Commit = lịch sử và bản sao lưu; cách quay lại</a></li>
+      <li><a href="#p4-pages">4.3 GitHub Pages tự cập nhật</a></li>
+      <li><a href="#p4-desktop">4.4 Giữ bản Desktop luôn mới</a></li>
+      <li><a href="#p4-saoluu">4.5 Sao lưu lớp và thư viện</a></li>
+      <li><a href="#p4-loi">4.6 Bảng xử lý sự cố</a></li>
+    </ul></li>
+  <li><span class="pn">5</span><a href="#faq">Câu hỏi thường gặp</a></li>
+  <li><span class="pn">6</span><a href="#cheat">Trang tóm tắt: phím tắt + quy trình một buổi học</a></li>
+</ul>
+
+<div class="box why"><span class="t">Cách đọc tài liệu này</span>
+Mỗi mục có hai lớp: khung <b>“Vì sao”</b> giải thích bản chất (tại sao hệ thống được làm như vậy), rồi đến <b>các bước</b>. Khi đã hiểu “vì sao”, thầy/cô sẽ tự đoán được cách xử lý cả những tình huống tài liệu chưa nhắc tới. Số trong vòng tròn đỏ trên ảnh ứng với chú thích ngay dưới ảnh.</div>
+</section>
+
+<!-- ============ TỔNG QUAN ============ -->
+<section class="page-break" id="tong-quan">
+<h1>Bức tranh tổng thể</h1>
+<p>Hệ thống gồm sáu “mảnh”. Hiểu mảnh nào giữ cái gì là chìa khóa để xử lý mọi sự cố.</p>
+
+<svg viewBox="0 0 760 540" width="100%" xmlns="http://www.w3.org/2000/svg" style="margin:4pt 0 8pt">
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker>
+  </defs>
+  <style>
+    .b{fill:#fff;stroke:#1e2a5a;stroke-width:2;rx:10}
+    .h{font-weight:700;font-size:15px;fill:#1e2a5a}
+    .s{font-size:11.5px;fill:#475569}
+    .l{stroke:#475569;stroke-width:1.8;fill:none;marker-end:url(#ar)}
+    .d{stroke:#94a3b8;stroke-width:1.5;fill:none;stroke-dasharray:5 4}
+    .lb{font-size:11px;fill:#b45309;font-weight:600}
+  </style>
+  <!-- Teacher -->
+  <rect class="b" x="275" y="10" width="210" height="66" style="fill:#fef3c7;stroke:#b45309"/>
+  <text class="h" x="380" y="37" text-anchor="middle">THẦY/CÔ</text>
+  <text class="s" x="380" y="57" text-anchor="middle">ra yêu cầu · duyệt câu hỏi · dạy</text>
+  <!-- Claude -->
+  <rect class="b" x="15" y="140" width="245" height="84"/>
+  <text class="h" x="137" y="166" text-anchor="middle">CLAUDE</text>
+  <text class="s" x="137" y="186" text-anchor="middle">phiên chính điều phối,</text>
+  <text class="s" x="137" y="202" text-anchor="middle">session phụ làm việc nặng</text>
+  <!-- Sheet -->
+  <rect class="b" x="500" y="140" width="245" height="84" style="fill:#ecfdf5;stroke:#15803d"/>
+  <text class="h" x="622" y="166" text-anchor="middle" style="fill:#15803d">GOOGLE SHEET</text>
+  <text class="s" x="622" y="186" text-anchor="middle">ngân hàng câu hỏi, 4 tab cấp độ</text>
+  <text class="s" x="622" y="202" text-anchor="middle">cột Approved = Y mới được dùng</text>
+  <!-- Local repo -->
+  <rect class="b" x="15" y="290" width="245" height="84"/>
+  <text class="h" x="137" y="316" text-anchor="middle">THƯ MỤC TRÊN MÁY</text>
+  <text class="s" x="137" y="336" text-anchor="middle">Downloads\HSK: file game,</text>
+  <text class="s" x="137" y="352" text-anchor="middle">TODO.md, skills, tài liệu</text>
+  <!-- GitHub -->
+  <rect class="b" x="290" y="290" width="180" height="84"/>
+  <text class="h" x="380" y="316" text-anchor="middle">GITHUB REPO</text>
+  <text class="s" x="380" y="336" text-anchor="middle">công khai · mỗi commit</text>
+  <text class="s" x="380" y="352" text-anchor="middle">là một bản sao lưu</text>
+  <!-- Pages -->
+  <rect class="b" x="500" y="290" width="245" height="84"/>
+  <text class="h" x="622" y="316" text-anchor="middle">GITHUB PAGES</text>
+  <text class="s" x="622" y="336" text-anchor="middle">link web cố định của game,</text>
+  <text class="s" x="622" y="352" text-anchor="middle">tự cập nhật sau mỗi lần push</text>
+  <!-- Desktop -->
+  <rect class="b" x="15" y="440" width="245" height="84" style="fill:#eef2ff"/>
+  <text class="h" x="137" y="466" text-anchor="middle">BẢN TRÊN DESKTOP</text>
+  <text class="s" x="137" y="486" text-anchor="middle">mở bằng bấm đúp (file://)</text>
+  <text class="s" x="137" y="502" text-anchor="middle">chạy được cả khi mất mạng</text>
+  <!-- Storage -->
+  <rect class="b" x="290" y="440" width="180" height="84" style="fill:#f8fafc;stroke:#94a3b8;stroke-dasharray:6 4"/>
+  <text class="h" x="380" y="466" text-anchor="middle" style="font-size:13px">KHO CỦA TRÌNH DUYỆT</text>
+  <text class="s" x="380" y="486" text-anchor="middle">lớp, thư viện, lịch sử,</text>
+  <text class="s" x="380" y="502" text-anchor="middle">cài đặt — riêng từng bản</text>
+  <!-- Web game -->
+  <rect class="b" x="500" y="440" width="245" height="84" style="fill:#eef2ff"/>
+  <text class="h" x="622" y="466" text-anchor="middle">GAME QUA LINK WEB</text>
+  <text class="s" x="622" y="486" text-anchor="middle">mở ở máy nào cũng được,</text>
+  <text class="s" x="622" y="502" text-anchor="middle">luôn là bản mới nhất</text>
+  <!-- arrows -->
+  <path class="l" d="M290,76 L200,140"/><text class="lb" x="150" y="108">yêu cầu bằng lời</text>
+  <path class="l" d="M470,76 L560,140"/><text class="lb" x="525" y="108">đọc, sửa, gõ Y</text>
+  <path class="l" d="M260,182 L500,182"/><text class="lb" x="300" y="174">skill feud-questions ghi bộ mới</text>
+  <path class="l" d="M137,224 L137,290"/><text class="lb" x="145" y="262">sửa game, ghi TODO.md</text>
+  <path class="l" d="M260,332 L290,332"/>
+  <text class="lb" x="262" y="285" >commit + push</text>
+  <path class="l" d="M470,332 L500,332"/><text class="lb" x="440" y="392">~1–2 phút</text>
+  <path class="l" d="M137,374 L137,440"/><text class="lb" x="145" y="412">chép file sang</text>
+  <path class="l" d="M622,374 L622,440"/>
+  <path class="l" d="M745,224 C 758,300 758,400 745,440"/><text class="lb" x="742" y="398" text-anchor="end">game chỉ</text><text class="lb" x="742" y="412" text-anchor="end">ĐỌC sheet</text>
+  <path class="d" d="M260,482 L290,482"/><path class="d" d="M470,482 L500,482"/>
+</svg>
+
+<table>
+  <tr><th style="width:24%">Mảnh</th><th>Giữ cái gì</th><th style="width:30%">Ai thay đổi nó</th></tr>
+  <tr><td>Google Sheet</td><td>Toàn bộ câu hỏi của 4 cấp; cột Approved quyết định câu nào được dùng.</td><td>Thầy/cô (sửa, duyệt) và Claude (thêm bộ mới).</td></tr>
+  <tr><td>Thư mục trên máy <code>Downloads\HSK</code></td><td>Bản gốc của game (<code>classroom-feud/Classroom-Feud.html</code>), tài liệu, <code>TODO.md</code>, các skill.</td><td>Claude, theo yêu cầu.</td></tr>
+  <tr><td>GitHub repo</td><td>Bản sao trên mạng của thư mục, kèm toàn bộ lịch sử thay đổi.</td><td>Claude “push” sau mỗi việc xong.</td></tr>
+  <tr><td>GitHub Pages</td><td>Trang web công khai chạy chính file game trong repo.</td><td>Tự động, không ai cần làm gì.</td></tr>
+  <tr><td>Bản trên Desktop</td><td>Một bản chép tay của file game, để mở khi không có mạng.</td><td>Thầy/cô hoặc Claude chép lại khi có bản mới.</td></tr>
+  <tr><td>Kho của trình duyệt</td><td>Danh sách lớp, lịch sử đã chơi, thư viện từ Excel, cài đặt âm thanh/ánh sáng, trận đang chơi dở.</td><td>Game tự lưu khi thầy/cô dùng.</td></tr>
+</table>
+
+<div class="box why"><span class="t">Vì sao lại chia ra như vậy?</span>
+Mỗi mảnh làm đúng một việc mà nó giỏi nhất. <b>Câu hỏi</b> nằm trên Google Sheet vì dễ sửa, xem được ở mọi máy, Claude ghi vào được. <b>Game</b> là một file HTML duy nhất (âm thanh nhúng sẵn bên trong) nên chép đi đâu cũng chạy, không cần cài đặt. <b>GitHub</b> giữ lịch sử để không bao giờ mất bản cũ, và tự biến file game thành một trang web. <b>Dữ liệu lớp học</b> nằm trong trình duyệt vì game không có máy chủ riêng — đây là cái giá của sự đơn giản, và là lý do phải sao lưu (mục 4.5).</div>
+</section>
+
+<!-- ============ PHẦN 1 ============ -->
+<section class="part" id="p1">
+<div class="part-title"><div class="n">Phần 1</div><h1>Dùng game trong lớp</h1></div>
+
+<h2 id="p1-mo">1.1 Mở game: link web hay file trên Desktop</h2>
+<p>Có hai cách mở cùng một game:</p>
+<table>
+  <tr><th style="width:18%"></th><th>Link web (GitHub Pages)</th><th>File trên Desktop (bấm đúp)</th></tr>
+  <tr><td>Địa chỉ</td><td><a href="https://trantrungg135family-tech.github.io/HSK/classroom-feud/Classroom-Feud.html">trantrungg135family-tech.github.io/HSK/<br>classroom-feud/Classroom-Feud.html</a></td><td><code>C:\Users\Admin\Desktop\CLASSROOM FEUD\</code><br>(địa chỉ bắt đầu bằng <code>file:///</code>)</td></tr>
+  <tr><td>Phiên bản</td><td>Luôn là bản mới nhất (tự cập nhật 1–2 phút sau mỗi lần Claude push).</td><td>Là bản tại lúc chép. Có bản mới thì phải chép lại (mục 4.4).</td></tr>
+  <tr><td>Cần mạng?</td><td>Cần để mở trang lần đầu.</td><td>Không cần (trừ khi tải câu hỏi mới từ Sheet).</td></tr>
+  <tr><td>Dùng ở máy khác</td><td>Gõ link là được.</td><td>Phải chép file qua USB/Drive.</td></tr>
+  <tr><td>Dữ liệu lớp, thư viện</td><td colspan="2" style="text-align:center"><b>Tách riêng</b> — xem khung dưới.</td></tr>
+</table>
+
+<div class="box why"><span class="t">Vì sao dữ liệu của hai bản tách riêng?</span>
+Trình duyệt cất dữ liệu của trang web vào một “ngăn kéo” gắn với <b>nguồn gốc</b> (origin) của trang: giao thức + tên miền. Link web có nguồn gốc <code>https://trantrungg135family-tech.github.io</code>; file mở bằng bấm đúp có nguồn gốc <code>file://</code>. Hai nguồn gốc khác nhau → hai ngăn kéo khác nhau, trang này không được phép đọc ngăn kéo của trang kia (đây là quy tắc bảo mật của mọi trình duyệt). Thêm nữa, mỗi trình duyệt (Chrome, Edge) và cửa sổ ẩn danh cũng có ngăn kéo riêng.<br>
+<b>Hệ quả:</b> lớp 1A tạo ở bản web sẽ không thấy ở bản Desktop, và ngược lại. Hãy <b>chọn một bản làm “bản chính”</b> trên máy dạy (khuyên dùng link web) và chỉ tạo lớp ở đó. Muốn chuyển dữ liệu sang bản kia: <b>Sao lưu thư viện</b> rồi <b>Khôi phục</b> (mục 4.5).<br>
+Câu hỏi trong Google Sheet thì <b>không</b> bị ảnh hưởng: cả hai bản đều đọc thẳng từ Sheet.</div>
+
+<div class="box tip"><span class="t">Chi tiết kỹ thuật hữu ích</span>
+Khi mở bằng bấm đúp, Google không cho trang <code>file://</code> tải Sheet theo cách thông thường. Game tự chuyển sang một cách tải dự phòng (JSONP), nên bản Desktop vẫn đọc được Sheet. Thầy/cô không cần làm gì — chỉ cần biết là “bấm đúp vẫn tải được Sheet”.</div>
+
+<h2 id="p1-setup">1.2 Màn Thiết lập</h2>
+<p>Đây là màn hiện ra khi mở game. Mọi chuẩn bị trước giờ học đều làm ở đây.</p>
+<figure>
+  <div class="shot"><img src="img/01-thiet-lap.jpg" alt="">
+    <span class="mk" style="left:80%;top:9%">1</span>
+    <span class="mk" style="left:87%;top:9%">2</span>
+    <span class="mk" style="left:93.5%;top:9%">3</span>
+    <span class="bx" style="left:10%;top:37.5%;width:29%;height:7.5%"></span><span class="mk" style="left:10%;top:37.5%">4</span>
+    <span class="mk" style="left:39.5%;top:36%">5</span>
+    <span class="mk" style="left:64%;top:36%">6</span>
+    <span class="mk" style="left:39.5%;top:65%">7</span>
+    <span class="mk" style="left:49%;top:65%">8</span>
+    <span class="mk" style="left:76%;top:90%">9</span>
+    <span class="mk" style="left:87.5%;top:90%">10</span>
+  </div>
+  <ol class="legend">
+    <li><b class="n">1</b>Ngôn ngữ giao diện EN / VI</li>
+    <li><b class="n">2</b>Cách chơi (?) và nút Âm thanh</li>
+    <li><b class="n">3</b>Light show (bóng đèn), Toàn màn hình</li>
+    <li><b class="n">4</b>Chọn <b>lớp</b> đang dạy</li>
+    <li><b class="n">5</b>Quản lý lớp</li>
+    <li><b class="n">6</b>Nhập Excel (cách cũ)</li>
+    <li><b class="n">7</b>Tải lại Google Sheet</li>
+    <li><b class="n">8</b>Đổi sang Sheet khác</li>
+    <li><b class="n">9</b>Xem trước bảng</li>
+    <li><b class="n">10</b>Bắt đầu trận</li>
+  </ol>
+  <figcaption>Hình 1. Màn Thiết lập (bản web, giao diện tiếng Việt, đã chọn lớp 2A · Movers).</figcaption>
+</figure>
+<p>Màn hình có bốn khối từ trên xuống: <b>Lớp học &amp; thư viện câu hỏi</b> → <b>Ngân hàng câu hỏi (Google Sheet)</b> → <b>Thông tin trò chơi</b> → <b>Các vòng chơi</b> (nội dung câu hỏi của trận sắp chơi, sửa trực tiếp được). Thanh dưới cùng có: Bộ đã lưu, Nhập file, Xuất file (một bộ câu hỏi dạng JSON), Xóa toàn bộ dữ liệu, Xem trước, Bắt đầu.</p>
+
+<h3>Thông tin trò chơi</h3>
+<figure>
+  <div class="shot"><img src="img/04-thong-tin.jpg" alt=""></div>
+  <figcaption>Hình 2. Khối Thông tin trò chơi: tên đội, vòng nhân điểm, hệ số, thời gian trả lời, bấm chuông, ô gõ đáp án.</figcaption>
+</figure>
+<table>
+  <tr><th style="width:32%">Ô</th><th>Ý nghĩa</th></tr>
+  <tr><td>Tên trò chơi</td><td>Tự điền bằng tên bộ (vd. <i>Movers 1</i>) khi chọn bộ; hiện ở góc trái màn chơi.</td></tr>
+  <tr><td>Tên đội A / B</td><td>Đặt tên vui cho hai đội; được giữ nguyên khi đổi bộ.</td></tr>
+  <tr><td>Vòng nhân điểm</td><td><i>Hai vòng cuối (tự động)</i> hoặc <i>Tự chọn</i> tối đa hai vòng.</td></tr>
+  <tr><td>Hệ số nhân điểm</td><td>×2 (mặc định) đến ×5.</td></tr>
+  <tr><td>Thời gian trả lời (giây)</td><td>Thời gian của đồng hồ (phím <kbd>T</kbd>). Đặt từ 8 giây trở lên thì có giọng “Hurry up!”.</td></tr>
+  <tr><td>Xếp ô từ điểm cao đến thấp</td><td>Bảng luôn xếp đúng thứ tự dù câu hỏi nhập lộn xộn.</td></tr>
+  <tr><td>Bấm chuông đầu mỗi vòng</td><td>Mỗi vòng bắt đầu bằng màn Bấm chuông (mục 1.8).</td></tr>
+  <tr><td>Ô gõ đáp án</td><td>Bật ô gõ để game tự chấm (mục 1.6). Bỏ chọn nếu muốn chỉ bấm tay.</td></tr>
+</table>
+
+<h2 id="p1-lop">1.3 Lớp học và cấp độ</h2>
+<div class="box why"><span class="t">Vì sao có “lớp”?</span>
+Mỗi lớp gắn với <b>một cấp</b> Cambridge (Starters, Movers, Flyers, KET). Nhờ vậy khi chọn lớp, game tự lọc đúng ngân hàng câu hỏi của cấp đó, và <b>ghi nhớ lớp nào đã chơi bộ nào</b>: bộ lớp chưa chơi được tô vàng “Chưa chơi”. Các lớp cùng cấp dùng chung câu hỏi, nhưng lịch sử là của riêng từng lớp — nên 2A và 2B cùng Movers vẫn không bị lặp bộ.</div>
+<div class="grid2">
+<figure><div class="shot"><img src="img/02-quan-ly-lop.jpg" alt=""></div><figcaption>Hình 3. Quản lý lớp: thêm 1A · Starters, 2A · Movers, 3A · Flyers, 4A · KET.</figcaption></figure>
+<div>
+<ol class="steps">
+  <li>Bấm <b>Quản lý lớp</b>.</li>
+  <li>Gõ tên lớp (tối đa 20 ký tự), chọn <b>Cấp độ</b>, bấm <b>Thêm lớp</b>.</li>
+  <li>Lặp lại cho các lớp khác. <b>Sửa</b> để đổi tên/cấp, <b>Xóa</b> để bỏ lớp.</li>
+  <li>Bấm <b>Đóng</b>, rồi chọn lớp ở ô <b>Lớp</b> mỗi lần vào dạy.</li>
+</ol>
+<div class="box warn"><span class="t">Nhớ</span>Lớp được lưu trong trình duyệt của <b>máy này, bản này</b> (mục 1.1). Tạo lớp ở bản bạn dùng hằng ngày.</div>
+</div>
+</div>
+
+<h2 id="p1-chonbo">1.4 Chọn bộ câu hỏi</h2>
+<p>Có ba nguồn câu hỏi. Nguồn chính là Google Sheet; hai nguồn còn lại để dự phòng.</p>
+<figure>
+  <div class="shot"><img src="img/03-ngan-hang.jpg" alt="">
+    <span class="mk" style="left:10%;top:20%">1</span>
+    <span class="mk" style="left:48%;top:15.5%">2</span>
+    <span class="mk" style="left:11%;top:26%">3</span>
+    <span class="bx" style="left:17%;top:36.5%;width:7%;height:4%"></span><span class="mk" style="left:25.5%;top:37%">4</span>
+    <span class="mk" style="left:67%;top:41%">5</span>
+    <span class="mk" style="left:75%;top:41%">6</span>
+  </div>
+  <ol class="legend">
+    <li><b class="n">1</b>Cấp độ — tự theo lớp đã chọn</li>
+    <li><b class="n">2</b>Tải lại Sheet sau khi sửa/duyệt</li>
+    <li><b class="n">3</b>Thời điểm dữ liệu được tải</li>
+    <li><b class="n">4</b>Nhãn “Chưa chơi” (với lớp đang chọn)</li>
+    <li><b class="n">5</b>Xem trước nội dung bộ</li>
+    <li><b class="n">6</b>Nạp bộ vào phần soạn</li>
+  </ol>
+  <figcaption>Hình 4. Thẻ Ngân hàng câu hỏi (Google Sheet): mỗi bộ ghi số câu và chủ đề từng câu, kèm lịch sử của lớp.</figcaption>
+</figure>
+
+<h3>a) Từ Google Sheet (cách chính)</h3>
+<ol class="steps">
+  <li>Chọn lớp ở ô <b>Lớp</b>. Ô <b>Cấp độ</b> của Sheet tự chuyển theo (có thể đổi tay).</li>
+  <li>Nhìn danh sách bộ: ưu tiên bộ có nhãn vàng <b>Chưa chơi</b>. Bấm <b>Xem</b> để đọc trước.</li>
+  <li>Bấm <b>Dùng bộ này</b>. Câu hỏi được nạp vào khối “Các vòng chơi”; tên trò chơi = tên bộ; tên đội, hệ số, thời gian giữ nguyên.</li>
+  <li>Bấm <b>Xem trước</b> nếu muốn kiểm tra bảng, rồi <b>Bắt đầu</b>. Ngay khi bắt đầu, bộ được ghi vào lịch sử của lớp.</li>
+</ol>
+<h3>b) Từ thư viện (bộ đã nhập từ Excel)</h3>
+<p>Nằm ở khối trên cùng: sau khi chọn lớp, game liệt kê các bộ cùng cấp trong thư viện, bộ chưa chơi lên đầu. Nút <b>Thư viện câu hỏi</b> mở toàn bộ thư viện để tìm theo chủ đề, xem, xóa, sao lưu.</p>
+<h3>c) Nhập file Excel (cách cũ, vẫn dùng được)</h3>
+<p>Bấm <b>Nhập Excel</b>, chọn file <code>.xlsx</code> có các sheet <code>Starters</code>, <code>Movers</code>, <code>Flyers</code>, <code>KET</code>. Chỉ dòng có <b>Y</b> ở cột Approved được nhập; mỗi chủ đề trên một sheet thành một bộ (vd. <i>Movers · Food</i>). Nhập lại cùng cấp + chủ đề thì bộ cũ được cập nhật. Lần đầu cần Internet để tải bộ đọc Excel.</p>
+<div class="box why"><span class="t">Vì sao Google Sheet là nguồn chính?</span>
+Excel nằm trong một file: sửa ở máy này thì máy kia không biết, và mỗi lần sửa phải nhập lại vào game. Sheet chỉ có <b>một bản duy nhất</b> trên mạng: sửa xong, bấm <b>Tải lại</b> là mọi máy, mọi bản game đều thấy. Claude cũng ghi được thẳng vào Sheet.</div>
+
+<h2 id="p1-luat">1.5 Luật chơi</h2>
+<ol class="steps">
+  <li><b>Giành lượt.</b> Đầu vòng, chọn đội trả lời bằng nút tên đội, bấm vào bục điểm, phím <kbd>A</kbd>/<kbd>B</kbd>, hoặc cho hai đội <b>bấm chuông</b> (mục 1.8). Bục đội đang trả lời sáng lên với nhãn “ĐANG TRẢ LỜI”.</li>
+  <li><b>Trả lời đúng</b> → ô lật ra, điểm cộng cho đội đang trả lời. Mỗi ô chỉ tính một lần.</li>
+  <li><b>Trả lời sai</b> → một dấu X. Lượt <b>không tự đổi</b>: đội đó tiếp tục cho tới khi đủ 3 X.</li>
+  <li><b>Đủ 3 X</b> → bảng “CƠ HỘI CƯỚP ĐIỂM”: đội kia được <b>một lần đoán</b>. Trúng một đáp án còn ẩn → đội cướp nhận <b>toàn bộ điểm còn lại trên bảng</b> (cộng cả ô vừa đoán). Trượt → không ai nhận phần còn lại.</li>
+  <li><b>Vòng nhân điểm</b> (mặc định hai vòng cuối, ×2): mọi điểm trong vòng — đáp án, cướp điểm, cộng tay — nhân đúng một lần. Ô 24 điểm hiện <b>48</b> kèm dòng “24 × 2”.</li>
+  <li>Bấm <b>Vòng tiếp</b> (<kbd>N</kbd>) khi đã sẵn sàng. Hết vòng cuối, bấm <kbd>N</kbd> lần nữa để sang màn kết quả.</li>
+</ol>
+<div class="grid2">
+<figure><div class="shot"><img src="img/10-sai.jpg" alt=""></div><figcaption>Hình 5. Sai một lần: ô X đầu tiên sáng đỏ, cạnh ô gõ ghi “‘chair’ không có trên bảng”.</figcaption></figure>
+<figure><div class="shot"><img src="img/18-x2.jpg" alt=""></div><figcaption>Hình 6. Vòng nhân điểm: nhãn “NHÂN ĐÔI ĐIỂM ×2”, ô ghi 48 và “24 × 2”.</figcaption></figure>
+</div>
+<div class="box why"><span class="t">Vì sao lượt không tự đổi và phải bấm “Vòng tiếp”?</span>
+Trong lớp học thật, giáo viên hay muốn dừng lại: giải thích từ mới, cho cả lớp đọc to đáp án, sửa phát âm. Nếu game tự nhảy vòng, thầy/cô sẽ bị cuốn theo nhịp máy. Vì vậy game chỉ đi tiếp khi thầy/cô ra lệnh — và mọi thao tác đều <b>Hoàn tác</b> được (<kbd>U</kbd>).</div>
+
+<h2 id="p1-ogo">1.6 Ô gõ đáp án — game tự chấm thế nào</h2>
+<p>Dưới bảng có ô nhập. Học sinh nói đáp án, thầy/cô gõ lại rồi nhấn <kbd>Enter</kbd>. Không cần nhớ đáp án, không cần tự bấm ô hay phím X.</p>
+<figure>
+  <div class="shot"><img src="img/06-o-go.jpg" alt="">
+    <span class="bx" style="left:28%;top:74%;width:44%;height:7%"></span><span class="mk" style="left:28%;top:74%">1</span>
+    <span class="mk" style="left:86%;top:31%">2</span>
+    <span class="mk" style="left:43%;top:33%">3</span>
+    <span class="mk" style="left:45.5%;top:96.5%">4</span>
+  </div>
+  <ol class="legend">
+    <li><b class="n">1</b>Ô gõ đáp án (đang gõ “noodle”)</li>
+    <li><b class="n">2</b>Đội đang trả lời</li>
+    <li><b class="n">3</b>Ba ô X (lượt sai)</li>
+    <li><b class="n">4</b>Dải điều khiển đã tự thu gọn</li>
+  </ol>
+  <figcaption>Hình 7. Màn chơi vòng 1. Gõ “noodle” — đáp án trên bảng là “Noodles”.</figcaption>
+</figure>
+
+<h3>Năm kết quả có thể xảy ra khi nhấn Enter</h3>
+<table>
+  <tr><th style="width:30%">Tình huống</th><th>Game làm gì</th></tr>
+  <tr><td>Trùng một đáp án đang ẩn</td><td>Ô lật ra (có trống dồn ngắn), cộng điểm, tính chuỗi đúng và vòng nhân điểm.</td></tr>
+  <tr><td>Trùng đáp án đã mở</td><td>Không tính sai; chỉ báo “Đáp án này đã có trên bảng: …”.</td></tr>
+  <tr><td>Không có trên bảng</td><td>Tính một lần sai (như phím <kbd>X</kbd>).</td></tr>
+  <tr><td>Gần giống nhưng chưa chắc</td><td>Hỏi lại <b>Có phải ý là “…”?</b> — <kbd>Enter</kbd> = đúng, mở ô · <kbd>Backspace</kbd> = không, tính sai · <kbd>Esc</kbd> = hủy để gõ lại.</td></tr>
+  <tr><td>Đang cướp điểm</td><td>Gõ câu đoán của đội cướp: trùng = cướp thành công, không trùng = cướp thất bại.</td></tr>
+</table>
+<figure style="width:62%"><div class="shot"><img src="img/07-top-answer.jpg" alt=""></div><figcaption>Hình 8. “noodle” khớp “Noodles” → ô lật, nhãn TOP ANSWER, cạnh ô gõ hiện ✓ Noodles.</figcaption></figure>
+<figure><div class="shot"><img src="img/08-co-phai.jpg" alt="">
+  <span class="bx" style="left:40.5%;top:89%;width:48%;height:6.5%"></span>
+  <span class="mk" style="left:47%;top:86%">1</span><span class="mk" style="left:61%;top:86%">2</span><span class="mk" style="left:74%;top:86%">3</span><span class="mk" style="left:85%;top:86%">4</span></div>
+  <ol class="legend"><li><b class="n">1</b>Câu hỏi lại “Có phải ý là ‘Bread’?”</li><li><b class="n">2</b>Đúng, mở ô (Enter)</li><li><b class="n">3</b>Không, tính sai (Backspace)</li><li><b class="n">4</b>Hủy, gõ lại (Esc)</li></ol>
+  <figcaption>Hình 9. Gõ “bred” (từ ngắn sai 1 chữ): game không tự quyết mà hỏi lại.</figcaption></figure>
+<figure><div class="shot"><img src="img/09-da-co.png" alt=""></div><figcaption>Hình 10. Gõ lại “Noodles” khi ô đã mở: chỉ báo “Đáp án này đã có trên bảng”, không bị tính sai.</figcaption></figure>
+
+<h3>Bản chất của việc so khớp</h3>
+<p>Game không “hiểu” tiếng Anh; nó <b>chuẩn hóa</b> cả câu gõ lẫn đáp án về một dạng gọn rồi so sánh. Hiểu các bước này sẽ giúp thầy/cô viết đáp án trong Sheet sao cho game chấm đúng.</p>
+<ol>
+  <li><b>Chuẩn hóa:</b> bỏ chữ hoa, dấu câu, dấu tiếng Việt, khoảng trắng thừa; bỏ <i>a / an / the</i> và <i>some / my…</i> ở đầu; “&amp;” = “and”; số viết chữ = số (“two” = “2”).</li>
+  <li><b>Biến thể từ:</b> số nhiều, đuôi <i>-ing</i>, <i>-ed</i> coi như nhau: “banana” = “Bananas”, “play football” = “Playing football”.</li>
+  <li><b>Một phần đáp án:</b> được chấp nhận nếu là từ có nghĩa: “football” khớp “Playing football”, “bus” khớp “By bus”. Các từ quá chung như <i>go, play, by, on, eat</i> đứng một mình thì <b>không</b> tính.</li>
+  <li><b>Lỗi chính tả</b> cho phép theo độ dài từ: ≤ 5 chữ phải đúng (sai 1 chữ thì game hỏi lại); 6–8 chữ cho sai 1; 9–13 chữ cho sai 2; dài hơn cho sai 3. Sai thêm một chữ nữa thì game hỏi lại. Hai chữ đảo chỗ (“raeding”) tính là một lỗi.</li>
+  <li><b>Từ đồng nghĩa:</b> game <b>không tự biết</b>. Muốn chấp nhận nhiều cách nói, viết trong Sheet: <code>TV / Television</code>, <code>Bike / Bicycle</code> — trên bảng chỉ hiện phần đầu. Phần trong ngoặc cũng được chấp nhận: <code>Tet (Lunar New Year)</code> khớp cả “Tet” lẫn “Lunar New Year”.</li>
+</ol>
+<div class="box why"><span class="t">Vì sao từ ngắn lại “khó tính” hơn?</span>
+Với từ ngắn, sai một chữ thường thành <b>một từ khác hẳn</b>: “cat” – “car”, “boots” – “books”. Nếu game tự chấp nhận thì sẽ chấm sai. Nên với từ ngắn game không đoán bừa mà hỏi lại thầy/cô — người duy nhất biết học sinh thật sự nói gì.</div>
+<div class="box tip"><span class="t">Mẹo</span>
+Phím <kbd>/</kbd> hoặc <kbd>Enter</kbd> (khi chưa chọn gì) đưa con trỏ vào ô gõ; <kbd>Esc</kbd> để thoát ra. Khi đang gõ trong ô, các phím tắt (số, X, R, N, Q/P, O…) tạm dừng để không bấm nhầm. Hoàn tác (<kbd>U</kbd>, hoặc <kbd>Ctrl</kbd>+<kbd>Z</kbd> khi ô trống) vẫn đảo ngược được việc ô tự chấm.</div>
+
+<h3>Ô gõ khi cướp điểm</h3>
+<figure>
+  <div class="shot"><img src="img/11-cuop.jpg" alt="">
+    <span class="mk" style="left:35%;top:80.5%">1</span>
+    <span class="mk" style="left:55.5%;top:82.5%">2</span>
+    <span class="mk" style="left:71.5%;top:82.5%">3</span>
+    <span class="mk" style="left:28%;top:93%">4</span>
+  </div>
+  <ol class="legend">
+    <li><b class="n">1</b>Đổi đội cướp nếu chọn nhầm</li>
+    <li><b class="n">2</b>Cướp thành công (bấm tay)</li>
+    <li><b class="n">3</b>Cướp thất bại (bấm tay)</li>
+    <li><b class="n">4</b>Hoặc gõ câu đoán rồi Enter</li>
+  </ol>
+  <figcaption>Hình 11. Đủ 3 X: bảng “CƠ HỘI CƯỚP ĐIỂM — TRỊ GIÁ 52 ĐIỂM”.</figcaption>
+</figure>
+<figure><div class="shot"><img src="img/12-cuop-xong.jpg" alt=""></div><figcaption>Hình 12. Gõ “ice-cream” → khớp “Ice cream”: Tigers cướp được 52 điểm, bảng mở hết, vương miện chuyển sang Tigers. Ô gõ khóa lại và nhắc bấm Vòng tiếp (N).</figcaption></figure>
+
+<h2 id="p1-tay">1.7 Điều khiển bằng tay và phím tắt</h2>
+<p>Ô gõ là tiện, nhưng mọi việc vẫn làm được bằng tay — hữu ích khi học sinh nói một ý đúng mà Sheet ghi khác hẳn chữ (game không biết từ đồng nghĩa): thầy/cô cứ bấm thẳng vào ô hoặc phím số.</p>
+<figure>
+  <div class="shot"><img src="img/13-thanh-dk.jpg" alt="">
+    <span class="mk" style="left:10%;top:82%">1</span>
+    <span class="mk" style="left:34%;top:82%">2</span>
+    <span class="mk" style="left:48%;top:82%">3</span>
+    <span class="mk" style="left:57%;top:82%">4</span>
+    <span class="mk" style="left:69%;top:82%">5</span>
+    <span class="mk" style="left:83%;top:82%">6</span>
+    <span class="mk" style="left:28%;top:89.5%">7</span>
+    <span class="mk" style="left:40.5%;top:89.5%">8</span>
+    <span class="mk" style="left:53.5%;top:89.5%">9</span>
+    <span class="mk" style="left:60.5%;top:89.5%">10</span>
+  </div>
+  <ol class="legend">
+    <li><b class="n">1</b>Chọn đội trả lời (A / B)</li>
+    <li><b class="n">2</b>Mở đáp án không tính điểm (R)</li>
+    <li><b class="n">3</b>Sai (X)</li>
+    <li><b class="n">4</b>Đếm giờ (T)</li>
+    <li><b class="n">5</b>Bấm chuông (O)</li>
+    <li><b class="n">6</b>Cộng/trừ điểm tay</li>
+    <li><b class="n">7</b>Hoàn tác (U)</li>
+    <li><b class="n">8</b>Chơi lại vòng</li>
+    <li><b class="n">9</b>Ẩn bảng điều khiển (H)</li>
+    <li><b class="n">10</b>Vòng tiếp (N)</li>
+  </ol>
+  <figcaption>Hình 13. Dải điều khiển hiện ra khi đưa chuột xuống mép dưới; tự thu gọn sau 3 giây.</figcaption>
+</figure>
+<div class="box why"><span class="t">Vì sao dải điều khiển tự ẩn?</span>
+Trên máy chiếu, học sinh cần thấy bảng và câu hỏi to rõ, không phải các nút của giáo viên. Dải thu thành vạch mỏng 12 px ở mép dưới; đưa chuột xuống, nhấn <kbd>Tab</kbd> hoặc chạm vạch là hiện lại. Nó không tự ẩn khi đang mở khung Điểm/Âm thanh/Ánh sáng hay đang chờ cướp điểm. Phím tắt luôn chạy dù dải đang ẩn.</div>
+
+<table>
+  <tr><th style="width:24%">Phím</th><th>Tác dụng</th></tr>
+  <tr><td><kbd>/</kbd> · <kbd>Enter</kbd></td><td>Vào ô gõ đáp án (<kbd>Esc</kbd> để thoát ra)</td></tr>
+  <tr><td><kbd>1</kbd>–<kbd>9</kbd>, <kbd>0</kbd></td><td>Mở đáp án 1–10, cộng điểm cho đội đang trả lời. <b>Giữ</b> phím = trống dồn rồi mới lật.</td></tr>
+  <tr><td><kbd>A</kbd> / <kbd>B</kbd></td><td>Chọn đội trả lời</td></tr>
+  <tr><td><kbd>X</kbd></td><td>Đánh dấu sai</td></tr>
+  <tr><td><kbd>R</kbd></td><td>Mở đáp án ẩn tiếp theo, không tính điểm (cho cả lớp xem phần còn lại)</td></tr>
+  <tr><td><kbd>T</kbd></td><td>Bật/tắt đồng hồ</td></tr>
+  <tr><td><kbd>O</kbd></td><td>Mở màn bấm chuông; <kbd>Q</kbd> = đội A, <kbd>P</kbd> = đội B</td></tr>
+  <tr><td><kbd>U</kbd> · <kbd>Ctrl</kbd>+<kbd>Z</kbd></td><td>Hoàn tác thao tác vừa rồi</td></tr>
+  <tr><td><kbd>N</kbd></td><td>Vòng tiếp (vòng cuối → màn kết quả)</td></tr>
+  <tr><td><kbd>H</kbd></td><td>Ẩn/hiện bảng điều khiển</td></tr>
+  <tr><td><kbd>F</kbd></td><td>Toàn màn hình</td></tr>
+  <tr><td><kbd>M</kbd></td><td>Tắt/bật tiếng</td></tr>
+  <tr><td><kbd>?</kbd></td><td>Mở hướng dẫn Cách chơi trong game</td></tr>
+  <tr><td><kbd>Esc</kbd></td><td>Đóng cửa sổ; bỏ qua bấm chuông; hủy câu hỏi “Có phải ý là…?”</td></tr>
+</table>
+<p><b>Hoàn tác</b> đảo ngược: mở ô, sai, cướp điểm, đổi lượt, cộng/trừ điểm, chuyển vòng. <b>Chơi lại vòng</b> ẩn lại mọi đáp án và bỏ điểm của vòng đó. <b>Điểm</b> mở khung cộng/trừ điểm tay cho từng đội (trong vòng nhân điểm, điểm tay cũng được nhân).</p>
+
+<h2 id="p1-vui">1.8 Bấm chuông, trống dồn, chuỗi đúng</h2>
+<h3>Bấm chuông (face-off)</h3>
+<div class="grid2">
+<figure><div class="shot"><img src="img/05-bam-chuong.jpg" alt=""></div><figcaption>Hình 14. Dolphins bấm P trước; dưới phím ghi thời gian phản xạ.</figcaption></figure>
+<div>
+<ol class="steps">
+  <li>Bật cho cả trận bằng ô <b>Bấm chuông giành lượt…</b> trong Thông tin trò chơi, hoặc bấm <b>Bấm chuông</b> (<kbd>O</kbd>) bất cứ lúc nào.</li>
+  <li>Mỗi đội cử một bạn đặt tay lên bàn phím. Màn hiện “Đặt tay sẵn… chờ hiệu lệnh GO!”.</li>
+  <li>Sau “GO!”: đội A bấm <kbd>Q</kbd>, đội B bấm <kbd>P</kbd> (hoặc chạm vào ô của đội). Đội nhanh hơn được trả lời.</li>
+  <li>Bấm trước “GO!” bị khóa 1,5 giây. <kbd>Esc</kbd> để bỏ qua. Hoàn tác được.</li>
+</ol>
+</div></div>
+<div class="box why"><span class="t">Vì sao Q và P?</span>Hai phím nằm ở hai đầu bàn phím, đủ xa để hai học sinh đứng hai bên không chạm tay nhau, và không trùng phím tắt nào khác.</div>
+<h3>Trống dồn</h3>
+<p><b>Giữ</b> phím số của ô (hoặc giữ chuột trên ô): trống dồn to dần, ô rung với viền vàng; <b>thả ra</b> thì ô lật kèm tiếng chũm chọe. Bấm nhanh thì ô mở ngay như bình thường. Dùng trống dồn cho đáp án quan trọng để tạo hồi hộp.</p>
+<h3>Chuỗi đúng và đổi ngôi</h3>
+<figure><div class="shot"><img src="img/17-chuoi.jpg" alt=""></div><figcaption>Hình 15. Ba đáp án đúng liên tiếp không sai: băng rôn “3 IN A ROW!”, nhãn 🔥3 dưới bục Tigers, pháo giấy. Đội dẫn đầu đội vương miện.</figcaption></figure>
+<p>3 đúng liên tiếp → “3 IN A ROW!”; 5 → “ON FIRE!”. Một lần sai sẽ xóa chuỗi. Khi điểm đội kia vượt lên → “LEAD CHANGE!”, vương miện bay sang bục mới.</p>
+
+<h2 id="p1-am">1.9 Âm thanh</h2>
+<div class="grid2">
+<figure><div class="shot"><img src="img/14-am-thanh.jpg" alt="">
+  <span class="bx" style="left:71.5%;top:22%;width:26%;height:6%"></span></div><figcaption>Hình 16. Khung Âm thanh (nút loa trên thanh trên cùng). Khung đỏ: ba mức âm lượng lớp học.</figcaption></figure>
+<div>
+<table>
+  <tr><th>Mức</th><th>Gồm</th></tr>
+  <tr><td>Lớp yên tĩnh</td><td>Hiệu ứng 45%, không khán giả, không nhạc</td></tr>
+  <tr><td>Bình thường</td><td>Hiệu ứng 80%, có khán giả (mặc định)</td></tr>
+  <tr><td>Sân khấu</td><td>100%, khán giả + nhạc nền</td></tr>
+</table>
+<p>Công tắc riêng: Tiếng khán giả reo hò và “ôi…”, Giọng đọc tiếng Anh (3-2-1-go, Round two, Correct, Wrong, Hurry up, Congratulations…), Trống dồn, Nhạc nền; hai thanh trượt âm lượng; nút <b>Thử âm thanh</b>.</p>
+</div></div>
+<div class="box why"><span class="t">Vì sao lúc mới mở game không có tiếng?</span>
+Mọi trình duyệt <b>cấm trang web tự phát tiếng</b> khi người dùng chưa tương tác (để quảng cáo không la hét). Âm thanh chỉ được “mở khóa” sau cú bấm chuột hoặc phím đầu tiên. Vì vậy trước giờ học hãy <b>bấm một lần</b> vào trang (vd. nút Thử âm thanh). Toàn bộ âm thanh nằm sẵn trong file game nên mất mạng vẫn có tiếng.</div>
+<p class="small">Nguồn âm: Kronbits, ObsydianX, Kenney (CC0); tiếng khán giả của Gregor Quendel (CC BY 4.0 — đã ghi công trong mục Cách chơi và <code>classroom-feud/SOUNDS.md</code>). Muốn đổi tiếng nào, nói với Claude tên thao tác và tiếng mong muốn.</p>
+
+<h2 id="p1-den">1.10 Hiệu ứng ánh sáng và “giảm chuyển động”</h2>
+<div class="grid2">
+<figure><div class="shot"><img src="img/15-anh-sang.jpg" alt="">
+  <span class="bx" style="left:71.5%;top:15.5%;width:26%;height:8.5%"></span></div><figcaption>Hình 17. Khung Hiệu ứng ánh sáng (nút bóng đèn): mức Tắt / Nhẹ nhàng / Đã đời, mỗi hiệu ứng có nút Thử.</figcaption></figure>
+<figure><div class="shot"><img src="img/16-giam-cd.jpg" alt="">
+  <span class="bx" style="left:71.5%;top:81%;width:26%;height:7.5%"></span></div><figcaption>Hình 18. Cuối khung: ô “Vẫn chạy ánh sáng khi máy bật ‘giảm chuyển động’”.</figcaption></figure>
+</div>
+<p>10 hiệu ứng: đèn pha sân khấu, hào quang đội, chớp máy ảnh, tia hào quang vàng, đèn báo đỏ, bụi vàng lấp lánh, đèn disco, nhịp tim đồng hồ, pháo hoa sao, băng rôn và vương miện. <b>Nhẹ nhàng</b> giữ 6 hiệu ứng êm; <b>Đã đời</b> bật tất cả (mặc định). Không hiệu ứng nào chớp quá 3 lần/giây. Cài đặt lưu trong trình duyệt.</p>
+<div class="box why"><span class="t">Vì sao có máy không thấy ánh sáng/pháo giấy?</span>
+Windows có tùy chọn <b>“Hiệu ứng hoạt ảnh” (Animation effects)</b> trong Cài đặt → Trợ năng → Hiệu ứng hình ảnh. Khi tắt, trình duyệt báo cho mọi trang “người dùng muốn giảm chuyển động”, và game tôn trọng điều đó: tắt ánh sáng, pháo giấy, pháo hoa, bục nảy (băng rôn và bục xếp hạng vẫn hiện nhưng đứng yên). Nếu máy dạy bị như vậy mà thầy/cô vẫn muốn hiệu ứng, tích ô <b>“Vẫn chạy ánh sáng…”</b> ở cuối khung (Hình 18) — game sẽ nhớ lựa chọn này.</div>
+
+<h2 id="p1-kq">1.11 Màn kết quả, MVP, xuất kết quả</h2>
+<figure><div class="shot"><img src="img/19-ket-qua.jpg" alt=""></div><figcaption>Hình 19. Màn kết quả: đội thắng, bục xếp hạng (đội nhì lên trước, đội thắng lên sau với vương miện), mưa pháo giấy.</figcaption></figure>
+<figure><div class="shot"><img src="img/20-xuat.jpg" alt="">
+  <span class="bx" style="left:13.5%;top:79.5%;width:72%;height:7.5%"></span><span class="mk" style="left:13.5%;top:79.5%">1</span>
+  <span class="bx" style="left:62%;top:89%;width:13%;height:7%"></span><span class="mk" style="left:62%;top:89%">2</span>
+</div>
+<ol class="legend"><li><b class="n">1</b>Điểm từng vòng (bấm để mở)</li><li><b class="n">2</b>Xuất kết quả (file CSV mở bằng Excel)</li></ol>
+<figcaption>Hình 20. Cuộn xuống: Giải thưởng MVP, Điểm từng vòng, các nút Chơi lại / Quay lại bảng / Về thiết lập / Xuất kết quả.</figcaption></figure>
+<p><b>Giải MVP</b> (chỉ hiện giải có người đạt; bằng nhau thì “Cả hai đội”): <i>Vua đáp án top</i> (mở nhiều ô điểm cao nhất), <i>Cướp điểm đỉnh nhất</i>, <i>Chuỗi đúng dài nhất</i>, <i>Bấm chuông nhanh nhất</i>, <i>Thợ săn đáp án</i> (tìm được nhiều đáp án nhất). <b>Xuất kết quả</b> tải về file <code>.csv</code> (mở bằng Excel) ghi điểm từng vòng — tiện để lưu điểm thưởng của lớp.</p>
+<div class="box tip"><span class="t">Gợi ý sư phạm</span>Giải MVP cho phép khen cả đội thua (vd. “bấm chuông nhanh nhất”), giữ không khí vui cho cả lớp.</div>
+
+<h2 id="p1-maychieu">1.12 Mẹo dùng với máy chiếu</h2>
+<ul>
+  <li><b>Toàn màn hình</b> (<kbd>F</kbd>) trước khi học sinh vào lớp. Game tự co giãn theo màn hình; câu hỏi dài tự thu nhỏ để không chèn bảng.</li>
+  <li>Nếu dùng chế độ <b>Duplicate</b> (hai màn giống nhau) thì học sinh thấy cả ô gõ — không sao, đáp án chỉ hiện khi ô lật. Không gõ trước đáp án mẫu trước mặt học sinh.</li>
+  <li><b>Bấm một lần</b> vào trang để mở khóa âm thanh, bấm <b>Thử âm thanh</b> để chỉnh loa.</li>
+  <li>Phòng ồn → mức <b>Sân khấu</b>; phòng bên cạnh đang thi → <b>Lớp yên tĩnh</b>.</li>
+  <li>Máy chiếu mờ/phòng sáng: ánh sáng mức <b>Nhẹ nhàng</b> cho dễ đọc chữ.</li>
+  <li>Dùng <b>chuột không dây</b> hoặc bàn phím rời để đi lại trong lớp; mọi thao tác đều có phím tắt.</li>
+  <li>Mở game và chọn bộ <b>trước giờ học</b> khi còn mạng; Sheet đã tải sẽ được nhớ nếu mạng rớt giữa giờ.</li>
+</ul>
+</section>
+
+<!-- ============ PHẦN 2 ============ -->
+<section class="part" id="p2">
+<div class="part-title"><div class="n">Phần 2</div><h1>Ngân hàng câu hỏi (Google Sheet)</h1></div>
+<p>Sheet: <b>NGÂN HÀNG CÂU HỎI CLASSROOM FEUD</b> — <a href="https://docs.google.com/spreadsheets/d/17W9UR-HAxUWoh-Lb8RQV37EIOTfJ30ZDTOHhBDUfOv8/edit">docs.google.com/spreadsheets/d/17W9UR-HAxUWoh-Lb8RQV37EIOTfJ30ZDTOHhBDUfOv8</a></p>
+<div class="box why"><span class="t">Bản chất: Sheet là một “hợp đồng”</span>
+Game không có ai đứng giữa để “hiểu” Sheet. Nó đọc Sheet <b>theo đúng tên tab và đúng tiêu đề cột</b>. Bên viết (thầy/cô, Claude) và bên đọc (game) phải giữ cùng một quy ước — gọi là hợp đồng, ghi trong <code>classroom-feud/SHEET-BANK.md</code>. Giữ đúng hợp đồng thì mọi thứ chạy; đổi tên một tab hay một tiêu đề cột là game “mù” phần đó.</div>
+
+<h2 id="p2-cautruc">2.1 Cấu trúc tab và cột</h2>
+<p>Có 5 tab: <code>Hướng dẫn</code> (game bỏ qua), <code>Starters</code>, <code>Movers</code>, <code>Flyers</code>, <code>KET</code>. Bốn tab cấp độ có cùng cột; dòng 1 là tiêu đề, <b>mỗi dòng sau là một câu hỏi = một vòng chơi</b>.</p>
+<figure><div class="shot"><img src="img/21-sheet-cot.jpg" alt="">
+  <span class="mk" style="left:4%;top:19.5%">A</span>
+  <span class="mk" style="left:12%;top:19.5%">B</span>
+  <span class="mk" style="left:20%;top:19.5%">C</span>
+  <span class="bx" style="left:45%;top:20%;width:55%;height:3.5%"></span>
+  <span class="bx" style="left:27%;top:96%;width:46%;height:4%"></span>
+</div><figcaption>Hình 21. Tab Movers: cột A Set (tên bộ), B Topic, C Question, rồi các cặp Answer/Points (khung đỏ trên). Khung đỏ dưới: các tab cấp độ — không đổi tên.</figcaption></figure>
+<table>
+  <tr><th style="width:12%">Cột</th><th style="width:26%">Tiêu đề</th><th>Nội dung và quy tắc</th></tr>
+  <tr><td>A</td><td><code>Set</code></td><td>Tên bộ: <code>&lt;Cấp&gt; &lt;số&gt;</code>, vd. <code>Movers 3</code>. Các dòng cùng bộ nằm liền nhau.</td></tr>
+  <tr><td>B</td><td><code>Topic</code></td><td>Chủ đề của câu (Food, Weather…). Hiện trong danh sách bộ.</td></tr>
+  <tr><td>C</td><td><code>Question</code></td><td>Câu hỏi tiếng Anh, tối đa 200 ký tự.</td></tr>
+  <tr><td>D, F, H … R</td><td><code>Answer 1</code> … <code>Answer 8</code></td><td>Đáp án, tối đa 80 ký tự. Có thể ghi nhiều cách nói: <code>TV / Television</code>.</td></tr>
+  <tr><td>E, G, I … S</td><td><code>Points 1</code> … <code>Points 8</code></td><td>Điểm, <b>số nguyên 0–999</b>. Cặp để trống thì bỏ qua.</td></tr>
+  <tr><td>T</td><td><code>Approved</code></td><td>Ô duyệt (danh sách chọn Y/N). Trống = chưa duyệt.</td></tr>
+  <tr><td>U</td><td><code>Note</code></td><td>Ghi chú tự do; game bỏ qua.</td></tr>
+</table>
+<div class="box why"><span class="t">Vì sao mỗi bộ có 5 câu, mỗi câu một chủ đề khác nhau?</span>
+Một trận thường 5 vòng (vừa một tiết). Trộn chủ đề giúp học sinh yếu ở chủ đề này vẫn có cơ hội ở chủ đề khác, và ôn được nhiều mảng từ vựng trong một trận. Chỉ khi thầy/cô xin rõ “bộ một chủ đề” thì cả 5 câu mới cùng chủ đề.</div>
+
+<h2 id="p2-duyet">2.2 Đặt tên bộ và bước duyệt</h2>
+<figure><div class="shot"><img src="img/22-sheet-duyet.jpg" alt="">
+  <span class="bx" style="left:93%;top:20%;width:7%;height:69%"></span></div>
+<figcaption>Hình 22. Kéo sang phải: cột T <b>Approved</b> (khung đỏ). Tab Movers hiện đã duyệt Y cho cả 25 câu.</figcaption></figure>
+<ul>
+  <li><b>Tên bộ</b> phải đúng dạng <code>Movers 1</code>, <code>Movers 2</code>… (tên cấp + khoảng trắng + số). Bộ mới nối tiếp số cuối cùng. Game liệt kê bộ theo thứ tự xuất hiện trong Sheet.</li>
+  <li><b>Duyệt</b>: gõ hoặc chọn <code>Y</code> ở cột Approved. Game cũng chấp nhận <code>Yes</code>, <code>X</code>, <code>✓</code>, <code>OK</code>, <code>Có</code>, <code>Duyệt</code>, <code>1</code>, <code>TRUE</code> (không phân biệt hoa thường). Trống hoặc <code>N</code> = chưa duyệt.</li>
+  <li>Bộ chỉ hiện trong game khi có <b>ít nhất một câu đã duyệt</b>; câu chưa duyệt trong bộ bị bỏ qua (bộ sẽ ít vòng hơn).</li>
+</ul>
+<div class="box why"><span class="t">Vì sao phải có bước duyệt?</span>
+Câu hỏi do Claude tạo có thể chưa hợp lớp mình: từ quá khó, đáp án lạ với học sinh Việt Nam, điểm chưa hợp lý. Cột Approved là <b>cửa kiểm soát chất lượng</b>: không câu nào lên màn chiếu mà thầy/cô chưa đọc. Nó cũng cho phép Claude ghi thêm bộ mới bất cứ lúc nào mà không sợ làm lộn xộn giờ học — bộ mới chưa duyệt thì game chưa thấy. Vì vậy Claude được dặn <b>không bao giờ tự điền</b> cột này.</div>
+
+<h2 id="p2-tay">2.3 Tự thêm câu hỏi bằng tay</h2>
+<ol class="steps">
+  <li>Mở tab đúng cấp, xuống dòng trống đầu tiên dưới bộ cuối cùng.</li>
+  <li>Cột A: tên bộ mới (vd. <code>Movers 6</code>) — ghi ở <b>cả 5 dòng</b> của bộ.</li>
+  <li>Cột B: chủ đề; cột C: câu hỏi kiểu “Name something…”.</li>
+  <li>Từ cột D: đáp án rồi điểm, xen kẽ. 5–6 đáp án, xếp từ phổ biến nhất, điểm giảm dần, tổng ≈ 100.</li>
+  <li>Cột T: chọn <b>Y</b> khi đã ưng. Mở game → <b>Tải lại</b>.</li>
+</ol>
+<div class="box warn"><span class="t">Những lỗi làm game bỏ qua dòng</span>
+Thiếu câu hỏi; đáp án có chữ mà ô điểm trống; điểm không phải số 0–999 (vd. “10đ”, “ten”); tên tab/tiêu đề cột bị đổi; cột bị chèn thêm làm lệch vị trí. Dòng đã duyệt mà lỗi sẽ bị bỏ qua — trong game bấm <b>Xem lỗi</b> để biết số dòng cần sửa. <b>Đừng</b> đổi tên tab, đừng chèn/xóa cột, đừng sửa dòng tiêu đề.</div>
+
+<h2 id="p2-claude">2.4 Nhờ Claude tạo bộ mới</h2>
+<p>Claude có skill <code>feud-questions</code> (mục 3.5): đọc tab của cấp đó để biết số bộ tiếp theo và tránh lặp câu cũ, viết câu theo từ vựng Cambridge của cấp, ghi thẳng vào Sheet, đọc lại để kiểm tra, rồi báo cho thầy/cô danh sách câu. Cột Approved để trống chờ thầy/cô duyệt.</p>
+<p>Ví dụ yêu cầu:</p>
+<div class="prompt"><b>›</b> Thêm 2 bộ câu hỏi cho Movers, có một câu về Tết.</div>
+<div class="prompt"><b>›</b> Tạo 1 bộ cho mỗi cấp, chủ đề gợi ý: Food.</div>
+<div class="prompt"><b>›</b> Làm 1 bộ KET chỉ một chủ đề Technology (cả 5 câu cùng chủ đề).</div>
+<div class="prompt"><b>›</b> Câu “Name a job…” ở Movers 2 quá dễ, viết lại khó hơn chút cho lớp 2A.</div>
+<div class="prompt"><b>›</b> Xuất bộ Flyers chủ đề School ra file Excel. <span style="color:#94a3b8">(chỉ khi thật sự cần file .xlsx)</span></div>
+<div class="box why"><span class="t">Vì sao chủ đề thầy/cô đưa chỉ là “gợi ý”?</span>
+Theo quy ước ở 2.1, mỗi bộ trộn 5 chủ đề. Nên “chủ đề Food” nghĩa là Food có mặt trong 1–2 câu, các câu còn lại lấy chủ đề khác của cấp đó. Muốn cả bộ cùng một chủ đề thì nói rõ “chỉ một chủ đề”.</div>
+<div class="box warn"><span class="t">Khi Claude không ghi được vào Sheet</span>
+Claude ghi Sheet qua <b>connector Google Sheets</b> gắn với tài khoản Claude đang dùng. Sau khi đổi tài khoản Claude, connector có thể chưa được kết nối — Claude sẽ báo. Thầy/cô bật lại connector Google trong phần cài đặt Claude (đăng nhập Google là việc của thầy/cô, Claude không làm thay). Game thì không cần connector: nó đọc Sheet công khai.</div>
+
+<h2 id="p2-tai">2.5 Tải lại, bộ nhớ đệm và khi mất mạng</h2>
+<ul>
+  <li>Mỗi lần mở game, game tự tải lại Sheet. Đang mở mà vừa sửa/duyệt Sheet → bấm <b>Tải lại</b>.</li>
+  <li>Game lưu <b>bản tải gần nhất</b> trong trình duyệt. Mất mạng vẫn chọn bộ được; dòng trạng thái ghi “Dữ liệu lúc …”.</li>
+  <li>Bản lưu này cũng theo nguyên tắc “mỗi bản game một ngăn kéo” (mục 1.1): bản Desktop có bộ nhớ đệm riêng.</li>
+</ul>
+<div class="box why"><span class="t">Vì sao game đọc được Sheet mà không cần đăng nhập?</span>
+Sheet được chia sẻ “Bất kỳ ai có đường liên kết”. Google cho phép tải sheet công khai dưới dạng bảng CSV qua một địa chỉ đặc biệt; game tải từng tab theo cách đó. Game <b>chỉ đọc</b>, không bao giờ sửa Sheet.</div>
+
+<h2 id="p2-chiase">2.6 Chia sẻ sheet và rủi ro “ai cũng sửa được”</h2>
+<p>Hiện Sheet để quyền <b>“Bất kỳ ai có đường liên kết — Người chỉnh sửa”</b> (thầy/cô đã chọn giữ như vậy).</p>
+<table>
+  <tr><th style="width:30%">Quyền</th><th>Game đọc được?</th><th>Rủi ro</th></tr>
+  <tr><td>Ai có link — <b>Người chỉnh sửa</b> (hiện tại)</td><td>Có</td><td>Ai cầm link đều sửa/xóa được câu hỏi. Link nằm công khai trong repo GitHub và trong file game.</td></tr>
+  <tr><td>Ai có link — <b>Người xem</b></td><td>Có</td><td>Người lạ chỉ xem được. Claude vẫn ghi được (qua connector, bằng tài khoản Google của thầy/cô có quyền sửa).</td></tr>
+  <tr><td>Bị hạn chế</td><td><b>Không</b></td><td>Game báo “sheet chưa chia sẻ”.</td></tr>
+</table>
+<div class="box warn"><span class="t">Nếu một ngày Sheet bị sửa bậy</span>
+Google Sheets → <b>Tệp → Nhật ký phiên bản → Xem nhật ký phiên bản</b>, chọn mốc thời gian trước khi bị sửa, bấm <b>Khôi phục phiên bản này</b>. Để chắc ăn hơn có thể chuyển sang quyền “Người xem” ở nút <b>Chia sẻ</b> — game vẫn chạy bình thường.</div>
+
+<h2 id="p2-khac">2.7 Dùng một sheet khác</h2>
+<ol class="steps">
+  <li>Tạo bản sao Sheet hiện tại (Tệp → Tạo bản sao) để giữ đúng tab và cột.</li>
+  <li>Chia sẻ bản mới “Bất kỳ ai có đường liên kết”.</li>
+  <li>Trong game bấm <b>Link Google Sheet</b>, dán link (hoặc ID), bấm <b>Lưu và tải</b>.</li>
+</ol>
+<p>Lựa chọn này lưu trong trình duyệt (từng bản game). Nhớ báo Claude ID sheet mới để skill <code>feud-questions</code> ghi đúng chỗ.</p>
+</section>
+
+<!-- ============ PHẦN 3 ============ -->
+<section class="part" id="p3">
+<div class="part-title"><div class="n">Phần 3</div><h1>Làm việc với Claude</h1></div>
+
+<h2 id="p3-context">3.1 Context là gì và vì sao phải giữ nó thấp</h2>
+<p><b>Context</b> là “bàn làm việc” của Claude trong một cuộc trò chuyện: mọi tin nhắn, mọi file Claude đã đọc, mọi kết quả lệnh đều nằm trên bàn đó. Bàn có giới hạn. Khi bàn đầy, phần cũ bị tóm tắt lại và chi tiết dễ bị mất; càng đầy Claude càng chậm và dễ sót.</p>
+<div class="box why"><span class="t">Vì sao không làm hết mọi việc trong một cuộc trò chuyện?</span>
+File game nặng hơn 500 KB. Chỉ cần sửa vài tính năng là bàn làm việc đầy những đoạn code đã đọc. Nếu cuộc trò chuyện chính vừa điều phối vừa sửa code, nó sẽ đầy rất nhanh và quên các quyết định quan trọng. Giải pháp: tách người <b>điều phối</b> khỏi người <b>làm việc nặng</b>.</div>
+
+<h2 id="p3-relay">3.2 Phương pháp session-relay</h2>
+<p>Tên gọi “relay” = chạy tiếp sức. Quy trình nằm trong skill <code>.claude/skills/session-relay/SKILL.md</code> và được nhắc trong <code>CLAUDE.md</code>, nên Claude tự làm theo.</p>
+<table>
+  <tr><th style="width:26%">Vai</th><th>Làm gì</th></tr>
+  <tr><td><b>Phiên chính</b> (cuộc trò chuyện thầy/cô đang nói chuyện)</td><td>Nhận yêu cầu, chia thành task, mở session phụ, kiểm tra kết quả, ghi <code>TODO.md</code>, bàn giao. Việc nhỏ (trả lời câu hỏi, sửa một chỗ) thì làm luôn.</td></tr>
+  <tr><td><b>Session phụ</b> (hiện trong thanh bên, tên kiểu <code>feud-answer-input</code>)</td><td>Làm một task nặng: sửa game, tạo câu hỏi, viết tài liệu… Xong thì commit và báo lại vài dòng.</td></tr>
+</table>
+<h3>Vòng đời của một phiên chính</h3>
+<ol class="steps">
+  <li><b>Bắt đầu:</b> đọc <code>TODO.md</code>, chạy <code>git pull</code>, kiểm tra session phụ còn chạy, làm tiếp mục đầu tiên chưa xong.</li>
+  <li><b>Nhận nhiều task:</b> task lớn → mở session phụ (mỗi task một session); task nhỏ → làm luôn. Ghi ngay session vừa mở vào <code>TODO.md</code>.</li>
+  <li><b>Theo dõi context</b> bằng công cụ <code>get_usage</code> sau mỗi task.</li>
+  <li><b>Ở mức 40–50%</b>: cập nhật <code>TODO.md</code> → commit → push → báo thầy/cô → tự clear cuộc trò chuyện.</li>
+  <li><b>Sau khi clear</b>: thầy/cô chỉ cần gõ “<b>tiếp tục</b>”. Phiên mới đọc <code>CLAUDE.md</code> → <code>TODO.md</code> → làm tiếp.</li>
+</ol>
+<div class="box why"><span class="t">Vì sao lại là 40–50%, không phải 90%?</span>
+Bản thân việc bàn giao cũng tốn chỗ (viết TODO, commit, push, có thể gặp lỗi push phải xử lý). Dừng ở 40% chừa đủ chỗ để bàn giao gọn gàng khi đầu óc Claude còn “tỉnh”. Và thứ tự <b>commit → push → rồi mới clear</b> là bắt buộc: nếu push lỗi mà đã clear thì bàn giao có thể mất. Push lỗi thì Claude dừng lại và báo, không clear.</div>
+
+<h2 id="p3-todo">3.3 TODO.md — trí nhớ bàn giao</h2>
+<p><code>TODO.md</code> ở gốc repo là <b>nguồn sự thật duy nhất</b> về việc đang dở. Sau khi clear, Claude không nhớ gì ngoài những gì có trong <code>TODO.md</code>, <code>CLAUDE.md</code>, các file và lịch sử Git.</p>
+<table>
+  <tr><th style="width:32%">Mục trong TODO.md</th><th>Chứa gì</th></tr>
+  <tr><td>Đang làm tiếp theo</td><td>Việc cụ thể đầu tiên phiên sau phải làm, kèm file/lệnh.</td></tr>
+  <tr><td>Session phụ đang chạy</td><td>Bảng tên, ID, task, nhánh, trạng thái.</td></tr>
+  <tr><td>Chờ</td><td>Việc chờ thầy/cô (vd. nghe thử loa thật, duyệt câu hỏi).</td></tr>
+  <tr><td>Đã xong gần đây</td><td>Việc vừa xong, commit nào.</td></tr>
+  <tr><td>Ghi chú &amp; quyết định đã chốt</td><td>Quyết định và lý do (vd. giữ game một file, chỉ dùng âm CC0, không đưa PDF giáo trình lên repo).</td></tr>
+</table>
+<div class="box tip"><span class="t">Thầy/cô cũng dùng được TODO.md</span>
+Mở <code>TODO.md</code> trên GitHub để xem nhanh dự án đang ở đâu. Muốn Claude nhớ một quyết định lâu dài, hãy nói: “<i>ghi vào TODO phần quyết định: …</i>”.</div>
+
+<h2 id="p3-taikhoan">3.4 Đổi tài khoản Claude</h2>
+<div class="box why"><span class="t">Vì sao đổi tài khoản không mất gì?</span>
+Mọi thứ quan trọng nằm <b>ngoài</b> Claude: code và TODO trong thư mục + GitHub; câu hỏi trong Google Sheet; quyền push GitHub lưu trên máy (Git Credential Manager), không phụ thuộc tài khoản Claude. Tài khoản Claude chỉ là “người thợ”; bàn giao qua TODO.md làm cho thợ nào vào cũng làm tiếp được.</div>
+<ol class="steps">
+  <li>Ở tài khoản cũ: nói “<b>bàn giao</b>” — Claude cập nhật TODO.md, commit, push.</li>
+  <li>Đăng xuất, đăng nhập tài khoản mới (thầy/cô tự làm).</li>
+  <li>Mở lại đúng thư mục <code>C:\Users\Admin\Downloads\HSK</code>, gõ “<b>tiếp tục</b>”.</li>
+  <li>Nếu cần ghi Google Sheet: bật connector Google Sheets cho tài khoản mới (mục 2.4).</li>
+</ol>
+
+<h2 id="p3-skill">3.5 Các skill đã tạo</h2>
+<p><b>Skill</b> là một bản hướng dẫn nghề viết sẵn cho Claude (file <code>SKILL.md</code>), nằm trong repo ở <code>.claude/skills/</code>. Claude tự nạp skill khi yêu cầu khớp với mô tả của nó — thầy/cô không cần gọi tên.</p>
+<table>
+  <tr><th style="width:20%">Skill</th><th>Làm gì</th><th style="width:30%">Kích hoạt khi nói</th></tr>
+  <tr><td><code>session-relay</code></td><td>Quy trình điều phối + session phụ + theo dõi context + bàn giao qua TODO.md (Phần 3.2).</td><td>“tiếp tục”, “làm tiếp”, “bàn giao”, giao nhiều việc một lúc.</td></tr>
+  <tr><td><code>feud-questions</code></td><td>Viết câu hỏi theo cấp Cambridge, ghi vào Sheet, kiểm tra lại; xuất Excel khi được yêu cầu rõ.</td><td>“thêm bộ câu hỏi”, “làm câu hỏi cho Movers”, hoặc chỉ đưa một chủ đề.</td></tr>
+</table>
+<div class="box why"><span class="t">Vì sao skill nằm trong repo?</span>Vì nó đi theo dự án: đổi máy, đổi tài khoản Claude, clone repo về là Claude có ngay đúng “nghề”. Muốn đổi cách làm (vd. mỗi bộ 6 câu) thì nhờ Claude sửa skill — lần sau tự làm theo cách mới.</div>
+
+<h2 id="p3-yeucau">3.6 Cách viết yêu cầu tốt</h2>
+<ul>
+  <li><b>Nói kết quả mong muốn, không cần nói cách làm:</b> “học sinh hay nói ‘bike’ mà bảng ghi ‘Bicycle’, muốn game chấp nhận” tốt hơn “sửa hàm so khớp”.</li>
+  <li><b>Nêu bối cảnh lớp học:</b> lớp mấy, máy chiếu gì, phòng ồn hay yên.</li>
+  <li><b>Một yêu cầu = một việc rõ ràng.</b> Nhiều việc thì liệt kê 1, 2, 3 — Claude sẽ chia session.</li>
+  <li><b>Nói điều không được đổi:</b> “giữ nguyên âm thanh hiện tại”.</li>
+  <li><b>Hỏi trước khi làm</b> khi chưa chắc: “đề xuất trước, chưa sửa” — như file <code>PROPOSAL-FX.md</code> đã làm.</li>
+</ul>
+<div class="prompt"><b>›</b> Tiếp tục.</div>
+<div class="prompt"><b>›</b> Hôm qua dạy 3A: phím Q hay bị kẹt, và tiếng khán giả hơi to. 1) kiểm tra phím Q, 2) giảm tiếng khán giả ở mức Bình thường. Làm rồi push.</div>
+<div class="prompt"><b>›</b> Đề xuất 3 cách làm màn kết quả có biểu đồ điểm theo vòng, chưa sửa code.</div>
+<div class="prompt"><b>›</b> Chép bản game mới nhất ra Desktop, thư mục CLASSROOM FEUD.</div>
+
+<h2 id="p3-kiemtra">3.7 Kiểm tra việc session phụ đã làm</h2>
+<ol class="steps">
+  <li>Session phụ hiện trong thanh bên; bấm vào để đọc báo cáo cuối (vài dòng: đã làm gì, commit/nhánh nào, đã thử gì, chưa thử gì).</li>
+  <li>Phiên chính nhận báo cáo và <b>tự kiểm tra lại</b> (đọc thay đổi, không tin báo cáo suông) rồi mới ghi “đã xong” vào TODO.md.</li>
+  <li>Thầy/cô <b>thử thật</b> những gì báo cáo ghi “chưa thử” — thường là loa, máy chiếu, cảm giác trong lớp.</li>
+  <li>Nếu session làm trên <b>nhánh riêng</b>: nó chỉ vào game chính khi thầy/cô đồng ý gộp (merge). Chưa gộp thì link web chưa đổi.</li>
+  <li>Muốn sửa thêm: nhắn thẳng vào session đó (nó còn nhớ việc), hoặc nói với phiên chính.</li>
+</ol>
+
+<h2 id="p3-khong">3.8 Những việc Claude không làm được (hoặc không được làm)</h2>
+<table>
+  <tr><th style="width:38%">Việc</th><th>Vì sao / thầy/cô làm thế nào</th></tr>
+  <tr><td>Đăng nhập, gõ mật khẩu, mã xác minh</td><td>Quy tắc an toàn: Claude không nhập mật khẩu. Thầy/cô tự đăng nhập Google, GitHub, Claude.</td></tr>
+  <tr><td>Nghe loa, nhìn máy chiếu thật</td><td>Claude chỉ “nghe” được dữ liệu âm thanh, không nghe được tai người. Âm lượng, độ chói phải thầy/cô thử và kể lại.</td></tr>
+  <tr><td>Bấm “Cho phép” (Allow) thay thầy/cô</td><td>Các hộp hỏi quyền là của thầy/cô quyết.</td></tr>
+  <tr><td>Tự duyệt câu hỏi (cột Approved)</td><td>Cố ý: duyệt là việc của giáo viên (mục 2.2).</td></tr>
+  <tr><td>Biết điều xảy ra sau khi clear</td><td>Chỉ biết những gì ghi trong TODO.md / Git.</td></tr>
+  <tr><td>Truy cập máy khác, trình duyệt của học sinh</td><td>Claude chỉ làm việc trên máy này.</td></tr>
+</table>
+</section>
+
+<!-- ============ PHẦN 4 ============ -->
+<section class="part" id="p4">
+<div class="part-title"><div class="n">Phần 4</div><h1>Lưu trữ và cập nhật</h1></div>
+
+<h2 id="p4-github">4.1 GitHub repo (công khai)</h2>
+<p>Repo: <a href="https://github.com/trantrungg135family-tech/HSK">github.com/trantrungg135family-tech/HSK</a>, nhánh <code>main</code>. Bản trên máy: <code>C:\Users\Admin\Downloads\HSK</code>.</p>
+<table>
+  <tr><th style="width:34%">Thư mục / file</th><th>Là gì</th></tr>
+  <tr><td><code>classroom-feud/Classroom-Feud.html</code></td><td>Bản gốc của game (một file, âm thanh nhúng sẵn).</td></tr>
+  <tr><td><code>classroom-feud/*.md</code></td><td>Tài liệu: README, SHEET-BANK (hợp đồng Sheet), EXCEL-FORMAT, SOUNDS, PROPOSAL-FX.</td></tr>
+  <tr><td><code>question-sets/</code></td><td>File Excel câu hỏi cũ.</td></tr>
+  <tr><td><code>.claude/skills/</code></td><td>Hai skill <code>session-relay</code>, <code>feud-questions</code>.</td></tr>
+  <tr><td><code>TODO.md</code>, <code>CLAUDE.md</code></td><td>Bàn giao và lời nhắc đầu phiên cho Claude.</td></tr>
+  <tr><td><code>docs/</code></td><td>Tài liệu hướng dẫn này (PDF + mã nguồn HTML, ảnh).</td></tr>
+</table>
+<div class="box warn"><span class="t">“Công khai” nghĩa là gì?</span>
+Ai trên mạng cũng xem và tải được mọi file trong repo, kể cả lịch sử cũ. Vì vậy: <b>không</b> đưa lên mật khẩu, khóa API, <b>họ tên/thông tin học sinh</b>, hay tài liệu có bản quyền. File <code>.gitignore</code> đã chặn mọi file <code>*.pdf</code> (giáo trình) — chỉ riêng PDF hướng dẫn này được cho phép. Dữ liệu lớp học nằm trong trình duyệt nên không bao giờ lên GitHub. Âm thanh chỉ dùng nguồn CC0/CC BY có ghi công.</div>
+
+<h2 id="p4-commit">4.2 Commit = lịch sử và bản sao lưu; cách quay lại</h2>
+<p>Mỗi <b>commit</b> là một “ảnh chụp” toàn bộ dự án tại một thời điểm, kèm lời mô tả (vd. <i>Classroom Feud: type-in answer box…</i>). <b>Push</b> là gửi các ảnh chụp đó lên GitHub. Vì GitHub giữ mọi ảnh chụp, không thay đổi nào là mất hẳn.</p>
+<h3>Xem lịch sử</h3>
+<p>Trên GitHub: mở file → nút <b>History</b>. Hoặc hỏi Claude: “<i>liệt kê 10 thay đổi gần nhất của game</i>”.</p>
+<h3>Quay lại bản cũ</h3>
+<ul>
+  <li><b>Cách an toàn nhất — nhờ Claude:</b> “<i>bản game trước khi thêm ô gõ đáp án chạy ổn hơn, quay game về bản đó rồi push</i>”. Claude dùng <code>git revert</code> (tạo commit mới đảo ngược thay đổi), không xóa lịch sử, nên muốn quay lại bản mới vẫn được.</li>
+  <li><b>Cần gấp trong giờ học:</b> trên GitHub, mở History của <code>Classroom-Feud.html</code>, chọn commit cũ → <b>Browse files</b> → mở file → <b>Download raw file</b>. Mở file vừa tải bằng bấm đúp là chơi được ngay (dữ liệu lớp: xem mục 1.1).</li>
+</ul>
+
+<h2 id="p4-pages">4.3 GitHub Pages tự cập nhật</h2>
+<p>GitHub Pages được bật với nguồn là nhánh <code>main</code>, thư mục gốc. Mỗi lần có push lên <code>main</code>, GitHub tự dựng lại trang trong khoảng 1–2 phút; link web không bao giờ đổi.</p>
+<div class="box tip"><span class="t">Link chưa thấy bản mới?</span>Chờ 1–2 phút rồi nhấn <kbd>Ctrl</kbd>+<kbd>F5</kbd> (tải lại bỏ qua bộ nhớ đệm). Xem trạng thái dựng trang ở tab <b>Actions</b> của repo (dấu ✓ xanh là xong).</div>
+
+<h2 id="p4-desktop">4.4 Giữ bản Desktop luôn mới</h2>
+<p>Bản Desktop không tự cập nhật. Hiện thư mục <code>Desktop\CLASSROOM FEUD</code> có bản cũ (28-10) và file Luật Chơi. Khi có bản game mới:</p>
+<ol class="steps">
+  <li>Cách nhanh nhất: nói với Claude “<b>chép bản game mới nhất ra Desktop</b>”.</li>
+  <li>Hoặc tự làm: chép <code>C:\Users\Admin\Downloads\HSK\classroom-feud\Classroom-Feud.html</code> dán vào <code>Desktop\CLASSROOM FEUD</code>, ghi đè file cùng tên.</li>
+  <li>Hoặc từ máy khác: mở link web, nhấn <kbd>Ctrl</kbd>+<kbd>S</kbd>, chọn “Trang web, chỉ HTML”.</li>
+</ol>
+<div class="box why"><span class="t">Ghi đè file có mất dữ liệu lớp không?</span>Không. Dữ liệu không nằm trong file HTML mà nằm trong ngăn kéo <code>file://</code> của trình duyệt. File mới, cùng trình duyệt → vẫn thấy lớp và lịch sử cũ.</div>
+
+<h2 id="p4-saoluu">4.5 Sao lưu lớp và thư viện</h2>
+<div class="box why"><span class="t">Vì sao phải tự sao lưu?</span>
+Lớp, lịch sử chơi và thư viện Excel chỉ nằm trong trình duyệt của một máy. Mất khi: xóa dữ liệu duyệt web, cài lại Windows, đổi máy, đổi trình duyệt. GitHub và Google Sheet <b>không</b> giữ những thứ này.</div>
+<ol class="steps">
+  <li><b>Sao lưu:</b> Thiết lập → <b>Thư viện câu hỏi</b> → <b>Sao lưu thư viện</b>. Tải về một file <code>.json</code> chứa mọi bộ trong thư viện và mọi lớp (kèm lịch sử). Cất lên Google Drive. Nên làm mỗi tháng hoặc sau đợt tạo lớp mới.</li>
+  <li><b>Khôi phục / chuyển sang bản khác hoặc máy khác:</b> mở game ở nơi mới → Thư viện câu hỏi → <b>Khôi phục bản sao lưu</b> → chọn file. Dữ liệu được <b>gộp</b> vào cái đang có.</li>
+  <li><b>Một bộ câu hỏi lẻ:</b> nút <b>Xuất file</b> / <b>Nhập file</b> ở thanh dưới.</li>
+</ol>
+<div class="box warn"><span class="t">Cẩn thận</span><b>Xóa toàn bộ dữ liệu</b> (thanh dưới) xóa câu hỏi đang soạn, bộ đã lưu và trận đang chơi — nhưng giữ thư viện, danh sách lớp và link Google Sheet. Xóa dữ liệu duyệt web của trình duyệt thì mất <b>tất cả</b>.</div>
+
+<h2 id="p4-loi">4.6 Bảng xử lý sự cố</h2>
+<table>
+  <tr><th style="width:27%">Hiện tượng</th><th style="width:33%">Nguyên nhân thường gặp</th><th>Cách xử lý</th></tr>
+  <tr><td>Không có tiếng</td><td>Chưa bấm vào trang (trình duyệt chặn tự phát tiếng); tiếng đang tắt (<kbd>M</kbd>); loa máy tính tắt; trình duyệt lạ.</td><td>Bấm một lần vào trang → <b>Thử âm thanh</b>. Kiểm tra nút loa trong game và loa Windows. Dùng <b>Chrome</b> hoặc <b>Edge</b> bản mới.</td></tr>
+  <tr><td>Không thấy ánh sáng, pháo giấy</td><td>Windows tắt “Hiệu ứng hoạt ảnh” (giảm chuyển động); hoặc ánh sáng đang mức Tắt.</td><td>Khung Light show → tích <b>“Vẫn chạy ánh sáng…”</b>, chọn mức Đã đời.</td></tr>
+  <tr><td>Không thấy bộ câu hỏi từ Sheet</td><td>Chưa duyệt (Approved trống); chưa Tải lại; sai cấp độ; tên tab/tiêu đề cột bị đổi; tên bộ sai dạng; Sheet chưa chia sẻ; mất mạng.</td><td>Gõ Y ở cột Approved → bấm <b>Tải lại</b>. Kiểm tra ô Cấp độ. Đọc thông báo lỗi; bấm <b>Xem lỗi</b> để biết dòng hỏng. Kiểm tra tên tab đúng <code>Starters/Movers/Flyers/KET</code>.</td></tr>
+  <tr><td>Bộ có ít vòng hơn 5</td><td>Một số câu trong bộ chưa duyệt hoặc dòng bị lỗi.</td><td>Duyệt nốt / sửa dòng lỗi rồi Tải lại.</td></tr>
+  <tr><td>Mất lớp / lịch sử</td><td>Đang mở bản khác (web ↔ Desktop), trình duyệt khác, cửa sổ ẩn danh.</td><td>Mở đúng bản và trình duyệt đã tạo lớp. Lần sau dùng Sao lưu/Khôi phục (4.5).</td></tr>
+  <tr><td>Mở ra bản cũ (thiếu tính năng mới)</td><td>Đang bấm đúp file cũ trên Desktop (vd. “ban cu 28-10”) hoặc file đã tải về trước đó.</td><td>Nhìn thanh địa chỉ: <code>file:///</code> là file trên máy. Dùng link web, hoặc chép lại bản mới (4.4).</td></tr>
+  <tr><td>Link web chưa cập nhật</td><td>GitHub Pages đang dựng lại; trình duyệt giữ bản cũ.</td><td>Chờ 1–2 phút, nhấn <kbd>Ctrl</kbd>+<kbd>F5</kbd>.</td></tr>
+  <tr><td>Ô gõ chấm sai một đáp án đúng</td><td>Học sinh dùng từ đồng nghĩa mà Sheet chưa ghi.</td><td>Bấm tay vào ô/phím số. Sau giờ học thêm cách nói vào Sheet: <code>Bike / Bicycle</code>.</td></tr>
+  <tr><td>Bấm phím tắt không ăn</td><td>Con trỏ đang trong ô gõ.</td><td>Nhấn <kbd>Esc</kbd> để ra khỏi ô.</td></tr>
+  <tr><td>Claude không ghi được Sheet</td><td>Connector Google chưa bật cho tài khoản Claude hiện tại.</td><td>Bật lại connector Google Sheets (2.4).</td></tr>
+  <tr><td>Claude báo push lỗi</td><td>Hết đăng nhập GitHub trên máy, mất mạng, xung đột.</td><td>Đọc lỗi Claude báo; đăng nhập GitHub lại khi được hỏi. Claude sẽ không clear khi chưa push xong.</td></tr>
+</table>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="page-break" id="faq">
+<h1>Câu hỏi thường gặp</h1>
+<h4>Học sinh mở link web ở nhà có thấy lớp và lịch sử của tôi không?</h4>
+<p>Không. Dữ liệu nằm trong trình duyệt máy của thầy/cô. Học sinh chỉ thấy câu hỏi mẫu, hoặc các bộ đã duyệt trong Sheet nếu chọn cấp độ.</p>
+<h4>Tôi sửa một câu trong Sheet giữa giờ học, game có đổi ngay không?</h4>
+<p>Chỉ sau khi bấm <b>Tải lại</b> và chọn lại bộ (<b>Dùng bộ này</b>). Trận đang chơi giữ nguyên nội dung đã nạp.</p>
+<h4>Một câu tôi muốn bỏ tạm thời?</h4>
+<p>Đổi Approved thành <code>N</code> (hoặc xóa Y), rồi Tải lại. Không cần xóa dòng.</p>
+<h4>Có thể sửa câu hỏi ngay trong game không?</h4>
+<p>Có, trong khối “Các vòng chơi” trước khi bắt đầu. Nhưng sửa ở đó chỉ áp dụng cho trận đó; muốn giữ lâu dài hãy sửa trong Sheet.</p>
+<h4>Một vòng có tối đa bao nhiêu đáp án?</h4>
+<p>8 trong Sheet (cột Answer 1–8). Bàn phím mở trực tiếp được ô 1–10. Khuyên dùng 5–6 cho vừa bảng và vừa sức học sinh.</p>
+<h4>Chơi nhiều hơn 2 đội được không?</h4>
+<p>Game thiết kế cho 2 đội. Lớp đông: chia 2 đội lớn, mỗi lượt cử một người trả lời.</p>
+<h4>Nếu mất mạng cả buổi?</h4>
+<p>Dùng bản Desktop đã mở ít nhất một lần khi có mạng (để có bộ nhớ đệm Sheet), hoặc các bộ trong thư viện / bộ đã lưu. Âm thanh vẫn chạy vì nhúng sẵn.</p>
+<h4>Claude có tự ý sửa game khi tôi không yêu cầu không?</h4>
+<p>Không. Claude làm theo yêu cầu và TODO.md; đề xuất lớn được viết thành bản đề xuất để thầy/cô duyệt trước.</p>
+<h4>Tôi có cần học Git không?</h4>
+<p>Không bắt buộc. Chỉ cần hiểu: commit = ảnh chụp, push = gửi lên GitHub, và mọi bản cũ đều lấy lại được. Các lệnh cụ thể Claude làm.</p>
+<h4>Làm sao biết đang dùng bản game nào?</h4>
+<p>Nhìn thanh địa chỉ: <code>https://trantrungg135family-tech.github.io/…</code> là bản web mới nhất; <code>file:///C:/Users/…</code> là file trên máy — xem tên thư mục để biết file nào.</p>
+</section>
+
+<!-- ============ CHEAT SHEET ============ -->
+<section class="page-break cheat" id="cheat">
+<h2>Trang tóm tắt — dán cạnh máy tính</h2>
+<div class="cols">
+<div>
+<h3>Phím tắt trong trận</h3>
+<table>
+  <tr><td><kbd>/</kbd> <kbd>Enter</kbd></td><td>Vào ô gõ đáp án</td></tr>
+  <tr><td><kbd>Esc</kbd></td><td>Thoát ô gõ / đóng cửa sổ</td></tr>
+  <tr><td><kbd>1</kbd>–<kbd>0</kbd></td><td>Mở ô 1–10 (giữ = trống dồn)</td></tr>
+  <tr><td><kbd>A</kbd> <kbd>B</kbd></td><td>Chọn đội trả lời</td></tr>
+  <tr><td><kbd>X</kbd></td><td>Sai</td></tr>
+  <tr><td><kbd>R</kbd></td><td>Mở ô tiếp, không tính điểm</td></tr>
+  <tr><td><kbd>O</kbd> → <kbd>Q</kbd> / <kbd>P</kbd></td><td>Bấm chuông: đội A / đội B</td></tr>
+  <tr><td><kbd>T</kbd></td><td>Đồng hồ</td></tr>
+  <tr><td><kbd>U</kbd> <kbd>Ctrl</kbd>+<kbd>Z</kbd></td><td>Hoàn tác</td></tr>
+  <tr><td><kbd>N</kbd></td><td>Vòng tiếp / kết quả</td></tr>
+  <tr><td><kbd>H</kbd> · <kbd>F</kbd> · <kbd>M</kbd></td><td>Ẩn điều khiển · Toàn màn hình · Tắt tiếng</td></tr>
+  <tr><td><kbd>?</kbd></td><td>Cách chơi</td></tr>
+</table>
+<h3>Khi game hỏi “Có phải ý là…?”</h3>
+<table>
+  <tr><td><kbd>Enter</kbd></td><td>Đúng → mở ô</td></tr>
+  <tr><td><kbd>Backspace</kbd></td><td>Không → tính sai</td></tr>
+  <tr><td><kbd>Esc</kbd></td><td>Hủy, gõ lại</td></tr>
+</table>
+<h3>Luật nhanh</h3>
+<ul style="margin:2pt 0;padding-left:14pt">
+  <li>3 X → đội kia đoán 1 lần để cướp toàn bộ điểm còn lại.</li>
+  <li>Hai vòng cuối ×2 (mặc định).</li>
+  <li>3 đúng liền = 3 IN A ROW · 5 = ON FIRE.</li>
+</ul>
+</div>
+<div>
+<h3>Trước buổi học (5 phút)</h3>
+<ol>
+  <li>(Tối hôm trước) Duyệt câu mới trong Sheet: gõ <b>Y</b>.</li>
+  <li>Mở <b>link web</b> (hoặc bản Desktop nếu không có mạng).</li>
+  <li>Chọn <b>Lớp</b> → bấm <b>Tải lại</b>.</li>
+  <li>Chọn bộ có nhãn <b>Chưa chơi</b> → <b>Dùng bộ này</b>.</li>
+  <li>Đặt tên 2 đội; bật “Bấm chuông” nếu muốn.</li>
+  <li>Bấm <b>Thử âm thanh</b>, chọn mức lớp; kiểm tra Light show.</li>
+  <li><kbd>F</kbd> toàn màn hình.</li>
+</ol>
+<h3>Trong giờ</h3>
+<ol>
+  <li><b>Bắt đầu</b> → đếm 3-2-1 → bấm chuông (Q/P).</li>
+  <li>Học sinh nói → gõ → <kbd>Enter</kbd>.</li>
+  <li>Đồng nghĩa lạ → bấm tay vào ô.</li>
+  <li>Hết vòng: giảng từ mới → <kbd>N</kbd>.</li>
+  <li>Bấm nhầm → <kbd>U</kbd>.</li>
+</ol>
+<h3>Sau giờ</h3>
+<ol>
+  <li>Màn kết quả: đọc giải MVP, <b>Xuất kết quả</b> nếu cần lưu điểm.</li>
+  <li>Ghi lại từ đồng nghĩa học sinh hay nói → thêm vào Sheet (<code>A / B</code>).</li>
+  <li>Mỗi tháng: <b>Sao lưu thư viện</b> → cất lên Drive.</li>
+</ol>
+<h3>Làm việc với Claude</h3>
+<ul style="margin:2pt 0;padding-left:14pt">
+  <li>Mở phiên mới → gõ “<b>tiếp tục</b>”.</li>
+  <li>Câu hỏi mới → “thêm 1 bộ Movers…” → duyệt Y.</li>
+  <li>Đổi tài khoản → “<b>bàn giao</b>” trước.</li>
+  <li>Bản mới → “chép game ra Desktop”.</li>
+</ul>
+</div>
+</div>
+<p class="small" style="margin-top:6pt">Link game: trantrungg135family-tech.github.io/HSK/classroom-feud/Classroom-Feud.html · Sheet: docs.google.com/spreadsheets/d/17W9UR-HAxUWoh-Lb8RQV37EIOTfJ30ZDTOHhBDUfOv8 · Repo: github.com/trantrungg135family-tech/HSK</p>
+</section>
+
+</body>
+</html>
